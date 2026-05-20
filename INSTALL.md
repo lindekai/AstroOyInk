@@ -69,6 +69,31 @@ Spring direkt zu Schritt 3.
 > CS, weil er nur HIGH-aktiv kurz nach dem Boot ist) und Pins, die mit
 > Flash/PSRAM belegt sind (6–11).
 
+### Optional: Batterieanzeige
+
+Wenn du einen LiPo-Akku anschließen und den Ladestand anzeigen willst,
+baue einen Spannungsteiler zwischen Akku-Plus und GPIO34:
+
+```
+Akku+ ── 100 kΩ ── GPIO34 ── 100 kΩ ── GND
+```
+
+| Verbindung | Bemerkung |
+|---|---|
+| Akku+ → 100 kΩ → GPIO34 | Spannungsteiler-Mitte an GPIO34 |
+| GPIO34 → 100 kΩ → GND | Spannungsteiler-Ende |
+| Akku+ direkt an ESP32-VBAT / 3V3-Ladepin | je nach deinem Lademodul |
+
+Danach in `config.h` aktivieren:
+
+```cpp
+#define BATT_ENABLED         1
+#define BATT_ADC_PIN         34
+#define BATT_VOLTAGE_DIVIDER 2.0f
+```
+
+Ohne Akku: `BATT_ENABLED 0` lassen — dann wird kein Widget gezeichnet.
+
 ---
 
 ## 3. Arduino IDE installieren
@@ -264,7 +289,7 @@ Direkt nach dem Hochladen passiert Folgendes:
 | Serielle Ausgabe: `[API] JSON parse error: NoMemory` | ArduinoJson **6.x** statt **7.x** installiert. Im Library Manager auf 7.x updaten. |
 | Anzeige steht **stundenlang still**, kein Update | Im seriellen Monitor prüfen (USB anschließen → RST drücken). Gerät kommt aus Deep-Sleep nur über internen Timer; bei stark verbrauchter Batterie ggf. neu laden. |
 | Sommer/Winter-Zeit stimmt nicht | `TIMEZONE_POSIX` in `config.h` korrekt gesetzt? Default `CET-1CEST,M3.5.0,M10.5.0/3` ist für Mitteleuropa korrekt. |
-| Kompilierfehler `'GxEPD2_750c_Z08' was not declared` | Display-Variante prüfen: V3-BWR braucht `GxEPD2_750c_Z90c` — in `display_renderer.cpp` umbenennen. |
+| Kompilierfehler `'GxEPD2_750c_Z08' was not declared` | GxEPD2-Bibliothek auf ≥ 1.5.x aktualisieren. Für 800×480 B/W/R ist `Z08` korrekt (in `src/rendering/display_base.cpp`). |
 | Kompilierfehler `'JsonDocument' was not declared` | ArduinoJson **7.x** notwendig. Update über Library Manager. |
 | Display sieht aus wie gewünscht, aber **Werte sehen falsch aus** | Koordinaten geprüft? Lat/Lon vertauscht? Der erste Test: `LOCATION_LAT=52.52` und `LOCATION_LON=13.405` sollte „Berlin" plausibles Wetter geben. |
 

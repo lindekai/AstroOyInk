@@ -5,8 +5,8 @@
 > Telemetrie deiner N.I.N.A.-Aufnahmesession. Wechsel automatisch, je nach
 > dem, ob N.I.N.A. im Netz erreichbar ist.
 
-[![Host Tests](https://github.com/CHANGE-ME/AstroOyInk/actions/workflows/test.yml/badge.svg)](https://github.com/CHANGE-ME/AstroOyInk/actions/workflows/test.yml)
-[![Arduino Build](https://github.com/CHANGE-ME/AstroOyInk/actions/workflows/arduino-compile.yml/badge.svg)](https://github.com/CHANGE-ME/AstroOyInk/actions/workflows/arduino-compile.yml)
+[![Host Tests](https://github.com/lindekai/AstroOyInk/actions/workflows/test.yml/badge.svg)](https://github.com/lindekai/AstroOyInk/actions/workflows/test.yml)
+[![Arduino Build](https://github.com/lindekai/AstroOyInk/actions/workflows/arduino-compile.yml/badge.svg)](https://github.com/lindekai/AstroOyInk/actions/workflows/arduino-compile.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Warum „AstroOyInk“?
@@ -63,22 +63,24 @@ ist nach der Roadmap geplant (siehe unten).
 
 ## Inhaltsverzeichnis
 
-1. [Was es kann](#was-es-kann)
-2. [Hardware](#hardware)
-3. [Display-Layout im WEATHER-Modus](#display-layout-im-weather-modus)
-4. [Installation](#installation)
-5. [Projektstruktur](#projektstruktur)
-6. [Konfiguration](#konfiguration)
-7. [Tests](#tests)
-8. [Roadmap](#roadmap)
-9. [Vorgeschichte: AstroWeatherEPD](#vorgeschichte-astroweatherepd)
-10. [Lizenz](#lizenz)
+1. [Warum „AstroOyInk"?](#warum-astrooyink)
+2. [Was es kann](#was-es-kann)
+3. [Hardware](#hardware)
+4. [Display-Layout im WEATHER-Modus](#display-layout-im-weather-modus)
+5. [Installation](#installation)
+6. [Projektstruktur](#projektstruktur)
+7. [Konfiguration](#konfiguration)
+8. [Tests](#tests)
+9. [Roadmap](#roadmap)
+10. [Vorgeschichte: AstroWeatherEPD](#vorgeschichte-astroweatherepd)
+11. [Credits](#credits)
+12. [Lizenz](#lizenz)
 
 ---
 
 ## Was es kann
 
-### Heute (v0.1.0 — WEATHER-Modus)
+### Heute (WEATHER-Modus)
 
 - ✅ Stündliches Update von Open-Meteo (kein API-Key)
 - 🌙 Mondberechnung lokal nach Meeus (Phase, Illumination, Höhe, Himmelsaufhellung)
@@ -86,12 +88,12 @@ ist nach der Roadmap geplant (siehe unten).
 - 🕘 Echtes Nachtfenster (Sonnenuntergang +2h … Sonnenaufgang −2h)
 - ⚠️ Wind- und Tau-Warnungen (>25 km/h, >90 % Feuchte)
 - 📊 Dashboard mit Nacht-Verlauf, Stundenwerten, 24h-Charts, 5-Tage-Vorschau
-- 🔋 Deep-Sleep zwischen Updates
+- 💤 Deep-Sleep zwischen Updates
 - 🎨 3-Color-Design ohne Grün (Sterne + Outline statt grüner Ampelfarbe)
+- 🔋 Batterieanzeige im Header (LiPo-Ladestand, USB-Erkennung, rot bei < 20 %)
 
 ### Geplant (siehe Roadmap)
 
-- 🔋 Batterieanzeige
 - 📶 WiFiManager (Captive Portal)
 - 📤 OTA-Updates
 - 🌡️ Lokaler BME280/DHT22-Sensor
@@ -112,7 +114,7 @@ ist nach der Roadmap geplant (siehe unten).
 ## Display-Layout im WEATHER-Modus
 
 ```
-┌─── Saarmund ────────── 01:18 ───────── Update 01:18 ────┐
+┌─── Saarmund ─── 01:18 ─── [████  ] 72%  Update 01:18 ──┐
 │ AKTUELL          │ NACHT-BEWERTUNG    │ MOND            │
 │  🌙  3.7°C       │  ┌──┐   GUT        │ 🌒 Zun. Sichel  │
 │      6 km/h     │  │0%│  ★★★★★      │    25 % beleucht │
@@ -154,7 +156,8 @@ AstroOyInk/
 │   │   ├── data_types.h
 │   │   ├── time_utils.h/.cpp
 │   │   ├── astro_logic.h/.cpp
-│   │   └── moon_calc.h/.cpp
+│   │   ├── moon_calc.h/.cpp
+│   │   └── battery.h/.cpp         # Batteriemessung (Roadmap #1)
 │   │
 │   ├── data_sources/
 │   │   └── weather_api.h/.cpp     # Open-Meteo
@@ -189,6 +192,11 @@ Alles in `config.h`:
 #define TIMEZONE_POSIX  "CET-1CEST,M3.5.0,M10.5.0/3"
 #define REFRESH_INTERVAL_S   3600UL
 #define DEBUG_MODE      1
+
+// Batterieanzeige (optionaler LiPo-Akku)
+#define BATT_ENABLED         1       // 0 = deaktiviert
+#define BATT_ADC_PIN         34      // GPIO34, input-only
+#define BATT_VOLTAGE_DIVIDER 2.0f    // 100k + 100k Spannungsteiler
 ```
 
 ## Tests
