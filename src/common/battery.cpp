@@ -1,6 +1,8 @@
 // =====================================================================
 //  src/common/battery.cpp
 //  ADC-Lesung und LiPo-Entladekurve fuer die Batterieanzeige.
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #include "battery.h"
 #include "config.h"

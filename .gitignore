@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Arduino IDE Build-Artefakte
+*.elf
+*.bin
+*.hex
+*.map
+*.eep
+build/
+
+# Host-Test-Binaries
+tests/build/
+
+# Geheime Zugangsdaten (nie committen!)
+secrets.h

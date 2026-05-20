@@ -1,5 +1,7 @@
 // =====================================================================
 //  time_utils.cpp
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #include "time_utils.h"
 #include "config.h"

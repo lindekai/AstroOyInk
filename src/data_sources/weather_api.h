@@ -1,6 +1,8 @@
 // =====================================================================
 //  weather_api.h
-//  Lädt und parst die Open-Meteo-Vorhersage.
+//  Laedt und parst die Open-Meteo-Vorhersage.
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #ifndef ASTRO_WEATHER_API_H
 #define ASTRO_WEATHER_API_H

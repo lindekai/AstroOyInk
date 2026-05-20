@@ -4,8 +4,15 @@ Alle relevanten Änderungen am Projekt.
 
 ## [Unreleased]
 
-### Geplant (in dieser Reihenfolge)
-- 🔋 Batterieanzeige im Header (ADC)
+### Hinzugefügt
+- 🔋 **Batterieanzeige im Header** — `src/common/battery.h/.cpp`
+  LiPo-Lookup-Tabelle (8 Stützpunkte), 16× ADC-Oversampling GPIO34,
+  USB-Erkennung (V > 4,3 V). Icon + %, rot bei < 20 %, USB-Label
+  bei USB-Betrieb. Spannungsteiler 100k+100k in `config.h` konfigurierbar.
+- 📄 `.gitignore` für .DS_Store, Build-Artefakte und `secrets.h`
+- 👤 Autor (Kai Linde) und Credits (Dark Matters Discord) in allen Quelldateien
+
+### Geplant (verbleibend)
 - 📶 WiFiManager / Captive-Portal-Konfiguration
 - 📤 OTA-Updates
 - 🌡️ Lokaler Sensor (BME280 / DHT22)

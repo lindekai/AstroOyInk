@@ -10,6 +10,9 @@
 //   - Update-Intervall
 //   - Zeitzone (Europe/Berlin inkl. Sommerzeit)
 //   - (später) N.I.N.A.-Host für den Session-Modus
+//
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #ifndef ASTROOYINK_CONFIG_H
 #define ASTROOYINK_CONFIG_H

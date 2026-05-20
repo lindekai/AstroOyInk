@@ -1,5 +1,7 @@
 // =====================================================================
 //  astro_logic.cpp
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #include "astro_logic.h"
 #include "config.h"

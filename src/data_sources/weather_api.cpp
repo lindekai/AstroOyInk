@@ -10,6 +10,8 @@
 //     Zertifikatsprüfung – das ist akzeptabel, weil die Daten öffentlich
 //     sind und nicht sicherheitskritisch.
 //   - JSON-Filter reduzieren den RAM-Bedarf erheblich.
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #include "weather_api.h"
 #include "time_utils.h"

@@ -1,6 +1,8 @@
 // =====================================================================
 //  astro_logic.h
 //  Berechnung des Wolken-Scores und der Nacht-Bewertung.
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #ifndef ASTRO_LOGIC_H
 #define ASTRO_LOGIC_H

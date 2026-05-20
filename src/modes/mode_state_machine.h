@@ -14,7 +14,9 @@
 //                        Inaktivität seit letztem Bild
 //
 //  Aktueller Status: SKELETT. Die Detection-Funktion liefert immer
-//  MODE_WEATHER. Wird in einem späteren Feature scharf geschaltet.
+//  MODE_WEATHER. Wird in einem spaeeteren Feature scharf geschaltet.
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #ifndef ASTROOYINK_MODE_STATE_MACHINE_H
 #define ASTROOYINK_MODE_STATE_MACHINE_H

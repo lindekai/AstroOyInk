@@ -205,7 +205,7 @@ bekannte Mondereignisse 2026.
 
 In dieser Reihenfolge geplant:
 
-1. 🔋 Batterieanzeige im Header (ADC)
+1. ~~🔋 Batterieanzeige im Header (ADC)~~ ✅
 2. 📶 WiFiManager (Captive Portal)
 3. 📤 OTA-Updates
 4. 🌡️ Lokaler Sensor (BME280 / DHT22)
@@ -222,6 +222,13 @@ AstroOyInk geht aus dem Vorgängerprojekt **AstroWeatherEPD v1.0** hervor.
 Dort wurde der WEATHER-Modus ursprünglich entwickelt. Wenn dich der Weg
 dorthin interessiert: siehe `CHANGELOG.md`. Das frühere Repo wurde nicht
 veröffentlicht — AstroOyInk ist die offizielle Linie.
+
+## Credits
+
+**Autor:** Kai Linde  
+**Community:** Dark Matters Discord
+
+---
 
 ## Lizenz
 

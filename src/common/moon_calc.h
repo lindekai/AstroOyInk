@@ -2,7 +2,9 @@
 //  moon_calc.h
 //  Berechnung von Mondphase, Illumination und Mondhöhe.
 //  Nach J. Meeus "Astronomical Algorithms" (vereinfacht).
-//  Genauigkeit: Phase ±0.1 %, Höhe ±1° – reicht für Astro-Planung locker.
+//  Genauigkeit: Phase ±0.1 %, Höhe ±1° – reicht fuer Astro-Planung locker.
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #ifndef ASTRO_MOON_CALC_H
 #define ASTRO_MOON_CALC_H

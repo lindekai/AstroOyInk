@@ -1,5 +1,7 @@
 // =====================================================================
 //  time_utils.h
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #ifndef ASTRO_TIME_UTILS_H
 #define ASTRO_TIME_UTILS_H

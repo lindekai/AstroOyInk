@@ -2,6 +2,8 @@
 //  src/common/battery.h
 //  Liest den LiPo-Ladestand ueber den internen ADC des ESP32.
 //  Externer Spannungsteiler: Akku+ → 100k → BATT_ADC_PIN → 100k → GND
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #ifndef ASTROOYINK_BATTERY_H
 #define ASTROOYINK_BATTERY_H

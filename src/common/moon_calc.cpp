@@ -1,6 +1,8 @@
 // =====================================================================
 //  moon_calc.cpp
 //  Implementierung nach Meeus (vereinfacht).
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #include "moon_calc.h"
 #include <math.h>

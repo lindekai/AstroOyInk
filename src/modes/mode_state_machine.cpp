@@ -3,6 +3,8 @@
 //
 //  Stub-Implementierung. Wird mit der Session-Integration scharf
 //  geschaltet (Roadmap-Punkt nach Feature 1-7).
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #include "mode_state_machine.h"
 

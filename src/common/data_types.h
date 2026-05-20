@@ -3,6 +3,8 @@
 //  Strukturen für Wetter- und Astrodaten.
 //  Bewusst flach gehalten (POD), damit ArduinoJson direkt befüllen kann
 //  und der Speicherbedarf vorhersagbar bleibt.
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #ifndef ASTRO_DATA_TYPES_H
 #define ASTRO_DATA_TYPES_H

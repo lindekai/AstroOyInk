@@ -14,6 +14,8 @@
 //    Basis-Funktionen (displayInit, displaySleep, waitBusyManual, gemein-
 //    same Zeichen-Helper). Aktuell bleibt alles hier zusammen, um das
 //    funktionierende v1.0-Verhalten nicht zu brechen.
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 #ifndef ASTROOYINK_DISPLAY_BASE_H
 #define ASTROOYINK_DISPLAY_BASE_H

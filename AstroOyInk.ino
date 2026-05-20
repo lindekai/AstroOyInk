@@ -15,6 +15,9 @@
 //  Produktiv (DEBUG_MODE=0):  Zyklus in setup(), danach Deep-Sleep.
 //  Debug    (DEBUG_MODE=1):  Zyklus in setup() UND in loop() alle 30 s,
 //                            kein Deep-Sleep → Serial Monitor bleibt an.
+//
+//  Author:  Kai Linde
+//  Credits: Dark Matters Discord
 // =====================================================================
 
 #include <Arduino.h>
