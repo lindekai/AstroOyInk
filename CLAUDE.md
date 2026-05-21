@@ -26,10 +26,10 @@ ESP32, das **automatisch zwischen zwei Modi wechselt**:
 Beide Modi laufen auf **dem gleichen Gerät**. Der Modus wird zu Beginn
 jedes Zyklus neu ermittelt (siehe `src/modes/mode_state_machine.cpp`).
 
-> **Aktueller Status:** v0.1.0 — der WEATHER-Modus läuft komplett wie in
-> AstroWeatherEPD v1.0. Die State-Machine ist als Skelett vorbereitet,
-> liefert aber immer `MODE_WEATHER`. Der SESSION-Modus wird nach Roadmap-
-> Punkten 1-7 (siehe unten) implementiert.
+> **Aktueller Status:** Roadmap-Punkte 1–3 abgeschlossen (Batterieanzeige,
+> WiFiManager, OTA). Der WEATHER-Modus läuft komplett. Die State-Machine ist
+> als Skelett vorbereitet, liefert aber immer `MODE_WEATHER`. Der SESSION-Modus
+> wird nach Roadmap-Punkten 4–7 implementiert.
 
 ## Vorgeschichte
 
@@ -64,7 +64,8 @@ Beschränkung. Bibliotheken (alle über Library Manager):
 | `GxEPD2`            | ≥1.5.x | E-Paper Treiber |
 | `Adafruit GFX`      | ≥1.11  | Schriften, Primitive |
 | `ArduinoJson`       | **7.x**  | API-JSON |
-| WiFi / HTTPClient / WiFiClientSecure | im ESP32-Core | HTTPS |
+| `WiFiManager`       | ≥2.0 (tzapu) | Captive Portal |
+| WiFi / HTTPClient / WiFiClientSecure / ArduinoOTA | im ESP32-Core | HTTPS + OTA |
 
 ESP32-Boardpaket: Espressif, ≥2.0.14.
 
@@ -82,7 +83,10 @@ AstroOyInk/
 │   │   │                          # MoonInfo, WeatherData (Sammelstruktur)
 │   │   ├── time_utils.h/.cpp      # NTP via configTzTime, ISO-Parser
 │   │   ├── astro_logic.h/.cpp     # Cloud-Score, Nachtfenster, Verdict
-│   │   └── moon_calc.h/.cpp       # Meeus-Mondberechnung
+│   │   ├── moon_calc.h/.cpp       # Meeus-Mondberechnung
+│   │   ├── battery.h/.cpp         # LiPo-Ladestand (ADC + Lookup-Tabelle)
+│   │   ├── app_config.h/.cpp      # NVS-Konfiguration (Preferences)
+│   │   └── ota_updater.h/.cpp     # ArduinoOTA-Fenster nach WLAN-Connect
 │   │
 │   ├── data_sources/              # External APIs / Datenquellen
 │   │   └── weather_api.h/.cpp     # Open-Meteo Client
@@ -152,10 +156,12 @@ keine zwei Dateien gleichen Namens in verschiedenen Unterordnern.
 
 ```
 1. displayInit()           → SPI + Panel-Init
-2. connectWiFi()           → STA, max 20 s
-3. timeSyncNTP()           → configTzTime + 3 NTP-Server
-4. detectCurrentMode()     → aktuell: immer MODE_WEATHER
-5+6. switch(mode):
+2. loadConfig()            → NVS lesen (Preferences) oder config.h-Defaults
+3. connectWithPortal()     → WiFiManager autoConnect + Captive Portal
+3b. otaSetup() + otaWaitWindow(30s)  → ArduinoOTA-Fenster fuer Firmware-Update
+4. timeSyncNTP(tz)         → configTzTime + 3 NTP-Server
+5. detectCurrentMode()     → aktuell: immer MODE_WEATHER
+6+7. switch(mode):
    - MODE_WEATHER:
        fetchWeather()            → Open-Meteo HTTPS-Client
        computeAstroSummary()     → Cloud-Score, Verdict, Warnungen
@@ -218,9 +224,9 @@ Penalty: Wind > 25 km/h ODER humidity > 90 % → eine Stufe schlechter
 
 In dieser Reihenfolge geplant (Reihenfolge vom Nutzer gewählt):
 
-1. 🔋 **Batterieanzeige** im Header (ADC-Spannungsteiler)
-2. 📶 **WiFiManager** (Captive Portal statt hardcoded SSID)
-3. 📤 **OTA-Updates** (ArduinoOTA)
+1. ~~🔋 **Batterieanzeige** im Header (ADC-Spannungsteiler)~~ ✅
+2. ~~📶 **WiFiManager** (Captive Portal statt hardcoded SSID)~~ ✅
+3. ~~📤 **OTA-Updates** (ArduinoOTA)~~ ✅
 4. 🌡️ **Lokaler Sensor** (BME280 / DHT22) für Tau-Berechnung am Standort
 5. 🪐 **7Timer! Seeing & Transparenz** zusätzlich zu Open-Meteo
 6. 🛰️ **ISS / Starlink Überflüge** für die Session-Vorschau

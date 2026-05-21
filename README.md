@@ -92,11 +92,10 @@ ist nach der Roadmap geplant (siehe unten).
 - 🎨 3-Color-Design ohne Grün (Sterne + Outline statt grüner Ampelfarbe)
 - 🔋 Batterieanzeige im Header (LiPo-Ladestand, USB-Erkennung, rot bei < 20 %)
 - 📶 WiFiManager: Captive Portal bei fehlendem/falschem WLAN — alle Parameter (Ort, Lat/Lon, Zeitzone, Intervall, N.I.N.A.) ohne Re-Flash konfigurierbar
+- 📤 OTA-Updates: 30-s-Flashfenster nach jedem WLAN-Connect — Firmware-Update aus der Arduino IDE ohne USB-Kabel
 
 ### Geplant (siehe Roadmap)
 
-- 📶 WiFiManager (Captive Portal)
-- 📤 OTA-Updates
 - 🌡️ Lokaler BME280/DHT22-Sensor
 - 🪐 7Timer! Seeing & Transparenz
 - 🛰️ ISS / Starlink-Überflüge
@@ -159,7 +158,8 @@ AstroOyInk/
 │   │   ├── astro_logic.h/.cpp
 │   │   ├── moon_calc.h/.cpp
 │   │   ├── battery.h/.cpp         # Batteriemessung (Roadmap #1)
-│   │   └── app_config.h/.cpp      # NVS-Konfiguration (Roadmap #2)
+│   │   ├── app_config.h/.cpp      # NVS-Konfiguration (Roadmap #2)
+│   │   └── ota_updater.h/.cpp     # OTA-Flashfenster (Roadmap #3)
 │   │
 │   ├── data_sources/
 │   │   └── weather_api.h/.cpp     # Open-Meteo
@@ -217,7 +217,7 @@ In dieser Reihenfolge geplant:
 
 1. ~~🔋 Batterieanzeige im Header (ADC)~~ ✅
 2. ~~📶 WiFiManager (Captive Portal)~~ ✅
-3. 📤 OTA-Updates
+3. ~~📤 OTA-Updates~~ ✅
 4. 🌡️ Lokaler Sensor (BME280 / DHT22)
 5. 🪐 7Timer! Seeing & Transparenz
 6. 🛰️ ISS / Starlink Überflüge

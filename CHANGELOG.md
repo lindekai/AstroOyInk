@@ -14,11 +14,16 @@ Alle relevanten Änderungen am Projekt.
   Refresh-Intervall, N.I.N.A. Host+Port. Einstellungen in NVS gespeichert
   (`src/common/app_config.h/.cpp`). AP-Name `AstroOyInk-XXXXXX`.
   E-Paper zeigt Verbindungsanleitung während Portal läuft.
+- 📤 **OTA-Updates** — `src/common/ota_updater.h/.cpp`
+  ArduinoOTA-Integration. Nach jedem WLAN-Connect wird ein 30-s-Fenster
+  geöffnet, in dem ein Firmware-Update per Netzwerk aus der Arduino IDE
+  eingespielt werden kann. Hostname `astrooyink` (erreichbar als
+  `astrooyink.local` via mDNS). Optionales Passwort über `OTA_PASSWORD`
+  in `config.h` konfigurierbar.
 - 📄 `.gitignore` für .DS_Store, Build-Artefakte und `secrets.h`
 - 👤 Autor (Kai Linde) und Credits (Dark Matters Discord) in allen Quelldateien
 
 ### Geplant (verbleibend)
-- 📤 OTA-Updates
 - 🌡️ Lokaler Sensor (BME280 / DHT22)
 - 🪐 Seeing- & Transparenz-Daten via 7Timer!
 - 🛰️ ISS / Starlink-Überflüge

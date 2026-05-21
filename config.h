@@ -122,4 +122,17 @@
 // #define LOCAL_SENSOR_ENABLED 0
 // #define LOCAL_SENSOR_TYPE    "BME280"   // oder "DHT22"
 
+// ---------------------------------------------------------------------
+//  OTA-Updates (Feature 3)
+//  Hostname: mDNS-Name unter dem das Geraet im Netzwerk erreichbar ist
+//            (z. B. flash via Arduino IDE → "astrooyink.local").
+//  Password: leer lassen fuer kein Passwort (nicht empfohlen im
+//            Heimnetz mit fremden Gaesten).
+//  Fenster:  Millisekunden nach dem WLAN-Connect, in denen ein
+//            Update aus der Arduino IDE eingespielt werden kann.
+// ---------------------------------------------------------------------
+#define OTA_HOSTNAME    "astrooyink"
+#define OTA_PASSWORD    ""
+#define OTA_WINDOW_MS   30000UL
+
 #endif // ASTROOYINK_CONFIG_H

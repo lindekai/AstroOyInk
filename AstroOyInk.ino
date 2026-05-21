@@ -8,6 +8,7 @@
 //    1) Display-Init
 //    2) Konfiguration aus NVS laden (oder config.h-Defaults)
 //    3) WiFi via WiFiManager verbinden (bei Fehler: Captive Portal)
+//    3b) OTA-Fenster (30 s) fuer Firmware-Updates per Netzwerk
 //    4) NTP-Zeit synchronisieren
 //    5) Modus ermitteln (detectCurrentMode)
 //    6) Modus-spezifisch: Daten holen + rendern
@@ -34,6 +35,7 @@
 #include "moon_calc.h"
 #include "battery.h"
 #include "app_config.h"
+#include "ota_updater.h"
 
 // data sources
 #include "weather_api.h"
@@ -255,6 +257,13 @@ static void doCycle() {
   // 3) WiFi mit Captive Portal
   Serial.println("[STEP 3] WiFi / Portal ...");
   bool wifiOk = connectWithPortal();
+
+  // 3b) OTA-Fenster: 30 s nach WLAN-Connect fuer Firmware-Updates offenhalten
+  if (wifiOk) {
+    Serial.println("[STEP 3b] OTA ...");
+    otaSetup(OTA_HOSTNAME, OTA_PASSWORD);
+    otaWaitWindow(OTA_WINDOW_MS);
+  }
 
   // 4) NTP mit der (ggf. vom Portal aktualisierten) Zeitzone
   bool timeOk = false;

@@ -19,8 +19,9 @@ auch wenn du **noch nie etwas mit Arduino oder ESP32 gemacht hast**.
 8. [Board und Port auswählen](#8-board-und-port-auswählen)
 9. [Kompilieren und Flashen](#9-kompilieren-und-flashen)
 10. [WLAN per Captive Portal konfigurieren](#10-wlan-per-captive-portal-konfigurieren)
-11. [Erstes Startverhalten](#11-erstes-startverhalten-nach-wlan-konfiguration)
-12. [Fehlerbehebung](#12-fehlerbehebung)
+11. [OTA-Updates (Firmware per Netzwerk)](#11-ota-updates-firmware-per-netzwerk)
+12. [Erstes Startverhalten](#12-erstes-startverhalten-nach-wlan-konfiguration)
+13. [Fehlerbehebung](#13-fehlerbehebung)
 
 ---
 
@@ -272,7 +273,62 @@ Verbindungsanleitung auf dem E-Paper:
 
 ---
 
-## 11. Erstes Startverhalten (nach WLAN-Konfiguration)
+## 11. OTA-Updates (Firmware per Netzwerk)
+
+Mit OTA (Over-The-Air) kannst du neue Firmware einspielen, **ohne den ESP32
+per USB anzuschließen** — solange er im WLAN eingebucht ist.
+
+### Voraussetzung
+
+Arduino IDE 2.x ist geöffnet und im gleichen WLAN wie der ESP32.
+**ArduinoOTA** ist Bestandteil des ESP32-Cores und muss nicht separat
+installiert werden.
+
+### Wie es funktioniert
+
+Nach jedem WLAN-Connect öffnet AstroOyInk **30 Sekunden** lang ein
+OTA-Empfangsfenster. In dieser Zeit ist der ESP32 als
+**`astrooyink`** (mDNS: `astrooyink.local`) im Netz sichtbar.
+
+### OTA-Update einspielen
+
+1. ESP32 starten (USB-Strom reicht, kein Datenkabel nötig).
+2. Im Seriellen Monitor (optional) siehst du:
+   ```
+   [OTA] Bereit — Hostname: 'astrooyink'
+   [OTA] Wartenfenster 30000 ms ...
+   ```
+3. In der Arduino IDE: **Werkzeuge → Port** — dort erscheint zusätzlich
+   zum COM-Port ein Netzwerk-Eintrag `astrooyink at 192.168.x.x`.
+   Diesen auswählen.
+4. Sketch wie gewohnt hochladen (→). Der Upload läuft nun per Netzwerk.
+5. Nach dem Update startet der ESP32 automatisch neu.
+
+> **Fenster verpasst?** Kein Problem — beim nächsten Aufwachen aus dem
+> Deep-Sleep öffnet sich das Fenster erneut für 30 Sekunden.
+
+### Passwort setzen (optional)
+
+In `config.h`:
+
+```cpp
+#define OTA_PASSWORD    "meinGeheimesPasswort"
+```
+
+Die Arduino IDE fragt dann beim ersten OTA-Upload nach dem Passwort.
+Leer lassen (`""`) deaktiviert den Passwortschutz.
+
+### Hostname ändern
+
+```cpp
+#define OTA_HOSTNAME    "mein-astro-display"
+```
+
+Der ESP32 ist dann als `mein-astro-display.local` erreichbar.
+
+---
+
+## 12. Erstes Startverhalten (nach WLAN-Konfiguration)
 
 Direkt nach dem Hochladen passiert Folgendes:
 
@@ -312,7 +368,7 @@ Direkt nach dem Hochladen passiert Folgendes:
 
 ---
 
-## 12. Fehlerbehebung
+## 13. Fehlerbehebung
 
 | Symptom | Mögliche Ursache & Lösung |
 |---|---|
