@@ -44,10 +44,6 @@ Alle relevanten Änderungen am Projekt.
   Benötigt: „Adafruit BME280 Library" + „Adafruit Unified Sensor".
 
 ### Geplant (verbleibend)
-- 🪐 Seeing- & Transparenz-Daten via 7Timer!
-
-- 🛰️ ISS / Starlink-Überflüge
-- 📷 Screenshot-Export auf SD-Karte
 - 🔭 **SESSION-Modus** über N.I.N.A. Advanced API
 
 ---

@@ -98,9 +98,6 @@ ist nach der Roadmap geplant (siehe unten).
 - 🛰️ ISS-Überflüge: nächster Pass rechts in der FAZIT-Zeile (open-notify.org, kein Key)
 
 ### Geplant (siehe Roadmap)
-- 🪐 7Timer! Seeing & Transparenz
-- 🛰️ ISS / Starlink-Überflüge
-- 📷 Screenshot auf SD
 - 🔭 **N.I.N.A.-Session-Modus** über die Advanced API
 
 ## Hardware
@@ -225,7 +222,7 @@ In dieser Reihenfolge geplant:
 4. ~~🌡️ Lokaler Sensor (BME280)~~ ✅
 5. ~~🪐 7Timer! Seeing & Transparenz~~ ✅
 6. ~~🛰️ ISS-Überflüge~~ ✅
-7. 📷 Screenshot-Export auf SD
+7. ~~📷 Screenshot-Export auf SD~~ *(entfällt)*
 8. 🔭 **SESSION-Modus** (N.I.N.A. Advanced API)
 
 Siehe [CHANGELOG.md](CHANGELOG.md) für die Versionshistorie.

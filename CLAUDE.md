@@ -28,9 +28,10 @@ jedes Zyklus neu ermittelt (siehe `src/modes/mode_state_machine.cpp`).
 
 > **Aktueller Status:** Roadmap-Punkte 1–6 abgeschlossen (Batterieanzeige,
 > WiFiManager, OTA, BME280-Innensensor, 7Timer! Seeing & Transparenz,
-> ISS-Überflüge). Der WEATHER-Modus läuft komplett. Die State-Machine ist
-> als Skelett vorbereitet, liefert aber immer `MODE_WEATHER`. Der
-> SESSION-Modus wird nach Roadmap-Punkt 7 implementiert.
+> ISS-Überflüge). Punkt 7 (SD-Screenshot) wurde bewusst gestrichen.
+> Der WEATHER-Modus läuft komplett. Die State-Machine ist als Skelett
+> vorbereitet, liefert aber immer `MODE_WEATHER`. Als nächstes folgt
+> Punkt 8: SESSION-Modus via N.I.N.A. Advanced API.
 
 ## Vorgeschichte
 
@@ -234,8 +235,8 @@ In dieser Reihenfolge geplant (Reihenfolge vom Nutzer gewählt):
 4. ~~🌡️ **Lokaler Sensor** (BME280, I2C) — Innen-Temp/Feuchte/Druck~~ ✅
 5. ~~🪐 **7Timer! Seeing & Transparenz** — rote Kurven im Nacht-Chart~~ ✅
 6. ~~🛰️ **ISS-Überflüge** — open-notify.org, nächster Pass in FAZIT-Zeile~~ ✅
-7. 📷 **Screenshot-Export** auf SD-Karte
-8. 🔭 **SESSION-Modus**: N.I.N.A. Advanced API anzapfen (Punkt 8 = der grosse Brocken)
+7. ~~📷 **Screenshot-Export** auf SD-Karte~~ *(entfällt — bewusst gestrichen)*
+8. 🔭 **SESSION-Modus**: N.I.N.A. Advanced API anzapfen (der grosse Brocken)
 
 > **Workflow für Claude Code:** Pro Roadmap-Punkt erst Detailfragen mit
 > dem Nutzer klären, *dann* implementieren. Nicht voreilig anfangen.
