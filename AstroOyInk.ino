@@ -1,16 +1,17 @@
 // =====================================================================
 //  AstroOyInk.ino
-//  Astro-Display für Astrofotografen.  Zwei Modi:
+//  Astro-Display fuer Astrofotografen.  Zwei Modi:
 //    - WEATHER:  Astro-Wetter-Dashboard (Open-Meteo + Mond)
 //    - SESSION:  N.I.N.A.-Live-Anzeige  (geplant, siehe Roadmap)
 //
 //  Ablauf pro Zyklus:
 //    1) Display-Init
-//    2) WLAN verbinden
-//    3) NTP-Zeit synchronisieren
-//    4) Modus ermitteln (detectCurrentMode)
-//    5) Modus-spezifisch: Daten holen + rendern
-//    6) Display in Hibernate
+//    2) Konfiguration aus NVS laden (oder config.h-Defaults)
+//    3) WiFi via WiFiManager verbinden (bei Fehler: Captive Portal)
+//    4) NTP-Zeit synchronisieren
+//    5) Modus ermitteln (detectCurrentMode)
+//    6) Modus-spezifisch: Daten holen + rendern
+//    7) Display in Hibernate
 //
 //  Produktiv (DEBUG_MODE=0):  Zyklus in setup(), danach Deep-Sleep.
 //  Debug    (DEBUG_MODE=1):  Zyklus in setup() UND in loop() alle 30 s,
@@ -22,6 +23,7 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiManager.h>
 
 #include "config.h"
 
@@ -31,6 +33,7 @@
 #include "astro_logic.h"
 #include "moon_calc.h"
 #include "battery.h"
+#include "app_config.h"
 
 // data sources
 #include "weather_api.h"
@@ -42,35 +45,85 @@
 #include "display_base.h"
 
 // ---------------------------------------------------------------------
-//  Persistente Daten über Deep-Sleep hinweg (RTC-RAM)
+//  Persistente Daten ueber Deep-Sleep hinweg (RTC-RAM)
 // ---------------------------------------------------------------------
-RTC_DATA_ATTR uint32_t bootCount = 0;
+RTC_DATA_ATTR uint32_t bootCount       = 0;
 RTC_DATA_ATTR bool     hasEverRendered = false;
 
-// ---------------------------------------------------------------------
-//  WLAN verbinden mit Reconnect-Logik
-// ---------------------------------------------------------------------
-static bool connectWiFi() {
-  Serial.printf("[WIFI] Connecting to %s ...\n", WIFI_SSID);
-  WiFi.persistent(false);
-  WiFi.mode(WIFI_STA);
-  WiFi.setAutoReconnect(true);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+// Laufzeit-Konfiguration (aus NVS oder config.h-Defaults)
+static AppConfig g_cfg;
 
-  uint32_t start = millis();
-  while (WiFi.status() != WL_CONNECTED && (millis() - start) < WIFI_TIMEOUT_MS) {
-    delay(250);
-    Serial.print(".");
-  }
-  Serial.println();
+// ---------------------------------------------------------------------
+//  WiFi + Captive Portal (WiFiManager)
+// ---------------------------------------------------------------------
+static bool connectWithPortal() {
+  WiFiManager wm;
+#if !DEBUG_MODE
+  wm.setDebugOutput(false);
+#endif
 
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.print("[WIFI] OK, IP: ");
-    Serial.println(WiFi.localIP());
-    return true;
+  // Aktuelle Werte als Voreinstellung im Portal-Formular
+  char latStr[16], lonStr[16], ivStr[12], portStr[8];
+  snprintf(latStr,  sizeof(latStr),  "%.6f", g_cfg.lat);
+  snprintf(lonStr,  sizeof(lonStr),  "%.6f", g_cfg.lon);
+  snprintf(ivStr,   sizeof(ivStr),   "%u",   g_cfg.refreshIntervalS);
+  snprintf(portStr, sizeof(portStr), "%u",   g_cfg.ninaPort);
+
+  WiFiManagerParameter p_loc("loc", "Ort",                   g_cfg.locationName, 31);
+  WiFiManagerParameter p_lat("lat", "Breitengrad",           latStr,             15);
+  WiFiManagerParameter p_lon("lon", "Laengengrad",           lonStr,             15);
+  WiFiManagerParameter p_tz( "tz",  "Zeitzone (POSIX)",      g_cfg.timezone,     47);
+  WiFiManagerParameter p_iv( "iv",  "Update-Intervall (s)",  ivStr,              11);
+  WiFiManagerParameter p_nh( "nh",  "N.I.N.A. Host (opt.)", g_cfg.ninaHost,     63);
+  WiFiManagerParameter p_np( "np",  "N.I.N.A. Port",        portStr,             5);
+
+  wm.addParameter(&p_loc);
+  wm.addParameter(&p_lat);
+  wm.addParameter(&p_lon);
+  wm.addParameter(&p_tz);
+  wm.addParameter(&p_iv);
+  wm.addParameter(&p_nh);
+  wm.addParameter(&p_np);
+
+  // AP-Name: AstroOyInk-XXXXXX mit den letzten 3 Bytes der MAC
+  char apName[28];
+  snprintf(apName, sizeof(apName), "AstroOyInk-%06X",
+           (uint32_t)(ESP.getEfuseMac() & 0xFFFFFF));
+
+  // Portal-Anzeige auf dem E-Paper wenn AP gestartet wird
+  wm.setAPCallback([&](WiFiManager*) {
+    Serial.printf("[WIFI] Portal offen: AP=%s\n", apName);
+    renderPortalInfo(apName);
+  });
+
+  bool paramsUpdated = false;
+  wm.setSaveParamsCallback([&]() { paramsUpdated = true; });
+
+  wm.setConfigPortalTimeout(WIFI_MANAGER_TIMEOUT_S);
+  wm.setTitle("AstroOyInk");
+
+  Serial.printf("[WIFI] autoConnect AP=\"%s\" timeout=%ds\n",
+                apName, WIFI_MANAGER_TIMEOUT_S);
+  bool connected = wm.autoConnect(apName);
+
+  if (connected) {
+    Serial.printf("[WIFI] Verbunden. SSID=%s\n", WiFi.SSID().c_str());
+    if (paramsUpdated) {
+      // Neue Werte aus dem Portal-Formular uebernehmen
+      strlcpy(g_cfg.locationName, p_loc.getValue(), sizeof(g_cfg.locationName));
+      g_cfg.lat = atof(p_lat.getValue());
+      g_cfg.lon = atof(p_lon.getValue());
+      strlcpy(g_cfg.timezone, p_tz.getValue(), sizeof(g_cfg.timezone));
+      uint32_t iv = (uint32_t)atol(p_iv.getValue());
+      g_cfg.refreshIntervalS = (iv >= 60) ? iv : REFRESH_INTERVAL_S;
+      strlcpy(g_cfg.ninaHost, p_nh.getValue(), sizeof(g_cfg.ninaHost));
+      g_cfg.ninaPort = (uint16_t)atoi(p_np.getValue());
+      saveConfig(g_cfg);
+    }
+  } else {
+    Serial.println("[WIFI] Timeout — kein WLAN konfiguriert.");
   }
-  Serial.println("[WIFI] FAILED");
-  return false;
+  return connected;
 }
 
 static void disconnectWiFi() {
@@ -79,17 +132,17 @@ static void disconnectWiFi() {
 }
 
 // ---------------------------------------------------------------------
-//  Tiefschlaf bis zum nächsten Update (nur im Produktivmodus)
+//  Tiefschlaf bis zum naechsten Update (nur im Produktivmodus)
 // ---------------------------------------------------------------------
-static void goDeepSleep() {
-  uint64_t sleepUs = (uint64_t)REFRESH_INTERVAL_S * 1000000ULL;
+static void goDeepSleep(uint32_t intervalS) {
+  uint64_t sleepUs = (uint64_t)intervalS * 1000000ULL;
 
   time_t now = time(nullptr);
   if (now > 1700000000) {
     struct tm lt; localtime_r(&now, &lt);
     uint32_t toNextHour = (uint32_t)((59 - lt.tm_min) * 60 + (60 - lt.tm_sec));
     if (toNextHour < 60) toNextHour += 3600;
-    if (toNextHour < REFRESH_INTERVAL_S * 2) {
+    if (toNextHour < intervalS * 2) {
       sleepUs = (uint64_t)toNextHour * 1000000ULL;
     }
   }
@@ -109,12 +162,12 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
 
   // WeatherData liegt static, damit es den 8 KB Stack nicht sprengt
   static WeatherData wd;
-  wd.locationName = LOCATION_NAME;
+  wd.locationName = g_cfg.locationName;
 
   bool apiOk = false;
   if (wifiOk && timeOk) {
     Serial.println("[STEP 4] Fetch Open-Meteo ...");
-    apiOk = fetchWeather(LOCATION_LAT, LOCATION_LON, FORECAST_DAYS, wd);
+    apiOk = fetchWeather(g_cfg.lat, g_cfg.lon, FORECAST_DAYS, wd);
   }
 
   if (apiOk) {
@@ -126,19 +179,19 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
                   wd.summary.nightHourCount);
 
     Serial.println("[STEP 5b] Compute Moon ...");
-    wd.moonNow = computeMoon(time(nullptr), LOCATION_LAT, LOCATION_LON);
+    wd.moonNow = computeMoon(time(nullptr), g_cfg.lat, g_cfg.lon);
     time_t nightMid = 0;
     if (wd.summary.nightStart > 0 && wd.summary.nightEnd > 0) {
       nightMid = (wd.summary.nightStart + wd.summary.nightEnd) / 2;
     } else {
       nightMid = time(nullptr) + 6 * 3600;
     }
-    wd.moonNight = computeMoon(nightMid, LOCATION_LAT, LOCATION_LON);
-    Serial.printf("         Moon now:    %s  illum=%.0f%%  alt=%.1f°\n",
+    wd.moonNight = computeMoon(nightMid, g_cfg.lat, g_cfg.lon);
+    Serial.printf("         Moon now:    %s  illum=%.0f%%  alt=%.1f\n",
                   wd.moonNow.phaseName,
                   wd.moonNow.illumination * 100.0f,
                   wd.moonNow.altitudeDeg);
-    Serial.printf("         Moon Mitte:  %s  illum=%.0f%%  alt=%.1f°\n",
+    Serial.printf("         Moon Mitte:  %s  illum=%.0f%%  alt=%.1f\n",
                   wd.moonNight.phaseName,
                   wd.moonNight.illumination * 100.0f,
                   wd.moonNight.altitudeDeg);
@@ -173,8 +226,7 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
 
 // ---------------------------------------------------------------------
 //  Modus SESSION: noch nicht implementiert.
-//  Roadmap: nach Abschluss der Features 1-7 (Batterie, WiFiManager,
-//  OTA, BME280, 7Timer!, ISS, SD).
+//  Roadmap: nach Abschluss der Features 1-7.
 // ---------------------------------------------------------------------
 static void runSessionMode(bool /*wifiOk*/, bool /*timeOk*/) {
   Serial.println("[STEP 5/6] SESSION-Mode noch nicht implementiert.");
@@ -196,29 +248,33 @@ static void doCycle() {
   displayInit();
   Serial.println("[STEP 1] Display-Init ok");
 
-  // 2) WLAN
-  Serial.println("[STEP 2] WiFi ...");
-  bool wifiOk = connectWiFi();
+  // 2) Konfiguration laden (NVS oder config.h-Defaults)
+  Serial.println("[STEP 2] Konfiguration laden ...");
+  g_cfg = loadConfig();
 
-  // 3) NTP
+  // 3) WiFi mit Captive Portal
+  Serial.println("[STEP 3] WiFi / Portal ...");
+  bool wifiOk = connectWithPortal();
+
+  // 4) NTP mit der (ggf. vom Portal aktualisierten) Zeitzone
   bool timeOk = false;
   if (wifiOk) {
-    Serial.println("[STEP 3] NTP ...");
-    timeOk = timeSyncNTP();
+    Serial.println("[STEP 4] NTP ...");
+    timeOk = timeSyncNTP(g_cfg.timezone);
   }
 
-  // 4) Modus ermitteln (aktuell: immer WEATHER)
+  // 5) Modus ermitteln (aktuell: immer WEATHER)
   DisplayMode mode = detectCurrentMode();
-  Serial.printf("[STEP 4] Modus = %s\n", modeName(mode));
+  Serial.printf("[STEP 5] Modus = %s\n", modeName(mode));
 
-  // 5+6) Modus-spezifisch
+  // 6) Modus-spezifisch
   switch (mode) {
     case MODE_SESSION: runSessionMode(wifiOk, timeOk); break;
     case MODE_WEATHER:
     default:           runWeatherMode(wifiOk, timeOk); break;
   }
 
-  // 7) Aufräumen
+  // 7) Aufraumen
   displaySleep();
   disconnectWiFi();
 
@@ -251,7 +307,7 @@ void setup() {
   doCycle();
 
 #if !DEBUG_MODE
-  goDeepSleep();
+  goDeepSleep(g_cfg.refreshIntervalS);
 #else
   Serial.println("[DEBUG] Kein Deep-Sleep - loop() uebernimmt.");
 #endif

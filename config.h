@@ -86,6 +86,14 @@
 #define FORECAST_DAYS          5
 #define HTTP_USER_AGENT        "AstroOyInk/0.1 (ESP32)"
 
+// ---------------------------------------------------------------------
+//  WiFiManager (Feature 2)
+//  Captive Portal oeffnet sich automatisch wenn kein WLAN gespeichert
+//  oder die Verbindung fehlschlaegt.
+//  AP-Name: AstroOyInk-XXXXXX (letzte 3 Bytes der Chip-MAC)
+// ---------------------------------------------------------------------
+#define WIFI_MANAGER_TIMEOUT_S  180    // Portal schliesst nach 3 Minuten
+
 // =====================================================================
 //  GEPLANTE BLÖCKE  (kommen mit späteren Features, vorerst auskommentiert)
 // =====================================================================

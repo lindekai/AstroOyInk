@@ -6,12 +6,12 @@
 #include "time_utils.h"
 #include "config.h"
 
-bool timeSyncNTP() {
+bool timeSyncNTP(const char* posixTz) {
   // configTzTime setzt den POSIX-TZ-String UND die NTP-Server in einem Rutsch
   // und speichert TZ korrekt – anders als die Kombination
   // setenv("TZ",...) + configTime(0,0,...), bei der configTime das TZ
   // wieder auf UTC zurücksetzt.
-  configTzTime(TIMEZONE_POSIX, NTP_SERVER_1, NTP_SERVER_2, NTP_SERVER_3);
+  configTzTime(posixTz, NTP_SERVER_1, NTP_SERVER_2, NTP_SERVER_3);
 
   // Auf Zeit warten – max ~10 s
   const uint32_t startMs = millis();
@@ -21,8 +21,7 @@ bool timeSyncNTP() {
     if (now > 1700000000) {  // ungefähr 2023+
       struct tm lt; localtime_r(&now, &lt);
       Serial.printf("[TIME] NTP sync ok: %ld  (lokal %02d:%02d:%02d, tz=%s)\n",
-                    (long)now, lt.tm_hour, lt.tm_min, lt.tm_sec,
-                    TIMEZONE_POSIX);
+                    (long)now, lt.tm_hour, lt.tm_min, lt.tm_sec, posixTz);
       return true;
     }
     delay(200);

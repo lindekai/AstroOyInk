@@ -10,8 +10,9 @@
 #include <time.h>
 
 // Zeit per NTP synchronisieren. Blockiert bis ~10 s.
+// posixTz: POSIX-TZ-String, z.B. "CET-1CEST,M3.5.0,M10.5.0/3"
 // Liefert true, wenn die Zeit plausibel gesetzt wurde.
-bool timeSyncNTP();
+bool timeSyncNTP(const char* posixTz);
 
 // Wandelt einen ISO-8601-String "YYYY-MM-DDTHH:MM" (lokal) in time_t (lokal).
 // Für Open-Meteo, das bei timezone= Lokalzeit liefert.

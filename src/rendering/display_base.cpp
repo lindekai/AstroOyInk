@@ -963,3 +963,46 @@ void renderFallback(const char* msg) {
                      &FreeSans9pt7b);
   } while (display.nextPage());
 }
+
+void renderPortalInfo(const char* apName) {
+  display.setFullWindow();
+  display.firstPage();
+  do {
+    display.fillScreen(GxEPD_WHITE);
+
+    // Header
+    display.fillRect(0, 0, W, HDR_H, GxEPD_BLACK);
+    drawTextAt(8, 19, "AstroOyInk  —  WiFi-Konfiguration", &FreeSansBold12pt7b, GxEPD_WHITE);
+
+    // Titelzeile
+    int16_t y = 70;
+    drawTextCentered(W / 2, y, "WLAN-Konfiguration erforderlich", &FreeSansBold18pt7b);
+
+    // Schritt 1
+    y += 55;
+    drawTextAt(60, y, "1.  Smartphone oder PC mit folgendem WLAN verbinden:",
+               &FreeSansBold12pt7b);
+    y += 34;
+    drawTextCentered(W / 2, y, apName ? apName : "AstroOyInk-??????",
+                     &FreeSansBold18pt7b, GxEPD_RED);
+
+    // Schritt 2
+    y += 50;
+    drawTextAt(60, y, "2.  Browser oeffnen und aufrufen:", &FreeSansBold12pt7b);
+    y += 34;
+    drawTextCentered(W / 2, y, "192.168.4.1", &FreeSansBold18pt7b);
+
+    // Schritt 3
+    y += 46;
+    drawTextAt(60, y, "3.  Formular ausfullen und speichern — Geraet startet neu.",
+               &FreeSans9pt7b);
+
+    // Hinweis Timeout
+    y += 30;
+    drawTextCentered(W / 2, y, "Portal schliesst nach 3 Minuten — danach erneuter Versuch.",
+                     &FreeSans9pt7b);
+
+    // Trennlinie
+    display.drawLine(40, y + 14, W - 40, y + 14, GxEPD_BLACK);
+  } while (display.nextPage());
+}

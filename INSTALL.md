@@ -18,8 +18,9 @@ auch wenn du **noch nie etwas mit Arduino oder ESP32 gemacht hast**.
 7. [`config.h` anpassen](#7-configh-anpassen)
 8. [Board und Port auswählen](#8-board-und-port-auswählen)
 9. [Kompilieren und Flashen](#9-kompilieren-und-flashen)
-10. [Erstes Startverhalten](#10-erstes-startverhalten)
-11. [Fehlerbehebung](#11-fehlerbehebung)
+10. [WLAN per Captive Portal konfigurieren](#10-wlan-per-captive-portal-konfigurieren)
+11. [Erstes Startverhalten](#11-erstes-startverhalten-nach-wlan-konfiguration)
+12. [Fehlerbehebung](#12-fehlerbehebung)
 
 ---
 
@@ -128,6 +129,9 @@ Die Arduino IDE kennt von Haus aus keinen ESP32. Wir fügen ihn hinzu:
 
 ## 5. Bibliotheken installieren
 
+> **WiFiManager** ist ab Roadmap-Feature 2 erforderlich. Installiere es
+> zusammen mit den anderen Bibliotheken in diesem Schritt.
+
 **Werkzeuge → Bibliotheken verwalten** öffnen und die folgenden vier
 Bibliotheken installieren (Suchbegriff → Installieren):
 
@@ -136,6 +140,7 @@ Bibliotheken installieren (Suchbegriff → Installieren):
 | `GxEPD2`        | Jean-Marc Zingg  | aktuelle (≥ 1.5.x) |
 | `Adafruit GFX`  | Adafruit         | aktuelle (≥ 1.11.x) |
 | `ArduinoJson`   | Benoit Blanchon  | **7.x** (wichtig!) |
+| `WiFiManager`   | tzapu / tablatronics | aktuelle (≥ 2.0) |
 | `Adafruit BusIO` | Adafruit        | (wird meist als Abhängigkeit von GFX automatisch vorgeschlagen → annehmen) |
 
 > **WiFi**, **HTTPClient** und **WiFiClientSecure** sind bereits
@@ -238,7 +243,36 @@ Falls du einen **anderen Pin** für das Display verwendest, hier ändern:
 
 ---
 
-## 10. Erstes Startverhalten
+## 10. WLAN per Captive Portal konfigurieren
+
+Beim **ersten Start** (oder wenn das gespeicherte WLAN nicht erreichbar ist)
+öffnet AstroOyInk automatisch ein eigenes WLAN-Netz und zeigt die
+Verbindungsanleitung auf dem E-Paper:
+
+1. **E-Paper zeigt:** `WLAN-Konfiguration erforderlich`
+   sowie den AP-Namen (z. B. `AstroOyInk-AB12CD`) und die IP `192.168.4.1`.
+2. **Smartphone oder PC:** Mit dem WLAN `AstroOyInk-XXXXXX` verbinden.
+3. **Browser öffnen:** `192.168.4.1` aufrufen.
+   *(Bei Android/iOS erscheint oft automatisch ein „Login erforderlich"-Popup.)*
+4. **Formular ausfüllen:**
+   - WLAN-SSID und Passwort (Pflichtfelder)
+   - Ort, Breitengrad, Längengrad
+   - Zeitzone (POSIX-String, z. B. `CET-1CEST,M3.5.0,M10.5.0/3`)
+   - Update-Intervall in Sekunden (Standard: 3600)
+   - N.I.N.A. Host und Port (optional, für späteren SESSION-Modus)
+5. **„Speichern" klicken** — der ESP32 startet neu und verbindet sich automatisch.
+
+> **Portal-Timeout:** Nach **3 Minuten** ohne Eingabe schließt das Portal.
+> Der ESP32 geht in Deep-Sleep und versucht beim nächsten Aufwachen erneut.
+
+> **Konfiguration ändern:** WLAN wechseln oder Standort korrigieren?
+> Im Seriellen Monitor `clearConfig()` aufrufen oder `WIFI_MANAGER_TIMEOUT_S`
+> auf 0 setzen, dann flashen — das löscht die NVS-Werte und öffnet beim
+> nächsten Start erneut das Portal.
+
+---
+
+## 11. Erstes Startverhalten (nach WLAN-Konfiguration)
 
 Direkt nach dem Hochladen passiert Folgendes:
 
@@ -278,7 +312,7 @@ Direkt nach dem Hochladen passiert Folgendes:
 
 ---
 
-## 11. Fehlerbehebung
+## 12. Fehlerbehebung
 
 | Symptom | Mögliche Ursache & Lösung |
 |---|---|

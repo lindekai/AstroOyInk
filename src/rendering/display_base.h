@@ -37,4 +37,8 @@ void renderDashboard(const WeatherData& wd, BatteryInfo batt);
 // Reine Fallback-Anzeige (Erststart, kein WLAN, kein API).
 void renderFallback(const char* msg);
 
+// Portal-Info: zeigt AP-Name und Verbindungshinweis waehrend der
+// WiFiManager das Captive Portal betreibt.
+void renderPortalInfo(const char* apName);
+
 #endif // ASTROOYINK_DISPLAY_BASE_H

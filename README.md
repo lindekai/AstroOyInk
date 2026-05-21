@@ -91,6 +91,7 @@ ist nach der Roadmap geplant (siehe unten).
 - 💤 Deep-Sleep zwischen Updates
 - 🎨 3-Color-Design ohne Grün (Sterne + Outline statt grüner Ampelfarbe)
 - 🔋 Batterieanzeige im Header (LiPo-Ladestand, USB-Erkennung, rot bei < 20 %)
+- 📶 WiFiManager: Captive Portal bei fehlendem/falschem WLAN — alle Parameter (Ort, Lat/Lon, Zeitzone, Intervall, N.I.N.A.) ohne Re-Flash konfigurierbar
 
 ### Geplant (siehe Roadmap)
 
@@ -157,7 +158,8 @@ AstroOyInk/
 │   │   ├── time_utils.h/.cpp
 │   │   ├── astro_logic.h/.cpp
 │   │   ├── moon_calc.h/.cpp
-│   │   └── battery.h/.cpp         # Batteriemessung (Roadmap #1)
+│   │   ├── battery.h/.cpp         # Batteriemessung (Roadmap #1)
+│   │   └── app_config.h/.cpp      # NVS-Konfiguration (Roadmap #2)
 │   │
 │   ├── data_sources/
 │   │   └── weather_api.h/.cpp     # Open-Meteo
@@ -214,7 +216,7 @@ bekannte Mondereignisse 2026.
 In dieser Reihenfolge geplant:
 
 1. ~~🔋 Batterieanzeige im Header (ADC)~~ ✅
-2. 📶 WiFiManager (Captive Portal)
+2. ~~📶 WiFiManager (Captive Portal)~~ ✅
 3. 📤 OTA-Updates
 4. 🌡️ Lokaler Sensor (BME280 / DHT22)
 5. 🪐 7Timer! Seeing & Transparenz
