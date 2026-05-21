@@ -37,7 +37,6 @@
 #include "astro_logic.h"
 #include "local_sensor.h"
 #include "seeing_api.h"
-#include "iss_api.h"
 #include "nina_api.h"
 
 #include <SPI.h>
@@ -123,13 +122,9 @@ static const int16_t TBL_W = 792, TBL_H = 45;
 static const int16_t MC_X = 4,   MC_Y = 337;
 static const int16_t MC_W = 792, MC_H = 56;
 
-// Forecast (4–5 Tage)
+// Forecast (4–5 Tage) — reicht jetzt bis ans untere Display-Ende
 static const int16_t FC_X = 4,   FC_Y = 397;
-static const int16_t FC_W = 792, FC_H = 46;
-
-// Fazit
-static const int16_t FZ_X = 4,   FZ_Y = 446;
-static const int16_t FZ_W = 792, FZ_H = 30;
+static const int16_t FC_W = 792, FC_H = 80;
 
 // ---------------------------------------------------------------------
 //  Hilfsfunktionen Zeichnen
@@ -871,48 +866,6 @@ static void drawForecast(const WeatherData& wd) {
 }
 
 // ---------------------------------------------------------------------
-//  Einzelblock: FAZIT
-// ---------------------------------------------------------------------
-static void drawFazit(const WeatherData& wd, const ISSData& iss) {
-  display.drawRect(FZ_X, FZ_Y, FZ_W, FZ_H, GxEPD_BLACK);
-
-  uint16_t col = GxEPD_BLACK;
-  if (wd.summary.verdict == ASTRO_BAD) col = DISPLAY_RED;
-
-  drawTextAt(FZ_X + 8, FZ_Y + 20, "FAZIT:", &FreeSansBold9pt7b);
-  drawTextAt(FZ_X + 75, FZ_Y + 20,
-             wd.summary.conclusion.length() ? wd.summary.conclusion
-                                            : String("--"),
-             &FreeSansBold9pt7b, col);
-
-  // ISS-Ueberflug rechts in der FAZIT-Zeile (naechster Pass innerhalb 24 h)
-  if (iss.valid && iss.count > 0) {
-    time_t now = time(nullptr);
-    for (uint8_t i = 0; i < iss.count; i++) {
-      time_t rt  = iss.passes[i].riseTime;
-      time_t end = rt + (time_t)iss.passes[i].duration;
-      char buf[32];
-      if (now >= rt && now < end) {
-        // ISS gerade sichtbar
-        snprintf(buf, sizeof(buf), "ISS: JETZT! %dmin",
-                 (int)(end - now) / 60 + 1);
-        drawTextRight(FZ_X + FZ_W - 8, FZ_Y + 20, buf,
-                      &FreeSansBold9pt7b, DISPLAY_RED);
-        break;
-      } else if (rt > now && rt <= now + 86400L) {
-        // Naechster Pass heute / morgen
-        char hhmm[8];
-        formatHHMM(rt, hhmm, sizeof(hhmm));
-        snprintf(buf, sizeof(buf), "ISS: %s  %dmin",
-                 hhmm, iss.passes[i].duration / 60);
-        drawTextRight(FZ_X + FZ_W - 8, FZ_Y + 20, buf, &FreeSansBold9pt7b);
-        break;
-      }
-    }
-  }
-}
-
-// ---------------------------------------------------------------------
 //  Mondphase als Icon: gefüllter Kreis mit Terminator-Ellipse.
 //  phase: 0..1 (0=Neumond, 0.25=1.Viertel, 0.5=Voll, 0.75=L.Viertel)
 //  Die Darstellung ist für die Nordhalbkugel korrekt (zunehmend:
@@ -1022,8 +975,7 @@ static void drawMoonBox(const WeatherData& wd) {
 // ---------------------------------------------------------------------
 void renderDashboard(const WeatherData& wd, BatteryInfo batt,
                      const LocalSensorData& sensor,
-                     const SeeingData& seeing,
-                     const ISSData& iss) {
+                     const SeeingData& seeing) {
   if (!wd.valid) {
     renderFallback("Keine Wetterdaten verfuegbar");
     return;
@@ -1041,7 +993,6 @@ void renderDashboard(const WeatherData& wd, BatteryInfo batt,
     drawHourTable(wd);
     drawMiniCharts(wd);
     drawForecast(wd);
-    drawFazit(wd, iss);
   } while (display.nextPage());
 }
 

@@ -24,7 +24,6 @@
 #include "battery.h"
 #include "local_sensor.h"
 #include "seeing_api.h"
-#include "iss_api.h"
 #include "nina_api.h"
 
 // Initialisiert das Display (SPI, RST, etc.). Einmal pro Zyklus aufrufen.
@@ -39,8 +38,7 @@ void displaySleep();
 //   sensor.valid == false   →  INNEN-Zeile wird nicht gezeichnet.
 void renderDashboard(const WeatherData& wd, BatteryInfo batt,
                      const LocalSensorData& sensor,
-                     const SeeingData& seeing,
-                     const ISSData& iss);
+                     const SeeingData& seeing);
 
 // SESSION-Dashboard zeichnen (voller Refresh; partiell als Optimierung
 // fuer spaetere Revision vorgesehen).

@@ -66,8 +66,11 @@ Alle relevanten Änderungen am Projekt.
   0x76 / 0x77 per `LOCAL_SENSOR_ADDR` in `config.h` wählbar.
   Benötigt: „Adafruit BME280 Library" + „Adafruit Unified Sensor".
 
-### Geplant (verbleibend)
-- 🔭 **SESSION-Modus** über N.I.N.A. Advanced API
+### Entfernt
+- 🗑️ **FAZIT-Zeile** aus dem WEATHER-Dashboard entfernt.
+  ISS-Überflüge werden nicht mehr geladen (`fetchISSPasses` entfällt).
+  `iss_api.h/.cpp` bleibt im Repository, wird aber nicht mehr aufgerufen.
+  Der dadurch freie vertikale Platz fließt dem Forecast-Bereich zu.
 
 ---
 
