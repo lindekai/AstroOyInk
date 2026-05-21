@@ -24,6 +24,7 @@
 #include "battery.h"
 #include "local_sensor.h"
 #include "seeing_api.h"
+#include "iss_api.h"
 
 // Initialisiert das Display (SPI, RST, etc.). Einmal in setup() aufrufen.
 void displayInit();
@@ -37,7 +38,8 @@ void displaySleep();
 //   sensor.valid == false   →  INNEN-Zeile wird nicht gezeichnet.
 void renderDashboard(const WeatherData& wd, BatteryInfo batt,
                      const LocalSensorData& sensor,
-                     const SeeingData& seeing);
+                     const SeeingData& seeing,
+                     const ISSData& iss);
 
 // Reine Fallback-Anzeige (Erststart, kein WLAN, kein API).
 void renderFallback(const char* msg);

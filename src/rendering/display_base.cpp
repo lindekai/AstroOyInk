@@ -37,6 +37,7 @@
 #include "astro_logic.h"   // fuer weightedCloudScore() in quickNightVerdict()
 #include "local_sensor.h"
 #include "seeing_api.h"
+#include "iss_api.h"
 
 #include <SPI.h>
 #include <GxEPD2_3C.h>
@@ -857,7 +858,7 @@ static void drawForecast(const WeatherData& wd) {
 // ---------------------------------------------------------------------
 //  Einzelblock: FAZIT
 // ---------------------------------------------------------------------
-static void drawFazit(const WeatherData& wd) {
+static void drawFazit(const WeatherData& wd, const ISSData& iss) {
   display.drawRect(FZ_X, FZ_Y, FZ_W, FZ_H, GxEPD_BLACK);
 
   uint16_t col = GxEPD_BLACK;
@@ -868,6 +869,32 @@ static void drawFazit(const WeatherData& wd) {
              wd.summary.conclusion.length() ? wd.summary.conclusion
                                             : String("--"),
              &FreeSansBold9pt7b, col);
+
+  // ISS-Ueberflug rechts in der FAZIT-Zeile (naechster Pass innerhalb 24 h)
+  if (iss.valid && iss.count > 0) {
+    time_t now = time(nullptr);
+    for (uint8_t i = 0; i < iss.count; i++) {
+      time_t rt  = iss.passes[i].riseTime;
+      time_t end = rt + (time_t)iss.passes[i].duration;
+      char buf[32];
+      if (now >= rt && now < end) {
+        // ISS gerade sichtbar
+        snprintf(buf, sizeof(buf), "ISS: JETZT! %dmin",
+                 (int)(end - now) / 60 + 1);
+        drawTextRight(FZ_X + FZ_W - 8, FZ_Y + 20, buf,
+                      &FreeSansBold9pt7b, GxEPD_RED);
+        break;
+      } else if (rt > now && rt <= now + 86400L) {
+        // Naechster Pass heute / morgen
+        char hhmm[8];
+        formatHHMM(rt, hhmm, sizeof(hhmm));
+        snprintf(buf, sizeof(buf), "ISS: %s  %dmin",
+                 hhmm, iss.passes[i].duration / 60);
+        drawTextRight(FZ_X + FZ_W - 8, FZ_Y + 20, buf, &FreeSansBold9pt7b);
+        break;
+      }
+    }
+  }
 }
 
 // ---------------------------------------------------------------------
@@ -980,7 +1007,8 @@ static void drawMoonBox(const WeatherData& wd) {
 // ---------------------------------------------------------------------
 void renderDashboard(const WeatherData& wd, BatteryInfo batt,
                      const LocalSensorData& sensor,
-                     const SeeingData& seeing) {
+                     const SeeingData& seeing,
+                     const ISSData& iss) {
   if (!wd.valid) {
     renderFallback("Keine Wetterdaten verfuegbar");
     return;
@@ -998,7 +1026,7 @@ void renderDashboard(const WeatherData& wd, BatteryInfo batt,
     drawHourTable(wd);
     drawMiniCharts(wd);
     drawForecast(wd);
-    drawFazit(wd);
+    drawFazit(wd, iss);
   } while (display.nextPage());
 }
 

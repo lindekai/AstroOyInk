@@ -23,6 +23,11 @@ Alle relevanten Änderungen am Projekt.
 - 📄 `.gitignore` für .DS_Store, Build-Artefakte und `secrets.h`
 - 👤 Autor (Kai Linde) und Credits (Dark Matters Discord) in allen Quelldateien
 
+- 🛰️ **ISS-Überflüge** — `src/data_sources/iss_api.h/.cpp`
+  open-notify.org HTTP-API, kein Key. Nächster ISS-Pass (innerhalb 24 h)
+  wird rechts in der FAZIT-Zeile eingeblendet: „ISS: HH:MM  Xmin".
+  Wenn die ISS gerade sichtbar ist: „ISS: JETZT! Xmin" in Rot.
+  Bei API-Fehler: FAZIT-Zeile bleibt unverändert.
 - 🪐 **7Timer! Seeing & Transparenz** — `src/data_sources/seeing_api.h/.cpp`
   Kostenloses HTTP-API, kein Key nötig. Liefert Seeing und atmosphärische
   Transparenz in 3-Stunden-Intervallen. Beide Kurven werden als rote
