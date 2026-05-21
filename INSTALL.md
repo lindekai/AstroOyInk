@@ -20,8 +20,9 @@ auch wenn du **noch nie etwas mit Arduino oder ESP32 gemacht hast**.
 9. [Kompilieren und Flashen](#9-kompilieren-und-flashen)
 10. [WLAN per Captive Portal konfigurieren](#10-wlan-per-captive-portal-konfigurieren)
 11. [OTA-Updates (Firmware per Netzwerk)](#11-ota-updates-firmware-per-netzwerk)
-12. [Erstes Startverhalten](#12-erstes-startverhalten-nach-wlan-konfiguration)
-13. [Fehlerbehebung](#13-fehlerbehebung)
+12. [SESSION-Modus: N.I.N.A. einbinden](#12-session-modus-nina-einbinden)
+13. [Erstes Startverhalten](#13-erstes-startverhalten-nach-wlan-konfiguration)
+14. [Fehlerbehebung](#14-fehlerbehebung)
 
 ---
 
@@ -286,7 +287,7 @@ Verbindungsanleitung auf dem E-Paper:
    - Ort, Breitengrad, Längengrad
    - Zeitzone (POSIX-String, z. B. `CET-1CEST,M3.5.0,M10.5.0/3`)
    - Update-Intervall in Sekunden (Standard: 3600)
-   - N.I.N.A. Host und Port (optional, für späteren SESSION-Modus)
+   - N.I.N.A. Host und Port (optional, für SESSION-Modus — siehe Schritt 12)
 5. **„Speichern" klicken** — der ESP32 startet neu und verbindet sich automatisch.
 
 > **Portal-Timeout:** Nach **3 Minuten** ohne Eingabe schließt das Portal.
@@ -354,7 +355,93 @@ Der ESP32 ist dann als `mein-astro-display.local` erreichbar.
 
 ---
 
-## 12. Erstes Startverhalten (nach WLAN-Konfiguration)
+## 12. SESSION-Modus: N.I.N.A. einbinden
+
+Der SESSION-Modus zeigt Live-Telemetrie einer laufenden N.I.N.A.-Sequenz
+direkt auf dem Display. Der Wechsel WEATHER ↔ SESSION passiert **automatisch**
+— sobald N.I.N.A. erreichbar ist und eine Sequenz läuft.
+
+### Voraussetzungen
+
+- **N.I.N.A. 3.x** mit installiertem **Advanced API Plugin**
+  (im N.I.N.A. Plugin-Manager suchen: „Advanced API")
+- ESP32 und N.I.N.A.-PC im **gleichen Heimnetz**
+- N.I.N.A.-PC-Hostname oder IP bekannt (z. B. `astro-pc.local` oder `192.168.1.42`)
+
+### N.I.N.A.-Host eintragen
+
+**Option A — WiFiManager-Portal (empfohlen, kein Re-Flash):**
+
+1. Portal öffnen (WLAN trennen oder `WIFI_MANAGER_TIMEOUT_S 0` setzen → neu flashen).
+2. Im Formular die Felder **„N.I.N.A. Host"** und **„N.I.N.A. Port"** ausfüllen.
+3. Port ist standardmäßig **1888**.
+4. Speichern → Gerät startet neu.
+
+**Option B — `config.h`:**
+
+```cpp
+// In config.h die Zeile auskommentieren und anpassen:
+// #define NINA_HOST_DEFAULT   "astro-pc.local"
+// #define NINA_PORT_DEFAULT   1888
+```
+
+> **Hinweis:** `config.h`-Werte gelten nur als Erstwert wenn NVS leer ist.
+> Danach haben die Portal-Einstellungen Vorrang.
+
+### Was das Display im SESSION-Modus zeigt
+
+```
+┌─── Saarmund ─── 01:18 ─── [████░] 72% ─── Update 01:18 ───┐
+│ SEQUENZ: M42 Ha   Target 2/3   Sub 47/120   Noch 1h 23m    │
+│ Status: Imaging                     Alt: 68°  Az: 215° SW  │
+├───────────────────┬──────────────────────┬──────────────────┤
+│ KAMERA            │ GUIDING              │ MOUNT            │
+│ ZWO ASI294MC Pro  │ RMS RA:   0.45"      │ iOptron CEM60    │
+│ Filter: Ha        │ RMS Dec:  0.38"      │ RA  05h 34m      │
+│ Exp:    300 s     │ Total:    0.59"      │ Dec +35° 48'     │
+│ HFR:    2.3 px    │ [Guiding OK]         │ Pier: West       │
+│                   │                      │ Flip in: 1h 23m  │
+└───────────────────┴──────────────────────┴──────────────────┘
+```
+
+### Warnungen im SESSION-Modus
+
+| Zustand | Anzeige BWR | Anzeige B/W |
+|---|---|---|
+| Guiding RMS ≥ 1,0″ | `[Guiding WARN]` **rot** | `[Guiding WARN]` invertiert |
+| Guiding verloren | `[Guiding LOST]` **rot** | `[Guiding LOST]` invertiert |
+| Flip in < 10 min | Flip-Countdown **rot** | Flip-Countdown invertiert |
+| Slewing / Pausiert | Status-Text **rot** | Status-Text invertiert |
+
+Den Guiding-Schwellwert anpassen:
+
+```cpp
+#define GUIDING_WARN_RMS_ARCSEC  1.0f   // Standard: 1,0 Bogensekunden
+```
+
+### B/W-Display (kein Rot)
+
+Wer ein reines Schwarz/Weiß-E-Paper-Display verwendet:
+
+```cpp
+#define DISPLAY_HAS_RED  0   // 0 = kein Rot, Warnungen invertiert statt rot
+```
+
+### Update-Intervall
+
+Im SESSION-Modus bleibt das Gerät wach und aktualisiert alle 5 Minuten.
+Das Intervall ist anpassbar:
+
+```cpp
+#define SESSION_REFRESH_INTERVAL_S  300UL   // 5 Minuten (Standard)
+```
+
+Wenn N.I.N.A. nicht mehr erreichbar ist oder keine Sequenz läuft, wechselt
+das Gerät **automatisch** zurück in den WEATHER-Modus und geht in Deep-Sleep.
+
+---
+
+## 13. Erstes Startverhalten (nach WLAN-Konfiguration)
 
 Direkt nach dem Hochladen passiert Folgendes:
 
@@ -394,7 +481,7 @@ Direkt nach dem Hochladen passiert Folgendes:
 
 ---
 
-## 13. Fehlerbehebung
+## 14. Fehlerbehebung
 
 | Symptom | Mögliche Ursache & Lösung |
 |---|---|
@@ -408,6 +495,10 @@ Direkt nach dem Hochladen passiert Folgendes:
 | Kompilierfehler `'GxEPD2_750c_Z08' was not declared` | GxEPD2-Bibliothek auf ≥ 1.5.x aktualisieren. Für 800×480 B/W/R ist `Z08` korrekt (in `src/rendering/display_base.cpp`). |
 | Kompilierfehler `'JsonDocument' was not declared` | ArduinoJson **7.x** notwendig. Update über Library Manager. |
 | Display sieht aus wie gewünscht, aber **Werte sehen falsch aus** | Koordinaten geprüft? Lat/Lon vertauscht? Der erste Test: `LOCATION_LAT=52.52` und `LOCATION_LON=13.405` sollte „Berlin" plausibles Wetter geben. |
+| **SESSION-Modus erscheint nie**, obwohl N.I.N.A. läuft | Advanced API Plugin in N.I.N.A. installiert und gestartet? Port 1888 in der Windows-Firewall freigegeben? Host-Eintrag im Portal/`config.h` korrekt? Mit `http://HOST:1888/v2/api/application/version` im Browser testen. |
+| SESSION-Modus zeigt **„N.I.N.A. nicht erreichbar"** | Sequenz wirklich gestartet? `ninaIsSequenceRunning` antwortet nur `true` wenn eine Sequenz aktiv läuft (nicht nur geöffnet). |
+| **Guiding-Werte immer 0** | N.I.N.A. Guider (PHD2 / DirectGuider) muss mit N.I.N.A. verbunden und aktiv sein. Wert bleibt 0 solange kein Guider angebunden ist. |
+| **Meridian-Flip-Countdown fehlt** | Einige Mount-Treiber liefern `TimeToMeridianFlip` nicht. Bekanntes API-Limit — Wert zeigt dann „--". |
 
 ---
 

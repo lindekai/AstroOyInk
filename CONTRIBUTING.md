@@ -20,10 +20,10 @@ Details siehe [INSTALL.md](INSTALL.md).
 Bitte vor größeren Änderungen **[CLAUDE.md](CLAUDE.md)** lesen. Dort
 stehen die Architektur-Prinzipien:
 
-1. Strikte Modulgrenzen
-2. Static / Heap statt Stack für `WeatherData`
-3. Paged Rendering
-4. Keine grüne Farbe (Display kann nur B/W/R)
+1. Strikte Modulgrenzen (`display_*` kennt kein WLAN, `*_api` kennt kein Display)
+2. Static / Heap statt Stack für große Structs (`WeatherData`, `NinaData`)
+3. Paged Rendering (`HEIGHT/4` Buffer wegen DRAM-Limit)
+4. Keine grüne Farbe — Display kann nur B/W/R; bei `DISPLAY_HAS_RED=0` auch nur B/W
 5. Manueller BUSY-Wait für V3-Panels
 
 ## Tests
@@ -58,5 +58,10 @@ GitHub Actions baut zusätzlich den Arduino-Sketch.
 
 ## Roadmap
 
-Aktuelle geplante Features siehe [CHANGELOG.md](CHANGELOG.md) Abschnitt
-"Unreleased". Issues mit Label `enhancement` sind willkommen.
+Alle 8 Roadmap-Punkte sind abgeschlossen. Weiterentwicklungen (neue Features,
+Bugfixes, Layout-Verbesserungen) als Issue mit Label `enhancement` willkommen.
+
+Bekannte Erweiterungsideen:
+- Partieller B/W-Refresh im SESSION-Modus für schnellere Updates
+- Aufteilen von `display_base.cpp` in `view_weather.cpp` + `view_session.cpp`
+- Starlink-Überflüge ergänzen

@@ -188,25 +188,46 @@ AstroOyInk/
 
 ## Konfiguration
 
-Alles in `config.h`:
+Alles in `config.h` (Ersteinrichtung) oder per **WiFiManager-Portal** (zur Laufzeit ohne Re-Flash):
 
 ```cpp
-#define WIFI_SSID       "MeinWLAN"
-#define WIFI_PASSWORD   "geheim"
-
+// Standort
 #define LOCATION_NAME   "Berlin"
 #define LOCATION_LAT    52.5200f
 #define LOCATION_LON    13.4050f
-
 #define TIMEZONE_POSIX  "CET-1CEST,M3.5.0,M10.5.0/3"
-#define REFRESH_INTERVAL_S   3600UL
-#define DEBUG_MODE      1
+
+// Update-Intervall WEATHER-Modus
+#define REFRESH_INTERVAL_S        3600UL   // 1 Stunde
+
+// Update-Intervall SESSION-Modus (Gerät bleibt wach)
+#define SESSION_REFRESH_INTERVAL_S  300UL  // 5 Minuten
+
+// Display-Typ: 1 = BWR (Schwarz/Weiss/Rot, Standard), 0 = nur B/W
+#define DISPLAY_HAS_RED  1
+
+// Guiding-Warnschwelle im SESSION-Modus
+#define GUIDING_WARN_RMS_ARCSEC  1.0f     // Warnung ab 1,0 Bogensekunden
 
 // Batterieanzeige (optionaler LiPo-Akku)
-#define BATT_ENABLED         1       // 0 = deaktiviert
-#define BATT_ADC_PIN         34      // GPIO34, input-only
-#define BATT_VOLTAGE_DIVIDER 2.0f    // 100k + 100k Spannungsteiler
+#define BATT_ENABLED         1
+#define BATT_ADC_PIN         34
+#define BATT_VOLTAGE_DIVIDER 2.0f
 ```
+
+### SESSION-Modus aktivieren
+
+N.I.N.A.-Host im WiFiManager-Portal eintragen (Feld „N.I.N.A. Host") oder
+direkt in `config.h`:
+
+```cpp
+// Auskommentieren und eigenen Host eintragen:
+// #define NINA_HOST_DEFAULT   "nina-pc.local"   // oder IP, z.B. "192.168.1.42"
+// #define NINA_PORT_DEFAULT   1888
+```
+
+Sobald N.I.N.A. Advanced API Plugin installiert ist und eine Sequenz läuft,
+wechselt das Display **automatisch** in den SESSION-Modus.
 
 ## Tests
 
