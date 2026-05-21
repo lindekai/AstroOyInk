@@ -26,10 +26,11 @@ ESP32, das **automatisch zwischen zwei Modi wechselt**:
 Beide Modi laufen auf **dem gleichen Gerät**. Der Modus wird zu Beginn
 jedes Zyklus neu ermittelt (siehe `src/modes/mode_state_machine.cpp`).
 
-> **Aktueller Status:** Roadmap-Punkte 1–4 abgeschlossen (Batterieanzeige,
-> WiFiManager, OTA, BME280-Innensensor). Der WEATHER-Modus läuft komplett.
-> Die State-Machine ist als Skelett vorbereitet, liefert aber immer
-> `MODE_WEATHER`. Der SESSION-Modus wird nach Roadmap-Punkten 5–7 implementiert.
+> **Aktueller Status:** Roadmap-Punkte 1–5 abgeschlossen (Batterieanzeige,
+> WiFiManager, OTA, BME280-Innensensor, 7Timer! Seeing & Transparenz).
+> Der WEATHER-Modus läuft komplett. Die State-Machine ist als Skelett
+> vorbereitet, liefert aber immer `MODE_WEATHER`. Der SESSION-Modus wird
+> nach Roadmap-Punkten 6–7 implementiert.
 
 ## Vorgeschichte
 
@@ -90,7 +91,8 @@ AstroOyInk/
 │   │   └── local_sensor.h/.cpp    # BME280 I2C, Innentemperatur/Feuchte/Druck
 │   │
 │   ├── data_sources/              # External APIs / Datenquellen
-│   │   └── weather_api.h/.cpp     # Open-Meteo Client
+│   │   ├── weather_api.h/.cpp     # Open-Meteo HTTPS-Client
+│   │   └── seeing_api.h/.cpp      # 7Timer! HTTP-Client, Seeing & Transparenz
 │   │   # (NACHHER: nina_api.h/.cpp fuer SESSION-Modus)
 │   │
 │   ├── modes/
@@ -229,7 +231,7 @@ In dieser Reihenfolge geplant (Reihenfolge vom Nutzer gewählt):
 2. ~~📶 **WiFiManager** (Captive Portal statt hardcoded SSID)~~ ✅
 3. ~~📤 **OTA-Updates** (ArduinoOTA)~~ ✅
 4. ~~🌡️ **Lokaler Sensor** (BME280, I2C) — Innen-Temp/Feuchte/Druck~~ ✅
-5. 🪐 **7Timer! Seeing & Transparenz** zusätzlich zu Open-Meteo
+5. ~~🪐 **7Timer! Seeing & Transparenz** — rote Kurven im Nacht-Chart~~ ✅
 6. 🛰️ **ISS / Starlink Überflüge** für die Session-Vorschau
 7. 📷 **Screenshot-Export** auf SD-Karte
 8. 🔭 **SESSION-Modus**: N.I.N.A. Advanced API anzapfen (Punkt 8 = der grosse Brocken)

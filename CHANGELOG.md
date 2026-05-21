@@ -23,6 +23,13 @@ Alle relevanten Änderungen am Projekt.
 - 📄 `.gitignore` für .DS_Store, Build-Artefakte und `secrets.h`
 - 👤 Autor (Kai Linde) und Credits (Dark Matters Discord) in allen Quelldateien
 
+- 🪐 **7Timer! Seeing & Transparenz** — `src/data_sources/seeing_api.h/.cpp`
+  Kostenloses HTTP-API, kein Key nötig. Liefert Seeing und atmosphärische
+  Transparenz in 3-Stunden-Intervallen. Beide Kurven werden als rote
+  Strich- bzw. Punktlinie in den Nacht-Wolken-Chart eingeblendet (normiert
+  auf 0–100 %, 1=exzellent=unten, 8=schlecht=oben — konsistent mit
+  Wolkenskala). Legende im Chart um 3. Zeile „Seeing / Transp" ergänzt.
+  Bei API-Fehler: kein Dashboard-Blockier, Linien werden weggelassen.
 - 🌡️ **Lokaler Sensor (BME280)** — `src/common/local_sensor.h/.cpp`
   I²C-Anbindung an GPIO 21/22 (Standard-ESP32-Pins, kein Konflikt mit
   Display oder Batterie-ADC). Liest Innentemperatur, Feuchte und Luftdruck.

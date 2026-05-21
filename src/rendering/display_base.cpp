@@ -36,6 +36,7 @@
 #include "time_utils.h"
 #include "astro_logic.h"   // fuer weightedCloudScore() in quickNightVerdict()
 #include "local_sensor.h"
+#include "seeing_api.h"
 
 #include <SPI.h>
 #include <GxEPD2_3C.h>
@@ -503,7 +504,7 @@ static uint16_t collectNightIndices(const WeatherData& wd, uint16_t* outIdx, uin
 //  Linien: Total (schwarz solid), Low (rot solid),
 //          Mid (schwarz gepunktet), High (schwarz gestrichelt)
 // ---------------------------------------------------------------------
-static void drawNightChart(const WeatherData& wd) {
+static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
   display.drawRect(CH_X, CH_Y, CH_W, CH_H, GxEPD_BLACK);
   drawTextAt(CH_X + 6, CH_Y + 16, "NACHT - WOLKEN VERLAUF (%)", &FreeSans9pt7b);
 
@@ -575,23 +576,64 @@ static void drawNightChart(const WeatherData& wd) {
       // High – schwarz gestrichelt
       drawDashedLine(x0, yOf(h0.cloudHigh), x1, yOf(h1.cloudHigh), GxEPD_BLACK);
     }
+
+    // Seeing + Transparenz aus 7Timer! (3-h-Intervall, normiert auf 0..100 %)
+    // Skala: 1 = exzellent (unten = 0 %), 8 = schlecht (oben = 100 %)
+    // konsistent mit Wolken: "schlecht = oben"
+    if (sd.valid && sd.count >= 2) {
+      time_t t0 = wd.hourly[idx[0]].ts;
+      time_t t1 = wd.hourly[idx[n - 1]].ts;
+      if (t1 > t0) {
+        auto tsToX = [&](time_t t) -> int16_t {
+          float r = (float)(t - t0) / (float)(t1 - t0);
+          if (r < 0.0f) r = 0.0f;
+          if (r > 1.0f) r = 1.0f;
+          return px + (int16_t)(r * (float)pw);
+        };
+        auto sToY = [&](uint8_t v) -> int16_t {
+          float pct = (float)(v - 1) / 7.0f * 100.0f;
+          return py + ph - (int16_t)((float)ph * pct / 100.0f);
+        };
+        for (uint8_t i = 1; i < sd.count; i++) {
+          time_t ta = sd.points[i - 1].ts;
+          time_t tb = sd.points[i].ts;
+          if (tb < t0 - 10800L || ta > t1 + 10800L) continue;
+          int16_t xa = tsToX(ta), xb = tsToX(tb);
+          // Seeing – gestrichelt rot, 2 px
+          int16_t ya = sToY(sd.points[i - 1].seeing);
+          int16_t yb = sToY(sd.points[i].seeing);
+          drawDashedLine(xa, ya,     xb, yb,     GxEPD_RED, 4, 3);
+          drawDashedLine(xa, ya - 1, xb, yb - 1, GxEPD_RED, 4, 3);
+          // Transparenz – gepunktet rot
+          drawDottedLine(xa, sToY(sd.points[i - 1].transparency),
+                         xb, sToY(sd.points[i].transparency), GxEPD_RED);
+        }
+      }
+    }
   }
 
-  // Legende rechts oben – zwei Zeilen, mit etwas mehr Luft
-  int16_t lx = CH_X + CH_W - 260;     // breiter: 260 statt 220
+  // Legende rechts oben – drei Zeilen (Zeile 3 ragt leicht in den Plot)
+  int16_t lx = CH_X + CH_W - 260;
   int16_t ly = CH_Y + 12;
+  // Zeile 1: Gesamt + Low
   display.drawLine(lx, ly, lx + 16, ly, GxEPD_BLACK);
   display.drawLine(lx, ly + 1, lx + 16, ly + 1, GxEPD_BLACK);
   drawTextAt(lx + 20, ly + 4, "Gesamt", &FreeSans9pt7b);
-
   display.drawLine(lx + 100, ly, lx + 116, ly, GxEPD_RED);
   drawTextAt(lx + 120, ly + 4, "Low", &FreeSans9pt7b, GxEPD_RED);
-
+  // Zeile 2: Mid + High
   drawDottedLine(lx, ly + 16, lx + 16, ly + 16, GxEPD_BLACK);
   drawTextAt(lx + 20, ly + 20, "Mid", &FreeSans9pt7b);
-
   drawDashedLine(lx + 100, ly + 16, lx + 116, ly + 16, GxEPD_BLACK);
   drawTextAt(lx + 120, ly + 20, "High", &FreeSans9pt7b);
+  // Zeile 3: Seeing + Transp (7Timer!) – nur wenn Daten vorhanden
+  if (sd.valid) {
+    drawDashedLine(lx, ly + 32, lx + 16, ly + 32, GxEPD_RED, 4, 3);
+    drawDashedLine(lx, ly + 31, lx + 16, ly + 31, GxEPD_RED, 4, 3);
+    drawTextAt(lx + 20, ly + 36, "Seeing", &FreeSans9pt7b, GxEPD_RED);
+    drawDottedLine(lx + 100, ly + 32, lx + 116, ly + 32, GxEPD_RED);
+    drawTextAt(lx + 120, ly + 36, "Transp", &FreeSans9pt7b, GxEPD_RED);
+  }
 }
 
 // ---------------------------------------------------------------------
@@ -937,7 +979,8 @@ static void drawMoonBox(const WeatherData& wd) {
 //  Public: Komplettes Dashboard
 // ---------------------------------------------------------------------
 void renderDashboard(const WeatherData& wd, BatteryInfo batt,
-                     const LocalSensorData& sensor) {
+                     const LocalSensorData& sensor,
+                     const SeeingData& seeing) {
   if (!wd.valid) {
     renderFallback("Keine Wetterdaten verfuegbar");
     return;
@@ -951,7 +994,7 @@ void renderDashboard(const WeatherData& wd, BatteryInfo batt,
     drawCurrent(wd, sensor);
     drawAstroBox(wd);
     drawMoonBox(wd);
-    drawNightChart(wd);
+    drawNightChart(wd, seeing);
     drawHourTable(wd);
     drawMiniCharts(wd);
     drawForecast(wd);

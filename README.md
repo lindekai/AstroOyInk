@@ -94,6 +94,7 @@ ist nach der Roadmap geplant (siehe unten).
 - 📶 WiFiManager: Captive Portal bei fehlendem/falschem WLAN — alle Parameter (Ort, Lat/Lon, Zeitzone, Intervall, N.I.N.A.) ohne Re-Flash konfigurierbar
 - 📤 OTA-Updates: 30-s-Flashfenster nach jedem WLAN-Connect — Firmware-Update aus der Arduino IDE ohne USB-Kabel
 - 🌡️ Lokaler BME280-Sensor: Innentemperatur, Feuchte und Luftdruck direkt am Gerät als „IN:"-Zeile im Dashboard
+- 🪐 7Timer! Seeing & Transparenz: astronomisches Seeing + Durchsicht als rote Kurven im Nacht-Wolken-Chart
 
 ### Geplant (siehe Roadmap)
 - 🪐 7Timer! Seeing & Transparenz
@@ -162,7 +163,8 @@ AstroOyInk/
 │   │   └── local_sensor.h/.cpp   # BME280-Innensensor (Roadmap #4)
 │   │
 │   ├── data_sources/
-│   │   └── weather_api.h/.cpp     # Open-Meteo
+│   │   ├── weather_api.h/.cpp     # Open-Meteo
+│   │   └── seeing_api.h/.cpp      # 7Timer! Seeing & Transparenz (Roadmap #5)
 │   │
 │   ├── modes/
 │   │   └── mode_state_machine.h/.cpp  # WEATHER ↔ SESSION (Skelett)
@@ -219,7 +221,7 @@ In dieser Reihenfolge geplant:
 2. ~~📶 WiFiManager (Captive Portal)~~ ✅
 3. ~~📤 OTA-Updates~~ ✅
 4. ~~🌡️ Lokaler Sensor (BME280)~~ ✅
-5. 🪐 7Timer! Seeing & Transparenz
+5. ~~🪐 7Timer! Seeing & Transparenz~~ ✅
 6. 🛰️ ISS / Starlink Überflüge
 7. 📷 Screenshot-Export auf SD
 8. 🔭 **SESSION-Modus** (N.I.N.A. Advanced API)
