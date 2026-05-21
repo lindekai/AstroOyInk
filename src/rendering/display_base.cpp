@@ -34,7 +34,8 @@
 #include "display_base.h"
 #include "config.h"
 #include "time_utils.h"
-#include "astro_logic.h"   // für weightedCloudScore() in quickNightVerdict()
+#include "astro_logic.h"   // fuer weightedCloudScore() in quickNightVerdict()
+#include "local_sensor.h"
 
 #include <SPI.h>
 #include <GxEPD2_3C.h>
@@ -342,7 +343,7 @@ static int16_t findCurrentHourIdx(const WeatherData& wd) {
 // ---------------------------------------------------------------------
 //  Einzelblock: AKTUELL
 // ---------------------------------------------------------------------
-static void drawCurrent(const WeatherData& wd) {
+static void drawCurrent(const WeatherData& wd, const LocalSensorData& sensor) {
   // Rahmen
   display.drawRect(CUR_X, CUR_Y, CUR_W, CUR_H, GxEPD_BLACK);
   drawTextAt(CUR_X + 6, CUR_Y + 16, "AKTUELL", &FreeSansBold9pt7b);
@@ -401,6 +402,18 @@ static void drawCurrent(const WeatherData& wd) {
     snprintf(buf, sizeof(buf), "-- hPa");
   }
   drawTextAt(rx, ry, buf, &FreeSans9pt7b);
+
+  // INNEN-Zeile am unteren Rand der Box (nur wenn Sensor aktiv und gueltig)
+  if (sensor.valid) {
+    int16_t sepY = CUR_Y + CUR_H - 22;
+    display.drawLine(CUR_X + 2, sepY, CUR_X + CUR_W - 2, sepY, GxEPD_BLACK);
+    int16_t txtY = CUR_Y + CUR_H - 8;
+    drawTextAt(CUR_X + 6, txtY, "IN:", &FreeSansBold9pt7b);
+    char ibuf[40];
+    snprintf(ibuf, sizeof(ibuf), " %.1fC  %.0f%%  %.0fhPa",
+             sensor.tempC, sensor.humidity, sensor.pressureHPa);
+    drawTextAt(CUR_X + 6 + 28, txtY, ibuf, &FreeSans9pt7b);
+  }
 }
 
 // ---------------------------------------------------------------------
@@ -923,7 +936,8 @@ static void drawMoonBox(const WeatherData& wd) {
 // ---------------------------------------------------------------------
 //  Public: Komplettes Dashboard
 // ---------------------------------------------------------------------
-void renderDashboard(const WeatherData& wd, BatteryInfo batt) {
+void renderDashboard(const WeatherData& wd, BatteryInfo batt,
+                     const LocalSensorData& sensor) {
   if (!wd.valid) {
     renderFallback("Keine Wetterdaten verfuegbar");
     return;
@@ -934,7 +948,7 @@ void renderDashboard(const WeatherData& wd, BatteryInfo batt) {
   do {
     display.fillScreen(GxEPD_WHITE);
     drawHeader(wd, batt);
-    drawCurrent(wd);
+    drawCurrent(wd, sensor);
     drawAstroBox(wd);
     drawMoonBox(wd);
     drawNightChart(wd);

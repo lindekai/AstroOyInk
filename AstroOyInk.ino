@@ -36,6 +36,7 @@
 #include "battery.h"
 #include "app_config.h"
 #include "ota_updater.h"
+#include "local_sensor.h"
 
 // data sources
 #include "weather_api.h"
@@ -159,8 +160,9 @@ static void goDeepSleep(uint32_t intervalS) {
 //  Modus WEATHER: Daten holen, Astro-Logik, Mond, Render
 // ---------------------------------------------------------------------
 static void runWeatherMode(bool wifiOk, bool timeOk) {
-  // Akku einmal pro Zyklus lesen (vor dem Render, kein WLAN noetig)
-  BatteryInfo batt = readBattery();
+  // Akku + Sensor einmal pro Zyklus lesen (vor dem Render, kein WLAN noetig)
+  BatteryInfo      batt   = readBattery();
+  LocalSensorData  sensor = localSensorRead();
 
   // WeatherData liegt static, damit es den 8 KB Stack nicht sprengt
   static WeatherData wd;
@@ -203,7 +205,7 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
     Serial.println("[STEP 6] Render Dashboard ...");
     Serial.flush();
     uint32_t t0 = millis();
-    renderDashboard(wd, batt);
+    renderDashboard(wd, batt, sensor);
     uint32_t dt = millis() - t0;
     hasEverRendered = true;
     Serial.printf("[STEP 6] Render ok (%lu ms)\n", (unsigned long)dt);
@@ -249,6 +251,9 @@ static void doCycle() {
   Serial.flush();
   displayInit();
   Serial.println("[STEP 1] Display-Init ok");
+
+  // 1b) Lokaler Sensor initialisieren (I2C, kein WLAN noetig)
+  localSensorInit();
 
   // 2) Konfiguration laden (NVS oder config.h-Defaults)
   Serial.println("[STEP 2] Konfiguration laden ...");

@@ -23,9 +23,17 @@ Alle relevanten Änderungen am Projekt.
 - 📄 `.gitignore` für .DS_Store, Build-Artefakte und `secrets.h`
 - 👤 Autor (Kai Linde) und Credits (Dark Matters Discord) in allen Quelldateien
 
+- 🌡️ **Lokaler Sensor (BME280)** — `src/common/local_sensor.h/.cpp`
+  I²C-Anbindung an GPIO 21/22 (Standard-ESP32-Pins, kein Konflikt mit
+  Display oder Batterie-ADC). Liest Innentemperatur, Feuchte und Luftdruck.
+  Anzeige als kompakte „IN: …"-Zeile am unteren Rand des AKTUELL-Blocks.
+  Standardmäßig deaktiviert (`LOCAL_SENSOR_ENABLED 0`). I²C-Adresse
+  0x76 / 0x77 per `LOCAL_SENSOR_ADDR` in `config.h` wählbar.
+  Benötigt: „Adafruit BME280 Library" + „Adafruit Unified Sensor".
+
 ### Geplant (verbleibend)
-- 🌡️ Lokaler Sensor (BME280 / DHT22)
 - 🪐 Seeing- & Transparenz-Daten via 7Timer!
+
 - 🛰️ ISS / Starlink-Überflüge
 - 📷 Screenshot-Export auf SD-Karte
 - 🔭 **SESSION-Modus** über N.I.N.A. Advanced API

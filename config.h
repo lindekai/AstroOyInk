@@ -116,11 +116,22 @@
 #define BATT_ADC_PIN         34
 #define BATT_VOLTAGE_DIVIDER 2.0f
 //
-// // ---------------------------------------------------------------------
-// //  Lokaler Umgebungssensor (Feature 4)
-// // ---------------------------------------------------------------------
-// #define LOCAL_SENSOR_ENABLED 0
-// #define LOCAL_SENSOR_TYPE    "BME280"   // oder "DHT22"
+// ---------------------------------------------------------------------
+//  Lokaler Umgebungssensor (Feature 4, BME280 via I2C)
+//  Misst Innentemperatur, Feuchte und Luftdruck direkt am Geraet.
+//  Benoetigt Bibliotheken: "Adafruit BME280 Library" +
+//                          "Adafruit Unified Sensor" (Library Manager).
+//
+//  Verdrahtung:
+//    BME280 VCC → 3V3      BME280 GND → GND
+//    BME280 SDA → GPIO 21  BME280 SCL → GPIO 22
+//    BME280 SDO → GND  (I2C-Adresse 0x76)
+//           SDO → VCC  (I2C-Adresse 0x77, dann SENSOR_ADDR aendern)
+// ---------------------------------------------------------------------
+#define LOCAL_SENSOR_ENABLED  0       // 0 = deaktiviert, 1 = aktiv
+#define LOCAL_SENSOR_SDA      21      // Standard-I2C-SDA (kein Konflikt mit Display)
+#define LOCAL_SENSOR_SCL      22      // Standard-I2C-SCL (kein Konflikt mit Display)
+#define LOCAL_SENSOR_ADDR     0x76    // SDO an GND → 0x76; SDO an VCC → 0x77
 
 // ---------------------------------------------------------------------
 //  OTA-Updates (Feature 3)

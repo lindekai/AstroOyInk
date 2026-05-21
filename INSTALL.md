@@ -71,6 +71,30 @@ Spring direkt zu Schritt 3.
 > CS, weil er nur HIGH-aktiv kurz nach dem Boot ist) und Pins, die mit
 > Flash/PSRAM belegt sind (6–11).
 
+### Optional: BME280-Innensensor
+
+Für Innentemperatur, Feuchte und Luftdruck (angezeigt als „IN:"-Zeile im Dashboard):
+
+| BME280 Pin | ESP32 GPIO | Bemerkung |
+|---|---|---|
+| `VCC` | `3V3` | **Nicht 5 V!** |
+| `GND` | `GND` | |
+| `SDA` | `GPIO 21` | Standard-I²C-SDA |
+| `SCL` | `GPIO 22` | Standard-I²C-SCL |
+| `SDO` | `GND` | I²C-Adresse 0x76 |
+
+Wenn `SDO` an `VCC` liegt, ist die I²C-Adresse 0x77 → in `config.h` anpassen:
+```cpp
+#define LOCAL_SENSOR_ADDR  0x77
+```
+
+Danach Sensor aktivieren:
+```cpp
+#define LOCAL_SENSOR_ENABLED  1
+```
+
+Ohne Sensor: `LOCAL_SENSOR_ENABLED 0` lassen — das Dashboard zeigt dann keine INNEN-Zeile.
+
 ### Optional: Batterieanzeige
 
 Wenn du einen LiPo-Akku anschließen und den Ladestand anzeigen willst,
@@ -142,6 +166,8 @@ Bibliotheken installieren (Suchbegriff → Installieren):
 | `Adafruit GFX`  | Adafruit         | aktuelle (≥ 1.11.x) |
 | `ArduinoJson`   | Benoit Blanchon  | **7.x** (wichtig!) |
 | `WiFiManager`   | tzapu / tablatronics | aktuelle (≥ 2.0) |
+| `Adafruit BME280 Library` | Adafruit | aktuelle (nur wenn Sensor verbaut) |
+| `Adafruit Unified Sensor` | Adafruit | (Abhängigkeit von BME280 → annehmen) |
 | `Adafruit BusIO` | Adafruit        | (wird meist als Abhängigkeit von GFX automatisch vorgeschlagen → annehmen) |
 
 > **WiFi**, **HTTPClient** und **WiFiClientSecure** sind bereits

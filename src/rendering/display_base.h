@@ -22,6 +22,7 @@
 
 #include "data_types.h"
 #include "battery.h"
+#include "local_sensor.h"
 
 // Initialisiert das Display (SPI, RST, etc.). Einmal in setup() aufrufen.
 void displayInit();
@@ -30,9 +31,11 @@ void displayInit();
 void displaySleep();
 
 // Komplettes Wetter-Dashboard zeichnen (volles Refresh).
-//   wd.valid == false  →  Fallback-Bildschirm wird gezeichnet.
+//   wd.valid == false       →  Fallback-Bildschirm wird gezeichnet.
 //   batt.status == BATT_UNKNOWN → kein Batterie-Widget im Header.
-void renderDashboard(const WeatherData& wd, BatteryInfo batt);
+//   sensor.valid == false   →  INNEN-Zeile wird nicht gezeichnet.
+void renderDashboard(const WeatherData& wd, BatteryInfo batt,
+                     const LocalSensorData& sensor);
 
 // Reine Fallback-Anzeige (Erststart, kein WLAN, kein API).
 void renderFallback(const char* msg);

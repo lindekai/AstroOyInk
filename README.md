@@ -93,10 +93,9 @@ ist nach der Roadmap geplant (siehe unten).
 - 🔋 Batterieanzeige im Header (LiPo-Ladestand, USB-Erkennung, rot bei < 20 %)
 - 📶 WiFiManager: Captive Portal bei fehlendem/falschem WLAN — alle Parameter (Ort, Lat/Lon, Zeitzone, Intervall, N.I.N.A.) ohne Re-Flash konfigurierbar
 - 📤 OTA-Updates: 30-s-Flashfenster nach jedem WLAN-Connect — Firmware-Update aus der Arduino IDE ohne USB-Kabel
+- 🌡️ Lokaler BME280-Sensor: Innentemperatur, Feuchte und Luftdruck direkt am Gerät als „IN:"-Zeile im Dashboard
 
 ### Geplant (siehe Roadmap)
-
-- 🌡️ Lokaler BME280/DHT22-Sensor
 - 🪐 7Timer! Seeing & Transparenz
 - 🛰️ ISS / Starlink-Überflüge
 - 📷 Screenshot auf SD
@@ -159,7 +158,8 @@ AstroOyInk/
 │   │   ├── moon_calc.h/.cpp
 │   │   ├── battery.h/.cpp         # Batteriemessung (Roadmap #1)
 │   │   ├── app_config.h/.cpp      # NVS-Konfiguration (Roadmap #2)
-│   │   └── ota_updater.h/.cpp     # OTA-Flashfenster (Roadmap #3)
+│   │   ├── ota_updater.h/.cpp     # OTA-Flashfenster (Roadmap #3)
+│   │   └── local_sensor.h/.cpp   # BME280-Innensensor (Roadmap #4)
 │   │
 │   ├── data_sources/
 │   │   └── weather_api.h/.cpp     # Open-Meteo
@@ -218,7 +218,7 @@ In dieser Reihenfolge geplant:
 1. ~~🔋 Batterieanzeige im Header (ADC)~~ ✅
 2. ~~📶 WiFiManager (Captive Portal)~~ ✅
 3. ~~📤 OTA-Updates~~ ✅
-4. 🌡️ Lokaler Sensor (BME280 / DHT22)
+4. ~~🌡️ Lokaler Sensor (BME280)~~ ✅
 5. 🪐 7Timer! Seeing & Transparenz
 6. 🛰️ ISS / Starlink Überflüge
 7. 📷 Screenshot-Export auf SD
