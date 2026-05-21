@@ -1075,9 +1075,22 @@ void renderPortalInfo(const char* apName) {
 //  SESSION-Dashboard
 //  Layout (800 x 480):
 //
-//    y=  0- 26  HEADER (schwarz)
-//    y= 27- 93  SEQUENZ-Block (Name, Target, Subs, Restzeit, Status, Alt/Az)
-//    y= 94-479  3 Spalten: KAMERA | GUIDING | MOUNT
+//    x=0                   x=264              x=534            x=796
+//    +---------------------+------------------+----------------+ y=0
+//    | HEADER  Ort | Uhrzeit | Akkustand  (x=0..796)          |
+//    +---------------------+------------------+----------------+ y=26
+//    | SEQUENZ-Block  x=0..796                                 |
+//    | Zeile 1 (y=48):  Sequenzname | Target i/n | Subs i/n   |
+//    | Zeile 2 (y=72):  Status      | Alt/Az      | Restzeit   |
+//    +---------------------+------------------+----------------+ y=86
+//    | KAMERA x=4..262     | GUIDING x=264..532| MOUNT x=534..796 |
+//    | Titel (y=108)       | Titel (y=108)     | Titel (y=108) |
+//    | Kameraname (y=142)  | RMS RA  (y=142)   | Mountname     |
+//    | Filter     (y=174)  | RMS Dec (y=174)   | RA/Dec        |
+//    | Belichtung (y=206)  | RMS Tot (y=206)   | Alt/Az/Dir    |
+//    | HFR        (y=238)  | Status  (y=238)   | Pier          |
+//    |                     |                   | Flip ETA      |
+//    +---------------------+------------------+----------------+ y=480
 //
 //  Farb-Logik:
 //    Normaltext   → schwarz
