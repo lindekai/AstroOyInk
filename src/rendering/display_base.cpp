@@ -19,13 +19,11 @@
 //    +--------------------+-----------------------------+ y=160
 //    | NACHT-WOLKEN-CHART (Gesamt/Low/Mid/High)         |
 //    +--------------------------------------------------+ y=286
-//    | HOUR TABLE  Stundenwerte Nacht                   |
-//    +--------------------------------------------------+ y=335
+//    | HOUR TABLE  Stundenwerte Nacht (inkl. ISS-Symbol)|
+//    +--------------------------------------------------+ y=347
 //    | MINI CHARTS  Temp | Wind | Feuchte | Niederschlag|
-//    +--------------------------------------------------+ y=395
+//    +--------------------------------------------------+ y=407
 //    | FORECAST  4–5 Tage                               |
-//    +--------------------------------------------------+ y=445
-//    | FAZIT                                            |
 //    +--------------------------------------------------+ y=480
 //  Author:  Kai Linde
 //  Credits: Dark Matters Discord
@@ -37,6 +35,7 @@
 #include "astro_logic.h"
 #include "local_sensor.h"
 #include "seeing_api.h"
+#include "iss_api.h"
 #include "nina_api.h"
 
 #include <SPI.h>
@@ -114,17 +113,17 @@ static const int16_t MOON_W = 250, MOON_H = 130;
 static const int16_t CH_X = 4,   CH_Y = 166;
 static const int16_t CH_W = 792, CH_H = 118;
 
-// Stundentabelle
+// Stundentabelle (3 Zeilen: Std / Wolk% / ISS-Symbol)
 static const int16_t TBL_X = 4,   TBL_Y = 288;
-static const int16_t TBL_W = 792, TBL_H = 45;
+static const int16_t TBL_W = 792, TBL_H = 57;
 
 // Mini-Charts (4 Stk., je ~196 breit)
-static const int16_t MC_X = 4,   MC_Y = 337;
+static const int16_t MC_X = 4,   MC_Y = 349;
 static const int16_t MC_W = 792, MC_H = 56;
 
 // Forecast (4–5 Tage) — reicht jetzt bis ans untere Display-Ende
-static const int16_t FC_X = 4,   FC_Y = 397;
-static const int16_t FC_W = 792, FC_H = 80;
+static const int16_t FC_X = 4,   FC_Y = 409;
+static const int16_t FC_W = 792, FC_H = 68;
 
 // ---------------------------------------------------------------------
 //  Hilfsfunktionen Zeichnen
@@ -652,7 +651,7 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
 //  Eine Zeile pro Stunde im Nachtfenster, kompakt.
 //  Spalten: HH | Cloud% | Wind | Hum | T
 // ---------------------------------------------------------------------
-static void drawHourTable(const WeatherData& wd) {
+static void drawHourTable(const WeatherData& wd, const ISSData& iss) {
   display.drawRect(TBL_X, TBL_Y, TBL_W, TBL_H, GxEPD_BLACK);
   drawTextAt(TBL_X + 6, TBL_Y + 16, "STUNDENWERTE NACHT", &FreeSans9pt7b);
 
@@ -671,21 +670,33 @@ static void drawHourTable(const WeatherData& wd) {
   // Header-Spalte ganz links
   int16_t lx = TBL_X + 6;
   int16_t headY = TBL_Y + 28;
-  drawTextAt(lx, headY,        "Std",   &FreeSans9pt7b);
-  drawTextAt(lx, headY + 12,   "Wolk%", &FreeSans9pt7b);
+  drawTextAt(lx, headY,      "Std",   &FreeSans9pt7b);
+  drawTextAt(lx, headY + 12, "Wolk%", &FreeSans9pt7b);
 
   // Jede Stunde als Spalte
   for (uint16_t k = 0; k < n; k++) {
     int16_t x = TBL_X + 50 + k * colW;
-    char hh[8];
-    struct tm lt; time_t t = wd.hourly[idx[k]].ts; localtime_r(&t, &lt);
-    snprintf(hh, sizeof(hh), "%02d", lt.tm_hour);
+    time_t hStart = wd.hourly[idx[k]].ts;
+
+    struct tm lt; localtime_r(&hStart, &lt);
+    char hh[8]; snprintf(hh, sizeof(hh), "%02d", lt.tm_hour);
     drawTextCentered(x + colW / 2, headY, hh, &FreeSansBold9pt7b);
 
     int cs = (int)round(wd.astroHourly[idx[k]].cloudScore);
     char cb[8]; snprintf(cb, sizeof(cb), "%d", cs);
     uint16_t col = (cs > ASTRO_CLOUD_MODERATE) ? DISPLAY_RED : GxEPD_BLACK;
     drawTextCentered(x + colW / 2, headY + 12, cb, &FreeSans9pt7b, col);
+
+    // ISS-Symbol wenn ein Pass in diese Stunde faellt
+    if (iss.valid) {
+      for (uint8_t p = 0; p < iss.count; p++) {
+        time_t rise = iss.passes[p].riseTime;
+        if (rise >= hStart && rise < hStart + 3600L) {
+          drawTextCentered(x + colW / 2, headY + 24, "ISS", &FreeSans9pt7b, DISPLAY_RED);
+          break;
+        }
+      }
+    }
   }
 }
 
@@ -975,7 +986,8 @@ static void drawMoonBox(const WeatherData& wd) {
 // ---------------------------------------------------------------------
 void renderDashboard(const WeatherData& wd, BatteryInfo batt,
                      const LocalSensorData& sensor,
-                     const SeeingData& seeing) {
+                     const SeeingData& seeing,
+                     const ISSData& iss) {
   if (!wd.valid) {
     renderFallback("Keine Wetterdaten verfuegbar");
     return;
@@ -990,7 +1002,7 @@ void renderDashboard(const WeatherData& wd, BatteryInfo batt,
     drawAstroBox(wd);
     drawMoonBox(wd);
     drawNightChart(wd, seeing);
-    drawHourTable(wd);
+    drawHourTable(wd, iss);
     drawMiniCharts(wd);
     drawForecast(wd);
   } while (display.nextPage());

@@ -41,6 +41,7 @@
 // data sources
 #include "weather_api.h"
 #include "seeing_api.h"
+#include "iss_api.h"
 // modes
 #include "mode_state_machine.h"
 
@@ -172,6 +173,7 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
   wd.locationName = g_cfg.locationName;
 
   static SeeingData seeing;
+  static ISSData    iss;
 
   bool apiOk = false;
   if (wifiOk && timeOk) {
@@ -180,6 +182,9 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
 
     Serial.println("[STEP 4b] Fetch 7Timer! Seeing ...");
     fetchSeeing(g_cfg.lat, g_cfg.lon, seeing);
+
+    Serial.println("[STEP 4c] Fetch ISS-Passes ...");
+    fetchISSPasses(g_cfg.lat, g_cfg.lon, iss);
   }
 
   if (apiOk) {
@@ -213,7 +218,7 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
     Serial.println("[STEP 6] Render Dashboard ...");
     Serial.flush();
     uint32_t t0 = millis();
-    renderDashboard(wd, batt, sensor, seeing);
+    renderDashboard(wd, batt, sensor, seeing, iss);
     uint32_t dt = millis() - t0;
     hasEverRendered = true;
     Serial.printf("[STEP 6] Render ok (%lu ms)\n", (unsigned long)dt);
@@ -373,6 +378,7 @@ void setup() {
   }
   goDeepSleep(g_cfg.refreshIntervalS);
 #else
+ 
   Serial.println("[DEBUG] Kein Deep-Sleep - loop() uebernimmt.");
 #endif
 }
