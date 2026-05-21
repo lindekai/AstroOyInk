@@ -34,10 +34,11 @@
 #include "display_base.h"
 #include "config.h"
 #include "time_utils.h"
-#include "astro_logic.h"   // fuer weightedCloudScore() in quickNightVerdict()
+#include "astro_logic.h"
 #include "local_sensor.h"
 #include "seeing_api.h"
 #include "iss_api.h"
+#include "nina_api.h"
 
 #include <SPI.h>
 #include <GxEPD2_3C.h>
@@ -46,6 +47,18 @@
 #include <Fonts/FreeSansBold12pt7b.h>
 #include <Fonts/FreeSansBold18pt7b.h>
 #include <Fonts/FreeSansBold24pt7b.h>
+
+// DISPLAY_RED:    Warnfarbe auf weissem Hintergrund.
+//                 BWR → GxEPD_RED; BW → GxEPD_BLACK (immer noch sichtbar).
+// DISPLAY_RED_BG: Warnfarbe auf schwarzem Hintergrund (z.B. Header).
+//                 BWR → GxEPD_RED; BW → GxEPD_WHITE (auf Schwarz sichtbar).
+#if DISPLAY_HAS_RED
+  #define DISPLAY_RED     GxEPD_RED
+  #define DISPLAY_RED_BG  GxEPD_RED
+#else
+  #define DISPLAY_RED     GxEPD_BLACK
+  #define DISPLAY_RED_BG  GxEPD_WHITE
+#endif
 
 // ---------------------------------------------------------------------
 //  Display-Treiber
@@ -283,7 +296,7 @@ static void drawBatteryWidget(int16_t x, int16_t y, const BatteryInfo& batt) {
   // Fuellstand (weiss = voll, rot = kritisch/niedrig)
   uint8_t pct = batt.percent;
   int16_t fillW = (int16_t)((int32_t)(iconW - 2) * pct / 100);
-  uint16_t fillCol = (pct <= 20) ? GxEPD_RED : GxEPD_WHITE;
+  uint16_t fillCol = (pct <= 20) ? DISPLAY_RED_BG : GxEPD_WHITE;
   if (fillW > 0) {
     display.fillRect(x + 1, y + 1, fillW, iconH - 2, fillCol);
   }
@@ -291,40 +304,42 @@ static void drawBatteryWidget(int16_t x, int16_t y, const BatteryInfo& batt) {
   // Prozenttext rechts neben dem Icon
   char buf[8];
   snprintf(buf, sizeof(buf), "%d%%", pct);
-  uint16_t textCol = (pct <= 20) ? GxEPD_RED : GxEPD_WHITE;
+  uint16_t textCol = (pct <= 20) ? DISPLAY_RED_BG : GxEPD_WHITE;
   drawTextAt(x + iconW + 5, textY, buf, &FreeSans9pt7b, textCol);
 }
 
 // ---------------------------------------------------------------------
-//  Einzelblock: HEADER
+//  Einzelblock: HEADER (gemeinsame Basis fuer WEATHER und SESSION)
 // ---------------------------------------------------------------------
-static void drawHeader(const WeatherData& wd, const BatteryInfo& batt) {
+static void drawHeaderImpl(const char* locationName, time_t fetchedAt,
+                           const BatteryInfo& batt) {
   display.fillRect(0, 0, W, HDR_H, GxEPD_BLACK);
 
-  // Ort links
-  drawTextAt(14, 19, wd.locationName.length() ? wd.locationName : String(LOCATION_NAME),
-             &FreeSansBold12pt7b, GxEPD_WHITE);
+  drawTextAt(14, 19, locationName, &FreeSansBold12pt7b, GxEPD_WHITE);
 
-  // Uhrzeit zentriert
   char hhmm[16];
   formatHHMM(time(nullptr), hhmm, sizeof(hhmm));
   drawTextCentered(W / 2, 19, hhmm, &FreeSansBold12pt7b, GxEPD_WHITE);
 
-  // Batterie-Widget zwischen Zeit und Update-Stempel
   if (batt.status != BATT_UNKNOWN) {
     drawBatteryWidget(575, 7, batt);
   }
 
-  // Update rechts
   char updBuf[40];
-  if (wd.fetchedAt > 0) {
+  if (fetchedAt > 0) {
     char tmp[20];
-    formatHHMM(wd.fetchedAt, tmp, sizeof(tmp));
+    formatHHMM(fetchedAt, tmp, sizeof(tmp));
     snprintf(updBuf, sizeof(updBuf), "Update  %s", tmp);
   } else {
     snprintf(updBuf, sizeof(updBuf), "Update  --:--");
   }
   drawTextRight(W - 14, 19, updBuf, &FreeSans9pt7b, GxEPD_WHITE);
+}
+
+static void drawHeader(const WeatherData& wd, const BatteryInfo& batt) {
+  const char* loc = wd.locationName.length() ? wd.locationName.c_str()
+                                              : LOCATION_NAME;
+  drawHeaderImpl(loc, wd.fetchedAt, batt);
 }
 
 // ---------------------------------------------------------------------
@@ -353,7 +368,7 @@ static void drawCurrent(const WeatherData& wd, const LocalSensorData& sensor) {
   int16_t idx = findCurrentHourIdx(wd);
   if (idx < 0) {
     drawTextAt(CUR_X + 10, CUR_Y + 60, "Keine Daten",
-               &FreeSansBold12pt7b, GxEPD_RED);
+               &FreeSansBold12pt7b, DISPLAY_RED);
     return;
   }
   const HourlyData& h = wd.hourly[idx];
@@ -384,13 +399,13 @@ static void drawCurrent(const WeatherData& wd, const LocalSensorData& sensor) {
 
   drawWindIcon(rx, ry - 4, GxEPD_BLACK);
   snprintf(buf, sizeof(buf), "%.0f km/h", isnan(h.windKmh) ? 0.0f : h.windKmh);
-  uint16_t windCol = (h.windKmh > ASTRO_WIND_WARN) ? GxEPD_RED : GxEPD_BLACK;
+  uint16_t windCol = (h.windKmh > ASTRO_WIND_WARN) ? DISPLAY_RED : GxEPD_BLACK;
   drawTextAt(rx + 22, ry, buf, &FreeSans9pt7b, windCol);
 
   ry += 22;
   drawDropIcon(rx + 4, ry - 4, GxEPD_BLACK);
   snprintf(buf, sizeof(buf), "%.0f %%", isnan(h.humidity) ? 0.0f : h.humidity);
-  uint16_t humCol = (h.humidity > ASTRO_HUMIDITY_WARN) ? GxEPD_RED : GxEPD_BLACK;
+  uint16_t humCol = (h.humidity > ASTRO_HUMIDITY_WARN) ? DISPLAY_RED : GxEPD_BLACK;
   drawTextAt(rx + 22, ry, buf, &FreeSans9pt7b, humCol);
 
   ry += 22;
@@ -448,7 +463,7 @@ static void drawAstroBox(const WeatherData& wd) {
   switch (s.verdict) {
     case ASTRO_GOOD:     label = "GUT";      break;
     case ASTRO_MODERATE: label = "MITTEL";   break;
-    case ASTRO_BAD:      label = "SCHLECHT"; labelCol = GxEPD_RED; break;
+    case ASTRO_BAD:      label = "SCHLECHT"; labelCol = DISPLAY_RED; break;
     default:             label = "KEINE NACHT";
   }
   drawTextAt(tx, ty, label, &FreeSansBold18pt7b, labelCol);
@@ -460,7 +475,7 @@ static void drawAstroBox(const WeatherData& wd) {
   } else if (s.verdict == ASTRO_MODERATE) {
     for (int i = 0; i < 3; i++) drawStar(tx + 8 + i * 20, sy, 6, GxEPD_BLACK);
   } else if (s.verdict == ASTRO_BAD) {
-    drawStar(tx + 8, sy, 6, GxEPD_RED);
+    drawStar(tx + 8, sy, 6, DISPLAY_RED);
   }
 
   // Nachtfenster + Stundenanzahl (knapp halten, damit das ')' nicht
@@ -479,11 +494,11 @@ static void drawAstroBox(const WeatherData& wd) {
   // Warnungen
   ty += 20;
   if (s.windWarn) {
-    drawTextAt(tx, ty, "Wind > 25 km/h", &FreeSansBold9pt7b, GxEPD_RED);
+    drawTextAt(tx, ty, "Wind > 25 km/h", &FreeSansBold9pt7b, DISPLAY_RED);
     ty += 16;
   }
   if (s.humidityWarn) {
-    drawTextAt(tx, ty, "Feuchte > 90%  (Tau!)", &FreeSansBold9pt7b, GxEPD_RED);
+    drawTextAt(tx, ty, "Feuchte > 90%  (Tau!)", &FreeSansBold9pt7b, DISPLAY_RED);
   }
 }
 
@@ -534,7 +549,7 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
 
   if (n < 2) {
     drawTextAt(px + 10, py + ph / 2, "Keine Nachtstunden im Datensatz.",
-               &FreeSans9pt7b, GxEPD_RED);
+               &FreeSans9pt7b, DISPLAY_RED);
   } else {
     // Hilfsfkt: x-Pos einer Nachtstunde im Plot
     auto xOf = [&](uint16_t k) -> int16_t {
@@ -569,7 +584,7 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
       display.drawLine(x0, yOf(t0) - 1, x1, yOf(t1) - 1, GxEPD_BLACK);
 
       // Low – rot solid
-      display.drawLine(x0, yOf(h0.cloudLow),  x1, yOf(h1.cloudLow),  GxEPD_RED);
+      display.drawLine(x0, yOf(h0.cloudLow),  x1, yOf(h1.cloudLow),  DISPLAY_RED);
 
       // Mid – schwarz gepunktet
       drawDottedLine(x0, yOf(h0.cloudMid),  x1, yOf(h1.cloudMid),  GxEPD_BLACK);
@@ -603,11 +618,11 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
           // Seeing – gestrichelt rot, 2 px
           int16_t ya = sToY(sd.points[i - 1].seeing);
           int16_t yb = sToY(sd.points[i].seeing);
-          drawDashedLine(xa, ya,     xb, yb,     GxEPD_RED, 4, 3);
-          drawDashedLine(xa, ya - 1, xb, yb - 1, GxEPD_RED, 4, 3);
+          drawDashedLine(xa, ya,     xb, yb,     DISPLAY_RED, 4, 3);
+          drawDashedLine(xa, ya - 1, xb, yb - 1, DISPLAY_RED, 4, 3);
           // Transparenz – gepunktet rot
           drawDottedLine(xa, sToY(sd.points[i - 1].transparency),
-                         xb, sToY(sd.points[i].transparency), GxEPD_RED);
+                         xb, sToY(sd.points[i].transparency), DISPLAY_RED);
         }
       }
     }
@@ -620,8 +635,8 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
   display.drawLine(lx, ly, lx + 16, ly, GxEPD_BLACK);
   display.drawLine(lx, ly + 1, lx + 16, ly + 1, GxEPD_BLACK);
   drawTextAt(lx + 20, ly + 4, "Gesamt", &FreeSans9pt7b);
-  display.drawLine(lx + 100, ly, lx + 116, ly, GxEPD_RED);
-  drawTextAt(lx + 120, ly + 4, "Low", &FreeSans9pt7b, GxEPD_RED);
+  display.drawLine(lx + 100, ly, lx + 116, ly, DISPLAY_RED);
+  drawTextAt(lx + 120, ly + 4, "Low", &FreeSans9pt7b, DISPLAY_RED);
   // Zeile 2: Mid + High
   drawDottedLine(lx, ly + 16, lx + 16, ly + 16, GxEPD_BLACK);
   drawTextAt(lx + 20, ly + 20, "Mid", &FreeSans9pt7b);
@@ -629,11 +644,11 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
   drawTextAt(lx + 120, ly + 20, "High", &FreeSans9pt7b);
   // Zeile 3: Seeing + Transp (7Timer!) – nur wenn Daten vorhanden
   if (sd.valid) {
-    drawDashedLine(lx, ly + 32, lx + 16, ly + 32, GxEPD_RED, 4, 3);
-    drawDashedLine(lx, ly + 31, lx + 16, ly + 31, GxEPD_RED, 4, 3);
-    drawTextAt(lx + 20, ly + 36, "Seeing", &FreeSans9pt7b, GxEPD_RED);
-    drawDottedLine(lx + 100, ly + 32, lx + 116, ly + 32, GxEPD_RED);
-    drawTextAt(lx + 120, ly + 36, "Transp", &FreeSans9pt7b, GxEPD_RED);
+    drawDashedLine(lx, ly + 32, lx + 16, ly + 32, DISPLAY_RED, 4, 3);
+    drawDashedLine(lx, ly + 31, lx + 16, ly + 31, DISPLAY_RED, 4, 3);
+    drawTextAt(lx + 20, ly + 36, "Seeing", &FreeSans9pt7b, DISPLAY_RED);
+    drawDottedLine(lx + 100, ly + 32, lx + 116, ly + 32, DISPLAY_RED);
+    drawTextAt(lx + 120, ly + 36, "Transp", &FreeSans9pt7b, DISPLAY_RED);
   }
 }
 
@@ -674,7 +689,7 @@ static void drawHourTable(const WeatherData& wd) {
 
     int cs = (int)round(wd.astroHourly[idx[k]].cloudScore);
     char cb[8]; snprintf(cb, sizeof(cb), "%d", cs);
-    uint16_t col = (cs > ASTRO_CLOUD_MODERATE) ? GxEPD_RED : GxEPD_BLACK;
+    uint16_t col = (cs > ASTRO_CLOUD_MODERATE) ? DISPLAY_RED : GxEPD_BLACK;
     drawTextCentered(x + colW / 2, headY + 12, cb, &FreeSans9pt7b, col);
   }
 }
@@ -772,7 +787,7 @@ static void drawMiniCharts(const WeatherData& wd) {
   drawMiniChart(MC_X + 2 * cw, MC_Y, cw - 4, MC_H, "Feuchte  (%)",
                 hArr, maxN, 0, 100, false, GxEPD_BLACK);
   drawMiniChart(MC_X + 3 * cw, MC_Y, cw - 4, MC_H, "Regen  (mm)",
-                pArr, maxN, 0, 0, true, GxEPD_RED);
+                pArr, maxN, 0, 0, true, DISPLAY_RED);
 }
 
 // ---------------------------------------------------------------------
@@ -848,7 +863,7 @@ static void drawForecast(const WeatherData& wd) {
     switch (v) {
       case ASTRO_GOOD:     label = "GUT";    break;
       case ASTRO_MODERATE: label = "MITTEL"; break;
-      case ASTRO_BAD:      label = "BAD";    col = GxEPD_RED; break;
+      case ASTRO_BAD:      label = "BAD";    col = DISPLAY_RED; break;
       default:             label = "--";
     }
     drawTextCentered(cx, FC_Y + 44, label, &FreeSansBold9pt7b, col);
@@ -862,7 +877,7 @@ static void drawFazit(const WeatherData& wd, const ISSData& iss) {
   display.drawRect(FZ_X, FZ_Y, FZ_W, FZ_H, GxEPD_BLACK);
 
   uint16_t col = GxEPD_BLACK;
-  if (wd.summary.verdict == ASTRO_BAD) col = GxEPD_RED;
+  if (wd.summary.verdict == ASTRO_BAD) col = DISPLAY_RED;
 
   drawTextAt(FZ_X + 8, FZ_Y + 20, "FAZIT:", &FreeSansBold9pt7b);
   drawTextAt(FZ_X + 75, FZ_Y + 20,
@@ -882,7 +897,7 @@ static void drawFazit(const WeatherData& wd, const ISSData& iss) {
         snprintf(buf, sizeof(buf), "ISS: JETZT! %dmin",
                  (int)(end - now) / 60 + 1);
         drawTextRight(FZ_X + FZ_W - 8, FZ_Y + 20, buf,
-                      &FreeSansBold9pt7b, GxEPD_RED);
+                      &FreeSansBold9pt7b, DISPLAY_RED);
         break;
       } else if (rt > now && rt <= now + 86400L) {
         // Naechster Pass heute / morgen
@@ -998,7 +1013,7 @@ static void drawMoonBox(const WeatherData& wd) {
   if      (m.skyImpact < 0.10f) impactLabel = "Himmel:  dunkel";
   else if (m.skyImpact < 0.35f) impactLabel = "Himmel:  mittel";
   else                        { impactLabel = "Himmel:  HELL";
-                                impactCol   = GxEPD_RED; }
+                                impactCol   = DISPLAY_RED; }
   drawTextAt(tx, ty, impactLabel, &FreeSansBold9pt7b, impactCol);
 }
 
@@ -1042,7 +1057,7 @@ void renderFallback(const char* msg) {
     // Zentrale Meldung
     drawTextCentered(W / 2, H / 2 - 20, "Erststart / Fehler", &FreeSansBold18pt7b);
     drawTextCentered(W / 2, H / 2 + 10, msg ? msg : "Bitte warten...",
-                     &FreeSansBold12pt7b, GxEPD_RED);
+                     &FreeSansBold12pt7b, DISPLAY_RED);
     drawTextCentered(W / 2, H / 2 + 40,
                      "Pruefe WLAN, Konfiguration und Internetzugang.",
                      &FreeSans9pt7b);
@@ -1069,7 +1084,7 @@ void renderPortalInfo(const char* apName) {
                &FreeSansBold12pt7b);
     y += 34;
     drawTextCentered(W / 2, y, apName ? apName : "AstroOyInk-??????",
-                     &FreeSansBold18pt7b, GxEPD_RED);
+                     &FreeSansBold18pt7b, DISPLAY_RED);
 
     // Schritt 2
     y += 50;
@@ -1089,5 +1104,299 @@ void renderPortalInfo(const char* apName) {
 
     // Trennlinie
     display.drawLine(40, y + 14, W - 40, y + 14, GxEPD_BLACK);
+  } while (display.nextPage());
+}
+
+// =====================================================================
+//  SESSION-Dashboard
+//  Layout (800 x 480):
+//
+//    y=  0- 26  HEADER (schwarz)
+//    y= 27- 93  SEQUENZ-Block (Name, Target, Subs, Restzeit, Status, Alt/Az)
+//    y= 94-479  3 Spalten: KAMERA | GUIDING | MOUNT
+//
+//  Farb-Logik:
+//    Normaltext   → schwarz
+//    Warnungen    → DISPLAY_RED (bei BW = schwarz, bei BWR = rot)
+//    Invertierter Warnblock (nur BW, wenn DISPLAY_HAS_RED=0) für
+//    kritische Meldungen wie [Guiding WARN/LOST].
+// =====================================================================
+
+// --- SESSION-Layout-Konstanten ---
+static const int16_t SS_SEQ_Y1  = 48;    // Sequenz-Zeile 1 Baseline
+static const int16_t SS_SEQ_Y2  = 72;    // Sequenz-Zeile 2 Baseline (Status/Alt)
+static const int16_t SS_SEQ_BOT = 86;    // Unterkante Sequenz-Block
+
+// Spaltenstart und -breiten
+static const int16_t SS_C1_X  = 4,   SS_C1_W = 258;   // KAMERA
+static const int16_t SS_C2_X  = 264, SS_C2_W = 268;   // GUIDING
+static const int16_t SS_C3_X  = 534, SS_C3_W = 262;   // MOUNT
+
+// Zeilenabstaende in den Spalten
+static const int16_t SS_R_TITLE = SS_SEQ_BOT + 22;    // = 108
+static const int16_t SS_R1      = SS_SEQ_BOT + 56;    // = 142
+static const int16_t SS_R2      = SS_SEQ_BOT + 88;    // = 174
+static const int16_t SS_R3      = SS_SEQ_BOT + 120;   // = 206
+static const int16_t SS_R4      = SS_SEQ_BOT + 152;   // = 238
+static const int16_t SS_R5      = SS_SEQ_BOT + 184;   // = 270
+
+// Zeichnet einen Warn-Text: bei BWR rot, bei BW invertierter Block
+static void drawWarnLabel(int16_t x, int16_t y, const char* text) {
+#if DISPLAY_HAS_RED
+  drawTextAt(x, y, text, &FreeSansBold9pt7b, DISPLAY_RED);
+#else
+  int16_t bx, by; uint16_t bw, bh;
+  display.setFont(&FreeSansBold9pt7b);
+  display.getTextBounds(text, x, y, &bx, &by, &bw, &bh);
+  display.fillRect(bx - 2, by - 2, bw + 4, bh + 4, GxEPD_BLACK);
+  drawTextAt(x, y, text, &FreeSansBold9pt7b, GxEPD_WHITE);
+#endif
+}
+
+// Hilfsfunktion: RA (Stunden) → "05h 34m"
+static void formatRAStr(float raH, char* buf, size_t sz) {
+  int h = (int)raH;
+  int m = (int)((raH - h) * 60.0f + 0.5f);
+  if (m >= 60) { h++; m = 0; }
+  snprintf(buf, sz, "%02dh %02dm", h, m);
+}
+
+// Hilfsfunktion: Dec (Grad) → "+35° 48'"
+static void formatDecStr(float decDeg, char* buf, size_t sz) {
+  char sign = (decDeg >= 0) ? '+' : '-';
+  float absDec = fabsf(decDeg);
+  int d = (int)absDec;
+  int m = (int)((absDec - d) * 60.0f + 0.5f);
+  if (m >= 60) { d++; m = 0; }
+  snprintf(buf, sz, "%c%02d%c %02d'", sign, d, '\xB0', m);
+}
+
+// Hilfsfunktion: Restzeit in Sekunden → "1h 23m" oder "45 min"
+static void formatEtaStr(uint32_t s, char* buf, size_t sz) {
+  if (s == 0) { snprintf(buf, sz, "--"); return; }
+  uint32_t h = s / 3600, m = (s % 3600) / 60;
+  if (h > 0) snprintf(buf, sz, "%uh %02um", (unsigned)h, (unsigned)m);
+  else        snprintf(buf, sz, "%u min",   (unsigned)m);
+}
+
+// Hilfsfunktion: Azimut (Grad) → Himmelsrichtung "N"/"NO"/"O"/...
+static const char* azToDir(float az) {
+  if (az < 22.5f || az >= 337.5f) return "N";
+  if (az < 67.5f)  return "NO";
+  if (az < 112.5f) return "O";
+  if (az < 157.5f) return "SO";
+  if (az < 202.5f) return "S";
+  if (az < 247.5f) return "SW";
+  if (az < 292.5f) return "W";
+  return "NW";
+}
+
+// ---------------------------------------------------------------------
+//  SESSION-Spalte: KAMERA
+// ---------------------------------------------------------------------
+static void drawSessionCamera(int16_t cx, int16_t cw, const NinaCameraInfo& c) {
+  drawTextAt(cx + 6, SS_R_TITLE, "KAMERA", &FreeSansBold12pt7b);
+  display.drawLine(cx + 2, SS_R_TITLE + 6, cx + cw - 2, SS_R_TITLE + 6, GxEPD_BLACK);
+
+  char buf[48];
+
+  // Kameraname (ggf. kuerzen)
+  strlcpy(buf, c.connected ? c.name : "---", sizeof(buf));
+  if (strlen(buf) > 18) buf[18] = '\0';
+  drawTextAt(cx + 6, SS_R1, buf, &FreeSans9pt7b);
+
+  snprintf(buf, sizeof(buf), "Filter: %s",
+           (c.filterName[0] != '\0') ? c.filterName : "--");
+  drawTextAt(cx + 6, SS_R2, buf, &FreeSans9pt7b);
+
+  if (c.exposureS > 0) snprintf(buf, sizeof(buf), "Exp:    %.0f s", c.exposureS);
+  else                 snprintf(buf, sizeof(buf), "Exp:    --");
+  drawTextAt(cx + 6, SS_R3, buf, &FreeSans9pt7b);
+
+  if (c.hfr > 0) snprintf(buf, sizeof(buf), "HFR:    %.1f px", c.hfr);
+  else           snprintf(buf, sizeof(buf), "HFR:    --");
+  drawTextAt(cx + 6, SS_R4, buf, &FreeSans9pt7b);
+}
+
+// ---------------------------------------------------------------------
+//  SESSION-Spalte: GUIDING
+// ---------------------------------------------------------------------
+static void drawSessionGuiding(int16_t cx, int16_t cw,
+                               const NinaGuidingInfo& g) {
+  drawTextAt(cx + 6, SS_R_TITLE, "GUIDING", &FreeSansBold12pt7b);
+  display.drawLine(cx + 2, SS_R_TITLE + 6, cx + cw - 2, SS_R_TITLE + 6, GxEPD_BLACK);
+
+  char buf[40];
+
+  if (!g.connected) {
+    drawWarnLabel(cx + 6, SS_R1, "[Kein Guider]");
+    return;
+  }
+
+  snprintf(buf, sizeof(buf), "RMS RA:  %.2f\"", g.rmsRA);
+  drawTextAt(cx + 6, SS_R1, buf, &FreeSans9pt7b);
+
+  snprintf(buf, sizeof(buf), "RMS Dec: %.2f\"", g.rmsDec);
+  drawTextAt(cx + 6, SS_R2, buf, &FreeSans9pt7b);
+
+  snprintf(buf, sizeof(buf), "Total:   %.2f\"", g.rmsTotal);
+  drawTextAt(cx + 6, SS_R3, buf, &FreeSans9pt7b);
+
+  // Status-Label: OK / WARN / LOST
+  bool guidingLost = (strstr(g.state, "Lost") || strstr(g.state, "Stop"));
+  bool guidingWarn = (!guidingLost && g.rmsTotal >= GUIDING_WARN_RMS_ARCSEC
+                      && g.rmsTotal > 0);
+
+  if (guidingLost) {
+    drawWarnLabel(cx + 6, SS_R4, "[Guiding LOST]");
+  } else if (guidingWarn) {
+    drawWarnLabel(cx + 6, SS_R4, "[Guiding WARN]");
+  } else {
+    drawTextAt(cx + 6, SS_R4, "[Guiding OK]", &FreeSansBold9pt7b);
+  }
+
+  drawTextAt(cx + 6, SS_R5, g.state[0] ? g.state : "---", &FreeSans9pt7b);
+}
+
+// ---------------------------------------------------------------------
+//  SESSION-Spalte: MOUNT
+// ---------------------------------------------------------------------
+static void drawSessionMount(int16_t cx, int16_t cw,
+                             const NinaMountInfo& m) {
+  drawTextAt(cx + 6, SS_R_TITLE, "MOUNT", &FreeSansBold12pt7b);
+  display.drawLine(cx + 2, SS_R_TITLE + 6, cx + cw - 2, SS_R_TITLE + 6, GxEPD_BLACK);
+
+  char buf[48];
+
+  // Mountname (kuerzen)
+  strlcpy(buf, m.connected ? m.name : "---", sizeof(buf));
+  if (strlen(buf) > 18) buf[18] = '\0';
+  drawTextAt(cx + 6, SS_R1, buf, &FreeSans9pt7b);
+
+  char ra[16];
+  formatRAStr(m.raH, ra, sizeof(ra));
+  snprintf(buf, sizeof(buf), "RA:  %s", ra);
+  drawTextAt(cx + 6, SS_R2, buf, &FreeSans9pt7b);
+
+  char dec[16];
+  formatDecStr(m.decDeg, dec, sizeof(dec));
+  snprintf(buf, sizeof(buf), "Dec: %s", dec);
+  drawTextAt(cx + 6, SS_R3, buf, &FreeSans9pt7b);
+
+  const char* pier = (m.pierSide == 0) ? "West"
+                   : (m.pierSide == 1) ? "East"
+                   :                     "--";
+  snprintf(buf, sizeof(buf), "Pier: %s", pier);
+  drawTextAt(cx + 6, SS_R4, buf, &FreeSans9pt7b);
+
+  // Meridian-Flip-Countdown
+  if (m.flipEtaS < 0) {
+    drawTextAt(cx + 6, SS_R5, "Flip: --", &FreeSans9pt7b);
+  } else {
+    char eta[20];
+    formatEtaStr((uint32_t)m.flipEtaS, eta, sizeof(eta));
+    snprintf(buf, sizeof(buf), "Flip: %s", eta);
+    // Warnung wenn Flip in < 10 Minuten
+    if (m.flipEtaS < 600) {
+      drawWarnLabel(cx + 6, SS_R5, buf);
+    } else {
+      drawTextAt(cx + 6, SS_R5, buf, &FreeSans9pt7b);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------
+//  renderSessionDashboard — public
+// ---------------------------------------------------------------------
+void renderSessionDashboard(const NinaData& data, const BatteryInfo& batt,
+                            const char* locationName) {
+  display.setFullWindow();
+  display.firstPage();
+  do {
+    display.fillScreen(GxEPD_WHITE);
+
+    // --- Header ---
+    drawHeaderImpl(locationName ? locationName : LOCATION_NAME,
+                   time(nullptr), batt);
+
+    if (!data.valid) {
+      drawTextCentered(W / 2, H / 2, "N.I.N.A. nicht erreichbar",
+                       &FreeSansBold18pt7b, DISPLAY_RED);
+      continue;
+    }
+
+    const NinaSequenceInfo& seq = data.sequence;
+
+    // --- Sequenz-Block ---
+    // Zeile 1: SEQUENZ + Target-Name | Target i/n | Sub i/n
+    char line1[128];
+    {
+      char seqLabel[72];
+      if (seq.targetName[0] != '\0') {
+        snprintf(seqLabel, sizeof(seqLabel), "SEQUENZ: %s", seq.targetName);
+      } else if (seq.sequenceName[0] != '\0') {
+        snprintf(seqLabel, sizeof(seqLabel), "SEQUENZ: %s", seq.sequenceName);
+      } else {
+        snprintf(seqLabel, sizeof(seqLabel), "SEQUENZ: ---");
+      }
+
+      char targets[24] = "";
+      if (seq.targetTotal > 0 && seq.targetIndex >= 0) {
+        snprintf(targets, sizeof(targets), "  Target %d/%d",
+                 seq.targetIndex + 1, (int)seq.targetTotal);
+      }
+
+      char subs[24] = "";
+      if (seq.subsTotal > 0) {
+        snprintf(subs, sizeof(subs), "  Sub %d/%d",
+                 (int)seq.subsDone, (int)seq.subsTotal);
+      }
+
+      char eta[20] = "";
+      if (seq.etaS > 0) {
+        char etaBuf[16];
+        formatEtaStr(seq.etaS, etaBuf, sizeof(etaBuf));
+        snprintf(eta, sizeof(eta), "  Noch %s", etaBuf);
+      }
+
+      snprintf(line1, sizeof(line1), "%s%s%s%s", seqLabel, targets, subs, eta);
+    }
+    drawTextAt(6, SS_SEQ_Y1, line1, &FreeSansBold9pt7b);
+
+    // Zeile 2: Status links | Alt/Az rechts
+    char statusBuf[32];
+    snprintf(statusBuf, sizeof(statusBuf), "Status: %s",
+             seq.status[0] ? seq.status : "---");
+
+    bool statusWarn = (strcmp(seq.status, "Slewing") == 0 ||
+                       strcmp(seq.status, "Pausiert") == 0);
+    if (statusWarn) {
+      drawWarnLabel(6, SS_SEQ_Y2, statusBuf);
+    } else {
+      drawTextAt(6, SS_SEQ_Y2, statusBuf, &FreeSans9pt7b);
+    }
+
+    // Alt/Az rechts in Zeile 2
+    if (data.mount.connected && data.mount.altDeg > -90.0f) {
+      char altaz[40];
+      snprintf(altaz, sizeof(altaz), "Alt: %.0f%c  Az: %.0f%c %s",
+               data.mount.altDeg, '\xB0',
+               data.mount.azDeg,  '\xB0',
+               azToDir(data.mount.azDeg));
+      drawTextRight(W - 6, SS_SEQ_Y2, altaz, &FreeSans9pt7b);
+    }
+
+    // Trennlinie unter Sequenz-Block
+    display.drawLine(4, SS_SEQ_BOT, W - 4, SS_SEQ_BOT, GxEPD_BLACK);
+
+    // --- Spalten-Trennlinien ---
+    display.drawLine(SS_C2_X - 2, SS_SEQ_BOT + 2, SS_C2_X - 2, H - 2, GxEPD_BLACK);
+    display.drawLine(SS_C3_X - 2, SS_SEQ_BOT + 2, SS_C3_X - 2, H - 2, GxEPD_BLACK);
+
+    // --- Die drei Spalten ---
+    drawSessionCamera(SS_C1_X, SS_C1_W, data.camera);
+    drawSessionGuiding(SS_C2_X, SS_C2_W, data.guiding);
+    drawSessionMount(SS_C3_X, SS_C3_W, data.mount);
+
   } while (display.nextPage());
 }

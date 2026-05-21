@@ -26,12 +26,11 @@ ESP32, das **automatisch zwischen zwei Modi wechselt**:
 Beide Modi laufen auf **dem gleichen Gerät**. Der Modus wird zu Beginn
 jedes Zyklus neu ermittelt (siehe `src/modes/mode_state_machine.cpp`).
 
-> **Aktueller Status:** Roadmap-Punkte 1–6 abgeschlossen (Batterieanzeige,
-> WiFiManager, OTA, BME280-Innensensor, 7Timer! Seeing & Transparenz,
-> ISS-Überflüge). Punkt 7 (SD-Screenshot) wurde bewusst gestrichen.
-> Der WEATHER-Modus läuft komplett. Die State-Machine ist als Skelett
-> vorbereitet, liefert aber immer `MODE_WEATHER`. Als nächstes folgt
-> Punkt 8: SESSION-Modus via N.I.N.A. Advanced API.
+> **Aktueller Status:** Alle Roadmap-Punkte 1–8 abgeschlossen.
+> Punkt 7 (SD-Screenshot) wurde bewusst gestrichen.
+> WEATHER-Modus und SESSION-Modus laufen vollständig.
+> Die State-Machine erkennt N.I.N.A. + laufende Sequenz und wechselt
+> automatisch zwischen den Modi.
 
 ## Vorgeschichte
 
@@ -94,19 +93,19 @@ AstroOyInk/
 │   ├── data_sources/              # External APIs / Datenquellen
 │   │   ├── weather_api.h/.cpp     # Open-Meteo HTTPS-Client
 │   │   ├── seeing_api.h/.cpp      # 7Timer! HTTP-Client, Seeing & Transparenz
-│   │   └── iss_api.h/.cpp         # open-notify.org, ISS-Ueberflugvorhersage
-│   │   # (NACHHER: nina_api.h/.cpp fuer SESSION-Modus)
+│   │   ├── iss_api.h/.cpp         # open-notify.org, ISS-Ueberflugvorhersage
+│   │   └── nina_api.h/.cpp        # N.I.N.A. Advanced API v2 (SESSION-Modus)
 │   │
 │   ├── modes/
 │   │   └── mode_state_machine.h/.cpp   # detectCurrentMode() - aktuell Stub
 │   │
 │   └── rendering/
 │       └── display_base.h/.cpp    # GxEPD2-Init, Page-Loop, manueller BUSY-Wait
-│                                  # PLUS: aktuell das komplette Wetter-Dashboard.
-│                                  # Wird spaeter aufgeteilt in:
+│                                  # PLUS: Wetter-Dashboard + Session-Dashboard.
+│                                  # Koennte spaeter aufgeteilt werden in:
 │                                  #   - display_base.cpp (nur Basis-Helpers)
-│                                  #   - view_weather.cpp (das Wetter-Dashboard)
-│                                  #   - view_session.cpp (Session-Live-Anzeige)
+│                                  #   - view_weather.cpp (Wetter-Dashboard)
+│                                  #   - view_session.cpp (Session-Dashboard)
 │
 ├── tests/                         # Host-Tests (g++, kein ESP32 noetig)
 │   ├── test_astro.cpp
@@ -236,7 +235,7 @@ In dieser Reihenfolge geplant (Reihenfolge vom Nutzer gewählt):
 5. ~~🪐 **7Timer! Seeing & Transparenz** — rote Kurven im Nacht-Chart~~ ✅
 6. ~~🛰️ **ISS-Überflüge** — open-notify.org, nächster Pass in FAZIT-Zeile~~ ✅
 7. ~~📷 **Screenshot-Export** auf SD-Karte~~ *(entfällt — bewusst gestrichen)*
-8. 🔭 **SESSION-Modus**: N.I.N.A. Advanced API anzapfen (der grosse Brocken)
+8. ~~🔭 **SESSION-Modus**: N.I.N.A. Advanced API~~ ✅
 
 > **Workflow für Claude Code:** Pro Roadmap-Punkt erst Detailfragen mit
 > dem Nutzer klären, *dann* implementieren. Nicht voreilig anfangen.

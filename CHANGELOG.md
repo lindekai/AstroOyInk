@@ -5,6 +5,29 @@ Alle relevanten Änderungen am Projekt.
 ## [Unreleased]
 
 ### Hinzugefügt
+- 🔭 **SESSION-Modus** — `src/data_sources/nina_api.h/.cpp` +
+  `renderSessionDashboard()` in `display_base.cpp`
+  N.I.N.A. Advanced API v2, Port 1888, kein Key. Automatischer Wechsel
+  WEATHER → SESSION wenn N.I.N.A. erreichbar **und** Sequenz läuft.
+  Zeigt: Sequenzname, Target i/n, Sub i/n, Restzeit, Status
+  (Imaging/Focusing/Slewing/Pausiert), Objekt-Höhe/Azimut, Kameraname,
+  Filter, Belichtungszeit, HFR, Guiding RMS RA/Dec/Total + Status-Label
+  ([Guiding OK] / [Guiding WARN] / [Guiding LOST]), Mountname,
+  RA/Dec-Koordinaten, Pier-Seite, Meridian-Flip-Countdown.
+  Warnungen (RMS ≥ 1,0″, Flip < 10 min, Slewing/Pausiert):
+  rot (BWR) oder invertierter Block (BW).
+  SESSION-Modus: Gerät bleibt wach, Update alle 5 min (Wake-Loop);
+  bei Verbindungsverlust automatisch zurück zu WEATHER + Deep-Sleep.
+- 🎨 **`DISPLAY_HAS_RED`** in `config.h` — steuert ob Rot-Kanal
+  genutzt wird (1 = BWR Standard, 0 = B/W-Display). Alle roten
+  Elemente (WEATHER + SESSION) reagieren auf diese Einstellung.
+  Makros `DISPLAY_RED` und `DISPLAY_RED_BG` in `display_base.cpp`.
+- ⚙️ **`GUIDING_WARN_RMS_ARCSEC`** in `config.h` — Schwellwert für
+  Guiding-Warnung (Standard 1,0″).
+- ⚙️ **`SESSION_REFRESH_INTERVAL_S`** in `config.h` — Aktualisierungs-
+  intervall im SESSION-Modus (Standard 300 s / 5 min).
+
+### Geplant (verbleibend)
 - 🔋 **Batterieanzeige im Header** — `src/common/battery.h/.cpp`
   LiPo-Lookup-Tabelle (8 Stützpunkte), 16× ADC-Oversampling GPIO34,
   USB-Erkennung (V > 4,3 V). Icon + %, rot bei < 20 %, USB-Label

@@ -29,11 +29,12 @@ enum DisplayMode : uint8_t {
 };
 
 // Ermittelt den aktuell passenden Modus.
-// Aktuell: liefert IMMER MODE_WEATHER (Stub).
-// Später: prüft N.I.N.A.-Erreichbarkeit + Session-Aktivität.
-DisplayMode detectCurrentMode();
+// SESSION wenn N.I.N.A. erreichbar UND Sequenz laeuft,
+// sonst immer WEATHER.
+// ninaHost leer → sofort MODE_WEATHER (SESSION deaktiviert).
+DisplayMode detectCurrentMode(const char* ninaHost, uint16_t ninaPort);
 
-// Menschenlesbarer Name eines Modus für Logging.
+// Menschenlesbarer Name eines Modus fuer Logging.
 const char* modeName(DisplayMode m);
 
 #endif // ASTROOYINK_MODE_STATE_MACHINE_H

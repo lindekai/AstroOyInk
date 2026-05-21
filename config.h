@@ -94,19 +94,34 @@
 // ---------------------------------------------------------------------
 #define WIFI_MANAGER_TIMEOUT_S  180    // Portal schliesst nach 3 Minuten
 
-// =====================================================================
-//  GEPLANTE BLÖCKE  (kommen mit späteren Features, vorerst auskommentiert)
-// =====================================================================
-//
-// // ---------------------------------------------------------------------
-// //  N.I.N.A.-Anbindung (Session-Modus, kommt nach Roadmap-Feature 7)
-// //  Du kannst entweder eine IP-Adresse oder einen Hostnamen eintragen.
-// //  Hostnamen funktionieren in den meisten Heimnetzen via mDNS.
-// // ---------------------------------------------------------------------
-// #define NINA_HOST       "nina-pc.local"   // oder z.B. "192.168.1.42"
-// #define NINA_PORT       1888
-// #define NINA_PROBE_INTERVAL_S    300      // alle 5 min im Wetter-Modus pingen
-//
+// ---------------------------------------------------------------------
+//  SESSION-Modus — N.I.N.A. Advanced API (Roadmap #8)
+//  Host/Port werden auch im WiFiManager-Portal konfiguriert (NVS).
+//  Diese Defaults gelten nur wenn NVS leer ist.
+//  Leer lassen → SESSION-Modus deaktiviert, immer WEATHER.
+// ---------------------------------------------------------------------
+// #define NINA_HOST_DEFAULT   "nina-pc.local"  // oder "192.168.1.42"
+// #define NINA_PORT_DEFAULT   1888
+
+// Aktualisierungsintervall im SESSION-Modus (Geraet bleibt wach)
+#define SESSION_REFRESH_INTERVAL_S  300UL   // 5 Minuten
+
+// ---------------------------------------------------------------------
+//  Display-Farb-Modus
+//  1 = BWR (Schwarz / Weiss / Rot) — Standard Waveshare 7.5" V3
+//  0 = BW  (nur Schwarz / Weiss)  — z.B. Waveshare 7.5" mono
+//  Bei BW: rote Elemente werden durch invertierte Bloecke (weiss auf
+//  schwarz) ersetzt, damit Warnungen trotzdem hervorstechen.
+// ---------------------------------------------------------------------
+#define DISPLAY_HAS_RED  1
+
+// ---------------------------------------------------------------------
+//  Guiding-Warnschwelle (SESSION-Modus)
+//  RMS Total >= dieser Wert → [Guiding WARN] in Rot / invertiert.
+// ---------------------------------------------------------------------
+#define GUIDING_WARN_RMS_ARCSEC  1.0f
+
+
 // ---------------------------------------------------------------------
 //  Batterieanzeige (Feature 1)
 //  Spannungsteiler: 100k + 100k zwischen Akku-Plus und GPIO34 (1:2).

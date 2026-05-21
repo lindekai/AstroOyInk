@@ -56,8 +56,8 @@ Ein kleines ePaper-Astrodisplay für Menschen, die „klarer Himmel“ eher als 
 └─────────────────────────────────────────────────────┘
 ```
 
-**Aktueller Stand (v0.1.0):** WEATHER-Modus läuft komplett. SESSION-Modus
-ist nach der Roadmap geplant (siehe unten).
+**Aktueller Stand:** WEATHER-Modus und SESSION-Modus sind vollständig implementiert
+(siehe Roadmap). Automatischer Wechsel je nach N.I.N.A.-Erreichbarkeit.
 
 ---
 
@@ -97,8 +97,14 @@ ist nach der Roadmap geplant (siehe unten).
 - 🪐 7Timer! Seeing & Transparenz: astronomisches Seeing + Durchsicht als rote Kurven im Nacht-Wolken-Chart
 - 🛰️ ISS-Überflüge: nächster Pass rechts in der FAZIT-Zeile (open-notify.org, kein Key)
 
-### Geplant (siehe Roadmap)
-- 🔭 **N.I.N.A.-Session-Modus** über die Advanced API
+### SESSION-Modus (N.I.N.A. Advanced API)
+
+- 🔭 Automatischer Wechsel WEATHER → SESSION wenn N.I.N.A. läuft
+- 📋 Sequenzfortschritt: Target i/n, Sub i/n, Restzeit, Status
+- 🎯 Objekt-Höhe und Azimut (aus N.I.N.A.)
+- 📷 Kamera: Name, Filter, Belichtungszeit, HFR
+- 🔭 Guiding: RMS RA/Dec/Total, Warnungen ab 1,0″
+- 🌐 Mount: Name, RA/Dec, Pier-Seite, Meridian-Flip-Countdown
 
 ## Hardware
 
@@ -223,7 +229,7 @@ In dieser Reihenfolge geplant:
 5. ~~🪐 7Timer! Seeing & Transparenz~~ ✅
 6. ~~🛰️ ISS-Überflüge~~ ✅
 7. ~~📷 Screenshot-Export auf SD~~ *(entfällt)*
-8. 🔭 **SESSION-Modus** (N.I.N.A. Advanced API)
+8. ~~🔭 **SESSION-Modus** (N.I.N.A. Advanced API)~~ ✅
 
 Siehe [CHANGELOG.md](CHANGELOG.md) für die Versionshistorie.
 

@@ -25,14 +25,15 @@
 #include "local_sensor.h"
 #include "seeing_api.h"
 #include "iss_api.h"
+#include "nina_api.h"
 
-// Initialisiert das Display (SPI, RST, etc.). Einmal in setup() aufrufen.
+// Initialisiert das Display (SPI, RST, etc.). Einmal pro Zyklus aufrufen.
 void displayInit();
 
-// Schaltet das Panel in Tiefschlaf (ohne Buffer löschen).
+// Schaltet das Panel in Tiefschlaf (ohne Buffer loeschen).
 void displaySleep();
 
-// Komplettes Wetter-Dashboard zeichnen (volles Refresh).
+// Komplettes Wetter-Dashboard zeichnen (voller Refresh).
 //   wd.valid == false       →  Fallback-Bildschirm wird gezeichnet.
 //   batt.status == BATT_UNKNOWN → kein Batterie-Widget im Header.
 //   sensor.valid == false   →  INNEN-Zeile wird nicht gezeichnet.
@@ -40,6 +41,13 @@ void renderDashboard(const WeatherData& wd, BatteryInfo batt,
                      const LocalSensorData& sensor,
                      const SeeingData& seeing,
                      const ISSData& iss);
+
+// SESSION-Dashboard zeichnen (voller Refresh; partiell als Optimierung
+// fuer spaetere Revision vorgesehen).
+//   data.valid == false     →  "N.I.N.A. nicht erreichbar"-Meldung.
+//   locationName            →  aus AppConfig (fuer den Header).
+void renderSessionDashboard(const NinaData& data, const BatteryInfo& batt,
+                            const char* locationName);
 
 // Reine Fallback-Anzeige (Erststart, kein WLAN, kein API).
 void renderFallback(const char* msg);

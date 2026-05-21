@@ -58,6 +58,9 @@ RTC_DATA_ATTR bool     hasEverRendered = false;
 // Laufzeit-Konfiguration (aus NVS oder config.h-Defaults)
 static AppConfig g_cfg;
 
+// Zuletzt ermittelter Modus — bestimmt Sleep-Strategie in setup()
+static DisplayMode g_lastMode = MODE_WEATHER;
+
 // ---------------------------------------------------------------------
 //  WiFi + Captive Portal (WiFiManager)
 // ---------------------------------------------------------------------
@@ -240,13 +243,38 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
 }
 
 // ---------------------------------------------------------------------
-//  Modus SESSION: noch nicht implementiert.
-//  Roadmap: nach Abschluss der Features 1-7.
+//  Modus SESSION: N.I.N.A.-Session-Telemetrie
 // ---------------------------------------------------------------------
-static void runSessionMode(bool /*wifiOk*/, bool /*timeOk*/) {
-  Serial.println("[STEP 5/6] SESSION-Mode noch nicht implementiert.");
-  renderFallback("SESSION-Mode kommt spaeter");
-  hasEverRendered = true;
+static void runSessionMode(bool wifiOk, bool /*timeOk*/) {
+  BatteryInfo batt = readBattery();
+
+  static NinaData nd;
+  bool ok = false;
+
+  if (wifiOk && g_cfg.ninaHost[0] != '\0') {
+    Serial.println("[STEP 5] Fetch N.I.N.A. Session-Daten ...");
+    ok = ninaFetchAll(g_cfg.ninaHost, g_cfg.ninaPort, nd);
+  }
+
+  if (ok) {
+    Serial.println("[STEP 6] Render Session-Dashboard ...");
+    Serial.flush();
+    uint32_t t0 = millis();
+    renderSessionDashboard(nd, batt, g_cfg.locationName);
+    hasEverRendered = true;
+    Serial.printf("[STEP 6] Render ok (%lu ms)\n", (unsigned long)(millis() - t0));
+  } else {
+    if (!hasEverRendered) {
+      const char* msg = !wifiOk ? "Kein WLAN"
+                       : (g_cfg.ninaHost[0] == '\0') ? "N.I.N.A. nicht konfiguriert"
+                       : "N.I.N.A. nicht erreichbar";
+      Serial.printf("[STEP 6] Fallback: %s\n", msg);
+      renderFallback(msg);
+      hasEverRendered = true;
+    } else {
+      Serial.println("[STEP 6] N.I.N.A.-Fehler, Anzeige bleibt unveraendert.");
+    }
+  }
 }
 
 // ---------------------------------------------------------------------
@@ -288,8 +316,9 @@ static void doCycle() {
     timeOk = timeSyncNTP(g_cfg.timezone);
   }
 
-  // 5) Modus ermitteln (aktuell: immer WEATHER)
-  DisplayMode mode = detectCurrentMode();
+  // 5) Modus ermitteln
+  DisplayMode mode = detectCurrentMode(g_cfg.ninaHost, g_cfg.ninaPort);
+  g_lastMode = mode;
   Serial.printf("[STEP 5] Modus = %s\n", modeName(mode));
 
   // 6) Modus-spezifisch
@@ -332,8 +361,24 @@ void setup() {
   doCycle();
 
 #if !DEBUG_MODE
+  if (g_lastMode == MODE_SESSION) {
+    // SESSION: wach bleiben und alle 5 Minuten aktualisieren.
+    // Sobald N.I.N.A. nicht mehr laeuft, wechselt doCycle() zurueck
+    // zu WEATHER und wir gehen in den normalen Deep-Sleep.
+    Serial.println("[SLEEP] SESSION-Modus: Wake-Loop aktiv.");
+    while (true) {
+      uint32_t remaining = (uint32_t)SESSION_REFRESH_INTERVAL_S * 1000UL;
+      while (remaining > 0) {
+        uint32_t tick = (remaining >= 500) ? 500 : remaining;
+        delay(tick);
+        remaining -= tick;
+      }
+      doCycle();
+      if (g_lastMode != MODE_SESSION) break;
+    }
+  }
   goDeepSleep(g_cfg.refreshIntervalS);
-# else
+#else
   Serial.println("[DEBUG] Kein Deep-Sleep - loop() uebernimmt.");
 #endif
 }
