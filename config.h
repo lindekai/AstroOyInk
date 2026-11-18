@@ -83,7 +83,10 @@
 // ---------------------------------------------------------------------
 //  Sonstiges
 // ---------------------------------------------------------------------
-#define FORECAST_DAYS          5
+// Abgerufene Tage. Einer mehr als angezeigt (FORECAST_SHOW_DAYS),
+// damit auch die letzte Nacht bis 04:00 Daten hat.
+#define FORECAST_DAYS          7
+#define FORECAST_SHOW_DAYS     6
 #define HTTP_USER_AGENT        "AstroOyInk/0.1 (ESP32)"
 
 // ---------------------------------------------------------------------

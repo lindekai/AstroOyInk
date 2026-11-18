@@ -73,7 +73,7 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 - 🪐 **Seeing & Transparenz** von 7Timer! als Kurven im Chart
 - 🌙 **Mondhöhe je Nachtstunde** in der Stundentabelle, ab 30° rot
 - ⚠️ **Wind- und Tau-Warnung** ab 25 km/h bzw. 90 % Feuchte
-- 📊 Mini-Charts (Temp, Wind, Feuchte, Regen) und **5-Tage-Vorschau**
+- 📊 Mini-Charts (Temp, Wind, Feuchte, Regen) und **6-Tage-Vorschau**
 
 </td>
 <td width="50%" valign="top">
@@ -294,7 +294,7 @@ Der Netz-Scan läuft nur von **1 h vor Sonnenuntergang bis 1 h nach Sonnenaufgan
 ├──────────────────────────────────────────────────────────────────────┤
 │ Temp │ Wind │ Feuchte │ Regen      (Mini-Charts 24 h)                │
 ├──────────────────────────────────────────────────────────────────────┤
-│    Mi        Do        Fr        Sa        So     (Tmin/Tmax/Nacht)  │
+│   Mi      Do      Fr      Sa      So      Mo    (Tmin/Tmax/Nacht)  │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 

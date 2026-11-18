@@ -19,7 +19,10 @@ Alle relevanten Änderungen am Projekt.
   GUT/MITTEL/SCHLECHT, ruhigeres Wolken-Chart mit drei 2-px-Linien.
 - Transparenz-Linie schwarz gestrichelt — bei gleichen Werten lag sie
   unsichtbar unter der roten Seeing-Linie.
-- Vorhersage ohne Überschrift „VORHERSAGE“, fünf Tage über die volle Breite.
+- Vorhersage ohne Überschrift „VORHERSAGE“, jetzt **6 Tage** über die volle
+  Breite (`FORECAST_SHOW_DAYS`). Abgerufen werden 7 Tage (`FORECAST_DAYS`),
+  damit auch die letzte Nacht bis 04:00 Daten hat — vorher beruhte die
+  Bewertung des letzten Tages nur auf 22–23 Uhr.
 - Regenbalken mindestens 3 px hoch (0,1 mm war nur ein Strich).
 - Log unterscheidet „N.I.N.A. nicht erreichbar“ und „keine laufende Sequenz“.
 

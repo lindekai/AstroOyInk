@@ -876,7 +876,7 @@ static void drawMiniCharts(const WeatherData& wd) {
 }
 
 // ---------------------------------------------------------------------
-//  Einzelblock: FORECAST 4-5 Tage
+//  Einzelblock: FORECAST (FORECAST_SHOW_DAYS Tage)
 // ---------------------------------------------------------------------
 //  Pro Tag: Wochentag, Tmin/Tmax, Niederschlag, kleines Symbol.
 //  Bewertung der Nacht: berechnen wir hier "leichtgewichtig" anhand
@@ -916,7 +916,7 @@ static void drawForecast(const WeatherData& wd) {
   display.drawRect(FC_X, FC_Y, FC_W, FC_H, GxEPD_BLACK);
 
   uint8_t n = wd.dailyCount;
-  if (n > 5) n = 5;
+  if (n > FORECAST_SHOW_DAYS) n = FORECAST_SHOW_DAYS;
   if (n < 1) return;
 
   int16_t cellW = FC_W / n;
