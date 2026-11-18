@@ -15,3 +15,7 @@ tests/build/
 
 # Geheime Zugangsdaten (nie committen!)
 secrets.h
+
+# Host-Vorschau (tools/preview/build_preview.sh)
+tools/preview/build/
+tools/preview/out/

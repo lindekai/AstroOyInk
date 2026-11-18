@@ -97,7 +97,8 @@ AstroOyInk/
 │   │   ├── seeing_api.h/.cpp      # 7Timer! HTTP-Client, Seeing & Transparenz
 │   │   ├── iss_api.h/.cpp         # open-notify.org, ISS-Ueberflugvorhersage
 │   │   ├── nina_api.h/.cpp        # N.I.N.A. Advanced API v2 (SESSION-Modus)
-│   │   └── nina_discovery.h/.cpp  # Auto-Discovery: /24-Scan nach Port 1888
+│   │   ├── nina_discovery.h/.cpp  # Auto-Discovery: /24-Scan nach Port 1888
+│   │   └── nina_sequence.h/.cpp   # sequence/state-Baum auswerten (Host-Test)
 │   │
 │   ├── modes/
 │   │   └── mode_state_machine.h/.cpp   # detectCurrentMode() - aktuell Stub
@@ -114,8 +115,17 @@ AstroOyInk/
 │   ├── test_astro.cpp
 │   ├── test_moon.cpp
 │   ├── test_scan_window.cpp
+│   ├── test_nina_sequence.cpp     # braucht ArduinoJson (ARDUINOJSON_DIR)
+│   ├── fixtures/                  # echte sequence/state-Antworten
 │   ├── Arduino.h                  # Stub fuer Host-Kompilierung
 │   └── build_and_run.sh
+│
+├── tools/
+│   ├── make_readme_svgs.py        # README-Grafiken (stilisiert, NICHT pixelgenau)
+│   └── preview/                   # Pixelgenaue Host-Vorschau des Displays
+│       ├── build_preview.sh       # → tools/preview/out/*.png
+│       ├── preview_main.cpp       # Beispieldaten fuer alle Ansichten
+│       └── stubs/                 # Arduino/Print/SPI/GxEPD2-Ersatz
 │
 ├── .github/
 │   ├── workflows/test.yml         # CI: Host-Tests
@@ -264,6 +274,15 @@ In dieser Reihenfolge geplant (Reihenfolge vom Nutzer gewählt):
   prüfen — speziell die „Architektur-Prinzipien".
 - **Beim Debugging** zuerst `DEBUG_MODE=1` setzen, dann mit den `[STEP …]`-
   Logs lokalisieren, in welcher Phase es klemmt.
+- **Layout-Änderungen:** Erst mit `tools/preview/build_preview.sh` rendern
+  und das PNG prüfen, dann flashen. Die Vorschau kompiliert den
+  unveränderten `display_base.cpp` mit echter Adafruit GFX + Fonts; nur
+  GxEPD2 ist durch eine Leinwand ersetzt (gleiche Farblogik). Die
+  README-SVGs sind dagegen nur Mockups.
+- **Text auf dem Display:** Grad-Zeichen als Backtick schreiben
+  (`"12`C"`), die Helfer zeichnen daraus `°`. Zeilenabstand bei 9pt
+  mindestens 20 px. Breite mit `textWidth()` prüfen, bei Platzmangel
+  `fitFont()` statt Text über den Rand laufen lassen.
 - **Tests:** Host-Tests in `tests/`. Mond- und Astro-Berechnungen
   validieren — laufen ohne ESP32-Hardware.
 - **Library-Updates:** Wenn ArduinoJson 8 erscheint, brechen womöglich
@@ -272,5 +291,11 @@ In dieser Reihenfolge geplant (Reihenfolge vom Nutzer gewählt):
   1888 (`/v2/api/...`) UND einen WebSocket (`/v2/socket`). Wir wollen den
   REST-Weg, weil polling-basiert + simpler. Detection-Endpoints:
   - `GET /v2/api/equipment/camera/info` — Kamera connected?
-  - `GET /v2/api/sequence/state` — Sequenz läuft?
-  - `GET /v2/api/image-history/0` — letztes Bild (für „Aktivität seit X")
+  - `GET /v2/api/version` — Erreichbarkeit / Discovery-Bestätigung
+  - `GET /v2/api/sequence/state` — Sequenz als Baum, läuft = ein Knoten
+    mit `Status: "RUNNING"` (Auswertung in `nina_sequence.cpp`)
+  - `GET /v2/api/image-history?index=0` — letztes Bild (Response ist Liste)
+
+  Getestet gegen Advanced API **2.2.15.3**. Dort liefern
+  `/v2/api/application/version`, `/v2/api/sequence` und
+  `/v2/api/image-history/0` **404** — nicht verwenden.

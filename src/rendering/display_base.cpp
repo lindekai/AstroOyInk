@@ -110,31 +110,66 @@ static const int16_t AST_W = 284, AST_H = 130;
 static const int16_t MOON_X = 546, MOON_Y = 30;
 static const int16_t MOON_W = 250, MOON_H = 130;
 
-// Nacht-Cloud-Chart
-static const int16_t CH_X = 4,   CH_Y = 166;
-static const int16_t CH_W = 792, CH_H = 118;
+// Nacht-Cloud-Chart (Titelzeile mit Legende, darunter der Plot)
+static const int16_t CH_X = 4,   CH_Y = 164;
+static const int16_t CH_W = 792, CH_H = 106;
 
-// Stundentabelle (3 Zeilen: Std / Wolk% / ISS-Symbol)
-static const int16_t TBL_X = 4,   TBL_Y = 288;
-static const int16_t TBL_W = 792, TBL_H = 57;
+// Stundentabelle (Uhr / Wolken % / ISS)
+static const int16_t TBL_X = 4,   TBL_Y = 274;
+static const int16_t TBL_W = 792, TBL_H = 70;
 
-// Mini-Charts (4 Stk., je ~196 breit)
-static const int16_t MC_X = 4,   MC_Y = 349;
+// Mini-Charts (4 Stk., je ~194 breit)
+static const int16_t MC_X = 4,   MC_Y = 348;
 static const int16_t MC_W = 792, MC_H = 56;
 
-// Forecast (4–5 Tage) — reicht jetzt bis ans untere Display-Ende
-static const int16_t FC_X = 4,   FC_Y = 409;
-static const int16_t FC_W = 792, FC_H = 68;
+// Forecast (4–5 Tage) — reicht bis ans untere Display-Ende
+static const int16_t FC_X = 4,   FC_Y = 408;
+static const int16_t FC_W = 792, FC_H = 70;
 
 // ---------------------------------------------------------------------
-//  Hilfsfunktionen Zeichnen
+//  Hilfsfunktionen Text
+//  Die GFX-Fonts kennen kein Grad-Zeichen. Im Text steht dafuer ein
+//  Backtick (`), der als kleiner Kreis gezeichnet wird: "12`C" → 12°C.
+//  Breiten werden ueber die Laufweite (xAdvance) gemessen — so wandert
+//  auch der Cursor, damit sitzen zentrierte/rechtsbuendige Texte exakt.
 // ---------------------------------------------------------------------
+static const char DEG = '`';
+
+static int16_t degRadius(const GFXfont* f) {
+  return f->yAdvance >= 40 ? 4 : (f->yAdvance >= 28 ? 3 : 2);
+}
+static int16_t degAdvance(const GFXfont* f) { return 2 * degRadius(f) + 3; }
+
+// Hoehe der Ziffern ueber der Grundlinie
+static int16_t capHeight(const GFXfont* f) {
+  return f->glyph['0' - f->first].height;
+}
+
+static int16_t textWidth(const char* text, const GFXfont* font) {
+  int16_t w = 0;
+  for (const char* p = text; *p; p++) {
+    uint8_t c = (uint8_t)*p;
+    if (c == (uint8_t)DEG) { w += degAdvance(font); continue; }
+    if (c < font->first || c > font->last) continue;
+    w += font->glyph[c - font->first].xAdvance;
+  }
+  return w;
+}
+
 static void drawTextAt(int16_t x, int16_t y, const char* text,
                        const GFXfont* font, uint16_t color = GxEPD_BLACK) {
   display.setFont(font);
   display.setTextColor(color);
   display.setCursor(x, y);
-  display.print(text);
+  for (const char* p = text; *p; p++) {
+    if (*p != DEG) { display.write((uint8_t)*p); continue; }
+    int16_t r  = degRadius(font);
+    int16_t cx = display.getCursorX() + r + 1;
+    int16_t cy = y - capHeight(font) + r;
+    display.drawCircle(cx, cy, r, color);
+    if (r >= 3) display.drawCircle(cx, cy, r - 1, color);
+    display.setCursor(display.getCursorX() + degAdvance(font), y);
+  }
 }
 
 static void drawTextAt(int16_t x, int16_t y, const String& s,
@@ -145,23 +180,26 @@ static void drawTextAt(int16_t x, int16_t y, const String& s,
 // rechtsbündig
 static void drawTextRight(int16_t xRight, int16_t y, const char* text,
                           const GFXfont* font, uint16_t color = GxEPD_BLACK) {
-  display.setFont(font);
-  display.setTextColor(color);
-  int16_t bx, by; uint16_t bw, bh;
-  display.getTextBounds(text, 0, 0, &bx, &by, &bw, &bh);
-  display.setCursor(xRight - bw, y);
-  display.print(text);
+  drawTextAt(xRight - textWidth(text, font), y, text, font, color);
 }
 
 static void drawTextCentered(int16_t xCenter, int16_t y, const char* text,
                              const GFXfont* font, uint16_t color = GxEPD_BLACK) {
-  display.setFont(font);
-  display.setTextColor(color);
-  int16_t bx, by; uint16_t bw, bh;
-  display.getTextBounds(text, 0, 0, &bx, &by, &bw, &bh);
-  display.setCursor(xCenter - bw / 2, y);
-  display.print(text);
+  drawTextAt(xCenter - textWidth(text, font) / 2, y, text, font, color);
 }
+
+// Groesster Font aus fonts[], mit dem text in maxW passt (sonst der letzte)
+static const GFXfont* fitFont(const char* text, int16_t maxW,
+                              const GFXfont* const* fonts, uint8_t n) {
+  for (uint8_t i = 0; i < n; i++) {
+    if (textWidth(text, fonts[i]) <= maxW) return fonts[i];
+  }
+  return fonts[n - 1];
+}
+
+// ---------------------------------------------------------------------
+//  Hilfsfunktionen Zeichnen
+// ---------------------------------------------------------------------
 
 static void drawDashedLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
                            uint16_t color, uint8_t dashOn = 6, uint8_t dashOff = 4) {
@@ -181,26 +219,6 @@ static void drawDashedLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
     if (e2 <= dx) { err += dx; y0 += sy; }
     step++;
   }
-}
-
-static void drawDottedLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
-                           uint16_t color) {
-  int16_t dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-  int16_t dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-  int16_t err = dx + dy;
-  uint16_t step = 0;
-  while (true) {
-    if ((step % 3) == 0) display.drawPixel(x0, y0, color);
-    if (x0 == x1 && y0 == y1) break;
-    int16_t e2 = 2 * err;
-    if (e2 >= dy) { err += dy; x0 += sx; }
-    if (e2 <= dx) { err += dx; y0 += sy; }
-    step++;
-  }
-}
-
-static void drawHLineDashed(int16_t x, int16_t y, int16_t w, uint16_t color) {
-  drawDashedLine(x, y, x + w - 1, y, color);
 }
 
 // Einfaches Wolkensymbol
@@ -231,13 +249,22 @@ static void drawMoonIcon(int16_t cx, int16_t cy, int16_t r, uint16_t color) {
   display.fillCircle(cx + r / 2, cy - r / 6, r, GxEPD_WHITE);
 }
 
-// Stern
+// Gefuellter 5-zackiger Stern (flaechig statt Linien: rendert sauberer)
 static void drawStar(int16_t cx, int16_t cy, int16_t r, uint16_t color) {
-  // Vereinfachter "Stern" als Plus + X
-  display.drawLine(cx - r, cy, cx + r, cy, color);
-  display.drawLine(cx, cy - r, cx, cy + r, color);
-  display.drawLine(cx - r, cy - r, cx + r, cy + r, color);
-  display.drawLine(cx - r, cy + r, cx + r, cy - r, color);
+  int16_t ox[5], oy[5], ix[5], iy[5];
+  for (int i = 0; i < 5; i++) {
+    float a = -PI / 2 + i * 2 * PI / 5;
+    float b = a + PI / 5;
+    ox[i] = cx + (int16_t)roundf(r * cosf(a));
+    oy[i] = cy + (int16_t)roundf(r * sinf(a));
+    ix[i] = cx + (int16_t)roundf(r * 0.42f * cosf(b));
+    iy[i] = cy + (int16_t)roundf(r * 0.42f * sinf(b));
+  }
+  for (int i = 0; i < 5; i++) {
+    int j = (i + 1) % 5;
+    display.fillTriangle(cx, cy, ox[i], oy[i], ix[i], iy[i], color);
+    display.fillTriangle(cx, cy, ix[i], iy[i], ox[j], oy[j], color);
+  }
 }
 
 // Wind-Pfeil als kleines Symbol
@@ -288,19 +315,18 @@ static void drawBatteryWidget(int16_t x, int16_t y, const BatteryInfo& batt) {
   // Pol-Nocke rechts
   display.fillRect(x + iconW, y + 3, 3, 6, GxEPD_WHITE);
 
-  // Fuellstand (weiss = voll, rot = kritisch/niedrig)
+  // Fuellstand — immer weiss: Rot auf schwarzem Header ist auf dem
+  // Panel kaum lesbar
   uint8_t pct = batt.percent;
   int16_t fillW = (int16_t)((int32_t)(iconW - 2) * pct / 100);
-  uint16_t fillCol = (pct <= 20) ? DISPLAY_RED_BG : GxEPD_WHITE;
   if (fillW > 0) {
-    display.fillRect(x + 1, y + 1, fillW, iconH - 2, fillCol);
+    display.fillRect(x + 1, y + 1, fillW, iconH - 2, GxEPD_WHITE);
   }
 
   // Prozenttext rechts neben dem Icon
   char buf[8];
   snprintf(buf, sizeof(buf), "%d%%", pct);
-  uint16_t textCol = (pct <= 20) ? DISPLAY_RED_BG : GxEPD_WHITE;
-  drawTextAt(x + iconW + 5, textY, buf, &FreeSans9pt7b, textCol);
+  drawTextAt(x + iconW + 5, textY, buf, &FreeSans9pt7b, GxEPD_WHITE);
 }
 
 // ---------------------------------------------------------------------
@@ -312,9 +338,16 @@ static void drawHeaderImpl(const char* locationName, time_t fetchedAt,
 
   drawTextAt(14, 19, locationName, &FreeSansBold12pt7b, GxEPD_WHITE);
 
-  char hhmm[16];
-  formatHHMM(time(nullptr), hhmm, sizeof(hhmm));
-  drawTextCentered(W / 2, 19, hhmm, &FreeSansBold12pt7b, GxEPD_WHITE);
+  // Mitte: Datum (die Uhrzeit steht rechts als Stand — beides waere doppelt,
+  // weil das Display nur beim Update neu gezeichnet wird)
+  char dateBuf[16] = "--";
+  time_t now = time(nullptr);
+  if (now > 1700000000) {
+    struct tm lt; localtime_r(&now, &lt);
+    snprintf(dateBuf, sizeof(dateBuf), "%s %02d.%02d.",
+             shortWeekdayDE(now), lt.tm_mday, lt.tm_mon + 1);
+  }
+  drawTextCentered(W / 2, 19, dateBuf, &FreeSansBold12pt7b, GxEPD_WHITE);
 
   if (batt.status != BATT_UNKNOWN) {
     drawBatteryWidget(575, 7, batt);
@@ -324,9 +357,9 @@ static void drawHeaderImpl(const char* locationName, time_t fetchedAt,
   if (fetchedAt > 0) {
     char tmp[20];
     formatHHMM(fetchedAt, tmp, sizeof(tmp));
-    snprintf(updBuf, sizeof(updBuf), "Update  %s", tmp);
+    snprintf(updBuf, sizeof(updBuf), "Stand %s", tmp);
   } else {
-    snprintf(updBuf, sizeof(updBuf), "Update  --:--");
+    snprintf(updBuf, sizeof(updBuf), "Stand --:--");
   }
   drawTextRight(W - 14, 19, updBuf, &FreeSans9pt7b, GxEPD_WHITE);
 }
@@ -387,44 +420,45 @@ static void drawCurrent(const WeatherData& wd, const LocalSensorData& sensor) {
   display.drawCircle(unitX + 4, tempY - 28, 2, GxEPD_BLACK);
   drawTextAt(unitX + 12, tempY - 16, "C", &FreeSansBold12pt7b);
 
-  // Werte rechte Spalte (kompakter, weil Box schmaler)
-  int16_t rx = CUR_X + 140;
-  int16_t ry = CUR_Y + 40;
+  // Werte rechte Spalte: 4 Zeilen à 20 px, Icons/Text in einer Flucht
+  int16_t rx = CUR_X + 142;
+  int16_t ry = CUR_Y + 38;
+  const int16_t tx = rx + 20;
   char buf[40];
 
-  drawWindIcon(rx, ry - 4, GxEPD_BLACK);
+  drawWindIcon(rx, ry - 5, GxEPD_BLACK);
   snprintf(buf, sizeof(buf), "%.0f km/h", isnan(h.windKmh) ? 0.0f : h.windKmh);
   uint16_t windCol = (h.windKmh > ASTRO_WIND_WARN) ? DISPLAY_RED : GxEPD_BLACK;
-  drawTextAt(rx + 22, ry, buf, &FreeSans9pt7b, windCol);
+  drawTextAt(tx, ry, buf, &FreeSans9pt7b, windCol);
 
-  ry += 22;
-  drawDropIcon(rx + 4, ry - 4, GxEPD_BLACK);
+  ry += 20;
+  drawDropIcon(rx + 5, ry - 6, GxEPD_BLACK);
   snprintf(buf, sizeof(buf), "%.0f %%", isnan(h.humidity) ? 0.0f : h.humidity);
   uint16_t humCol = (h.humidity > ASTRO_HUMIDITY_WARN) ? DISPLAY_RED : GxEPD_BLACK;
-  drawTextAt(rx + 22, ry, buf, &FreeSans9pt7b, humCol);
+  drawTextAt(tx, ry, buf, &FreeSans9pt7b, humCol);
 
-  ry += 22;
-  snprintf(buf, sizeof(buf), "Tau %.1f C", isnan(h.dewpointC) ? 0.0f : h.dewpointC);
-  drawTextAt(rx, ry, buf, &FreeSans9pt7b);
+  ry += 20;
+  snprintf(buf, sizeof(buf), "Tau %.1f`C", isnan(h.dewpointC) ? 0.0f : h.dewpointC);
+  drawTextAt(tx, ry, buf, &FreeSans9pt7b);
 
-  ry += 22;
+  ry += 20;
   if (!isnan(h.pressureHpa)) {
     snprintf(buf, sizeof(buf), "%.0f hPa", h.pressureHpa);
   } else {
     snprintf(buf, sizeof(buf), "-- hPa");
   }
-  drawTextAt(rx, ry, buf, &FreeSans9pt7b);
+  drawTextAt(tx, ry, buf, &FreeSans9pt7b);
 
   // INNEN-Zeile am unteren Rand der Box (nur wenn Sensor aktiv und gueltig)
   if (sensor.valid) {
-    int16_t sepY = CUR_Y + CUR_H - 22;
-    display.drawLine(CUR_X + 2, sepY, CUR_X + CUR_W - 2, sepY, GxEPD_BLACK);
+    int16_t sepY = CUR_Y + CUR_H - 26;
+    display.drawLine(CUR_X + 1, sepY, CUR_X + CUR_W - 2, sepY, GxEPD_BLACK);
     int16_t txtY = CUR_Y + CUR_H - 8;
-    drawTextAt(CUR_X + 6, txtY, "IN:", &FreeSansBold9pt7b);
+    drawTextAt(CUR_X + 8, txtY, "Innen", &FreeSansBold9pt7b);
     char ibuf[40];
-    snprintf(ibuf, sizeof(ibuf), " %.1fC  %.0f%%  %.0fhPa",
-             sensor.tempC, sensor.humidity, sensor.pressureHPa);
-    drawTextAt(CUR_X + 6 + 28, txtY, ibuf, &FreeSans9pt7b);
+    // Luftdruck fehlt bewusst: innen = aussen, steht schon oben
+    snprintf(ibuf, sizeof(ibuf), "%.1f`C     %.0f %%", sensor.tempC, sensor.humidity);
+    drawTextAt(CUR_X + 66, txtY, ibuf, &FreeSans9pt7b);
   }
 }
 
@@ -437,22 +471,24 @@ static void drawAstroBox(const WeatherData& wd) {
 
   const AstroSummary& s = wd.summary;
 
-  // Großer Score-Kreis links – kleiner, damit Platz fuer Text bleibt
-  int16_t cx = AST_X + 45, cy = AST_Y + 72;
-  display.drawCircle(cx, cy, 40, GxEPD_BLACK);
-  display.drawCircle(cx, cy, 39, GxEPD_BLACK);
+  // Score-Kreis links
+  const int16_t cx = AST_X + 42, cy = AST_Y + 76, r = 34;
+  display.drawCircle(cx, cy, r,     GxEPD_BLACK);
+  display.drawCircle(cx, cy, r - 1, GxEPD_BLACK);
 
+  char buf[60];
   if (s.verdict == ASTRO_NO_NIGHT) {
-    drawTextCentered(cx, cy + 6, "--", &FreeSansBold18pt7b);
+    snprintf(buf, sizeof(buf), "--");
   } else {
-    char buf[8];
     snprintf(buf, sizeof(buf), "%d%%", (int)round(s.avgCloudScore));
-    drawTextCentered(cx, cy + 6, buf, &FreeSansBold18pt7b);
   }
+  static const GFXfont* const kScoreFonts[] = {&FreeSansBold18pt7b, &FreeSansBold12pt7b};
+  drawTextCentered(cx, cy + 9, buf, fitFont(buf, 2 * r - 8, kScoreFonts, 2));
 
-  // Verdict-Text + Symbole
-  int16_t tx = AST_X + 100;
-  int16_t ty = AST_Y + 50;
+  // Textspalte rechts vom Kreis — breit genug fuer "SCHLECHT" in 18pt
+  const int16_t tx   = AST_X + 84;
+  const int16_t maxW = AST_X + AST_W - 6 - tx;
+
   const char* label;
   uint16_t labelCol = GxEPD_BLACK;
   switch (s.verdict) {
@@ -461,40 +497,36 @@ static void drawAstroBox(const WeatherData& wd) {
     case ASTRO_BAD:      label = "SCHLECHT"; labelCol = DISPLAY_RED; break;
     default:             label = "KEINE NACHT";
   }
-  drawTextAt(tx, ty, label, &FreeSansBold18pt7b, labelCol);
+  static const GFXfont* const kVerdictFonts[] = {&FreeSansBold18pt7b, &FreeSansBold12pt7b};
+  drawTextAt(tx, AST_Y + 54, label, fitFont(label, maxW, kVerdictFonts, 2), labelCol);
 
-  // Sterne eine Zeile unter dem Label – mit Luft dazwischen
-  int16_t sy = ty + 22;
-  if (s.verdict == ASTRO_GOOD) {
-    for (int i = 0; i < 5; i++) drawStar(tx + 8 + i * 20, sy, 6, GxEPD_BLACK);
-  } else if (s.verdict == ASTRO_MODERATE) {
-    for (int i = 0; i < 3; i++) drawStar(tx + 8 + i * 20, sy, 6, GxEPD_BLACK);
-  } else if (s.verdict == ASTRO_BAD) {
-    drawStar(tx + 8, sy, 6, DISPLAY_RED);
+  // Sterne unter dem Label (nur fuer gute/mittlere Naechte)
+  int16_t stars = (s.verdict == ASTRO_GOOD) ? 5 : (s.verdict == ASTRO_MODERATE) ? 3 : 0;
+  for (int16_t i = 0; i < stars; i++) {
+    drawStar(tx + 8 + i * 20, AST_Y + 70, 8, GxEPD_BLACK);
   }
+  // Ohne Sterne ruecken die Folgezeilen nach oben
+  int16_t ty = AST_Y + (stars ? 98 : 84);
 
-  // Nachtfenster + Stundenanzahl (knapp halten, damit das ')' nicht
-  // am rechten Rand abgeschnitten wird)
-  ty += 44;
+  // Nachtfenster + Stundenanzahl
   if (s.nightStart > 0 && s.nightEnd > 0) {
     char a[8], b[8];
     formatHHMM(s.nightStart, a, sizeof(a));
     formatHHMM(s.nightEnd,   b, sizeof(b));
-    char buf[60];
-    snprintf(buf, sizeof(buf), "Nacht %s-%s  %uh",
-             a, b, s.nightHourCount);
+    snprintf(buf, sizeof(buf), "Nacht %s - %s (%u h)", a, b, s.nightHourCount);
+    if (textWidth(buf, &FreeSans9pt7b) > maxW) {
+      snprintf(buf, sizeof(buf), "%s - %s (%u h)", a, b, s.nightHourCount);
+    }
     drawTextAt(tx, ty, buf, &FreeSans9pt7b);
   }
+  ty += 21;
 
-  // Warnungen
-  ty += 20;
-  if (s.windWarn) {
-    drawTextAt(tx, ty, "Wind > 25 km/h", &FreeSansBold9pt7b, DISPLAY_RED);
-    ty += 16;
-  }
-  if (s.humidityWarn) {
-    drawTextAt(tx, ty, "Feuchte > 90%  (Tau!)", &FreeSansBold9pt7b, DISPLAY_RED);
-  }
+  // Warnungen — eine Zeile, damit nichts aus der Box laeuft
+  const char* warn = nullptr;
+  if (s.windWarn && s.humidityWarn) warn = "Wind + Tau-Gefahr";
+  else if (s.windWarn)              warn = "Wind > 25 km/h";
+  else if (s.humidityWarn)          warn = "Tau-Gefahr (> 90 %)";
+  if (warn) drawTextAt(tx, ty, warn, &FreeSansBold9pt7b, DISPLAY_RED);
 }
 
 // ---------------------------------------------------------------------
@@ -509,194 +541,186 @@ static uint16_t collectNightIndices(const WeatherData& wd, uint16_t* outIdx, uin
 }
 
 // ---------------------------------------------------------------------
-//  Einzelblock: NACHT-CHART (Cloud-Verläufe)
-//  X-Achse: Stunden im Nachtfenster
-//  Y-Achse: 0..100 %
-//  Linien: Total (schwarz solid), Low (rot solid),
-//          Mid (schwarz gepunktet), High (schwarz gestrichelt)
+//  Einzelblock: NACHT-CHART
+//  X-Achse: Stunden im Nachtfenster, Y-Achse: 0..100 % ("oben = schlecht")
+//  Bewusst nur drei Linien, alle 2 px stark (duenne/gepunktete Linien
+//  flimmern auf dem 3-Farb-Panel):
+//    Wolken (gewichteter Score)  schwarz durchgezogen
+//    Seeing      (7Timer!)       rot durchgezogen
+//    Transparenz (7Timer!)       rot gestrichelt
 // ---------------------------------------------------------------------
+static void drawThickLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
+                          uint16_t color, bool dashed) {
+  if (dashed) {
+    drawDashedLine(x0, y0,     x1, y1,     color, 7, 5);
+    drawDashedLine(x0, y0 - 1, x1, y1 - 1, color, 7, 5);
+  } else {
+    display.drawLine(x0, y0,     x1, y1,     color);
+    display.drawLine(x0, y0 - 1, x1, y1 - 1, color);
+  }
+}
+
 static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
   display.drawRect(CH_X, CH_Y, CH_W, CH_H, GxEPD_BLACK);
-  drawTextAt(CH_X + 6, CH_Y + 16, "NACHT - WOLKEN VERLAUF (%)", &FreeSans9pt7b);
+  drawTextAt(CH_X + 6, CH_Y + 18, "WOLKEN IN DER NACHT (%)", &FreeSansBold9pt7b);
 
-  // Plot-Bereich
-  const int16_t pad = 28;
-  int16_t px = CH_X + pad;
-  int16_t py = CH_Y + 22;
-  int16_t pw = CH_W - pad - 20;
-  int16_t ph = CH_H - 22 - 18;
-
-  // Achsen
-  display.drawLine(px,        py,        px,        py + ph, GxEPD_BLACK);
-  display.drawLine(px,        py + ph,   px + pw,   py + ph, GxEPD_BLACK);
-
-  // Y-Gitter 25/50/75/100
-  for (int v = 0; v <= 100; v += 25) {
-    int16_t y = py + ph - (int16_t)(ph * v / 100);
-    drawHLineDashed(px + 1, y, pw - 1, GxEPD_BLACK);
-    char buf[8]; snprintf(buf, sizeof(buf), "%d", v);
-    drawTextRight(px - 2, y + 4, buf, &FreeSans9pt7b);
+  // Legende rechts in der Titelzeile
+  {
+    struct Item { const char* label; uint16_t color; bool dashed; };
+    Item items[3] = {{"Wolken", GxEPD_BLACK, false},
+                     {"Seeing", DISPLAY_RED, false},
+                     {"Transparenz", DISPLAY_RED, true}};
+    uint8_t cnt = sd.valid ? 3 : 1;
+    const int16_t sampleW = 20, gap = 6, itemGap = 18;
+    int16_t total = 0;
+    for (uint8_t i = 0; i < cnt; i++) {
+      total += sampleW + gap + textWidth(items[i].label, &FreeSans9pt7b);
+      if (i + 1 < cnt) total += itemGap;
+    }
+    int16_t lx = CH_X + CH_W - 8 - total;
+    for (uint8_t i = 0; i < cnt; i++) {
+      drawThickLine(lx, CH_Y + 13, lx + sampleW, CH_Y + 13, items[i].color, items[i].dashed);
+      lx += sampleW + gap;
+      drawTextAt(lx, CH_Y + 18, items[i].label, &FreeSans9pt7b, items[i].color);
+      lx += textWidth(items[i].label, &FreeSans9pt7b) + itemGap;
+    }
   }
 
-  // Indizes der Nachtstunden
+  // Plot-Bereich unter der Titelzeile
+  const int16_t px = CH_X + 36;
+  const int16_t py = CH_Y + 32;
+  const int16_t pw = CH_W - 36 - 24;
+  const int16_t ph = CH_H - 32 - 20;
+
+  // Achsen + ruhiges Gitter (Punkte im 6-px-Raster bei 50 %)
+  display.drawLine(px, py, px, py + ph, GxEPD_BLACK);
+  display.drawLine(px, py + ph, px + pw, py + ph, GxEPD_BLACK);
+  for (int16_t x = px + 6; x < px + pw; x += 6) {
+    display.drawPixel(x, py, GxEPD_BLACK);
+    display.drawPixel(x, py + ph / 2, GxEPD_BLACK);
+  }
+  drawTextRight(px - 5, py + 5,          "100", &FreeSans9pt7b);
+  drawTextRight(px - 5, py + ph / 2 + 5, "50",  &FreeSans9pt7b);
+  drawTextRight(px - 5, py + ph + 5,     "0",   &FreeSans9pt7b);
+
   uint16_t idx[64];
   uint16_t n = collectNightIndices(wd, idx, 64);
-
   if (n < 2) {
-    drawTextAt(px + 10, py + ph / 2, "Keine Nachtstunden im Datensatz.",
+    drawTextAt(px + 10, py + ph / 2 - 6, "Keine Nachtstunden im Datensatz.",
                &FreeSans9pt7b, DISPLAY_RED);
-  } else {
-    // Hilfsfkt: x-Pos einer Nachtstunde im Plot
-    auto xOf = [&](uint16_t k) -> int16_t {
-      if (n == 1) return px + pw / 2;
-      return px + (int16_t)((long)pw * k / (n - 1));
+    return;
+  }
+
+  auto xOf = [&](uint16_t k) -> int16_t {
+    return px + (int16_t)((long)pw * k / (n - 1));
+  };
+  auto yOf = [&](float v) -> int16_t {
+    if (v < 0) v = 0;
+    if (v > 100) v = 100;
+    return py + ph - (int16_t)(ph * v / 100.0f);
+  };
+
+  // X-Beschriftung alle 2 Stunden, innerhalb der Box gehalten
+  for (uint16_t k = 0; k < n; k += 2) {
+    char hhmm[8];
+    formatHHMM(wd.hourly[idx[k]].ts, hhmm, sizeof(hhmm));
+    int16_t w = textWidth(hhmm, &FreeSans9pt7b);
+    int16_t x = xOf(k) - w / 2;
+    if (x < px) x = px;                                  // nicht unter die Y-Labels
+    if (x + w > CH_X + CH_W - 4) x = CH_X + CH_W - 4 - w;
+    drawTextAt(x, py + ph + 17, hhmm, &FreeSans9pt7b);
+  }
+
+  // Seeing + Transparenz zuerst, damit die Wolkenlinie obenauf liegt.
+  // Skala 1 (exzellent) .. 8 (schlecht) → 0..100 %
+  if (sd.valid && sd.count >= 2) {
+    time_t t0 = wd.hourly[idx[0]].ts;
+    time_t t1 = wd.hourly[idx[n - 1]].ts;
+    auto tsToX = [&](time_t t) -> int16_t {
+      float r = (float)(t - t0) / (float)(t1 - t0);
+      if (r < 0.0f) r = 0.0f;
+      if (r > 1.0f) r = 1.0f;
+      return px + (int16_t)(r * (float)pw);
     };
-    auto yOf = [&](float v) -> int16_t {
-      if (v < 0) v = 0; if (v > 100) v = 100;
-      return py + ph - (int16_t)(ph * v / 100.0f);
+    auto sToY = [&](uint8_t v) -> int16_t {
+      return yOf((float)(v - 1) / 7.0f * 100.0f);
     };
-
-    // X-Achsen-Beschriftung (Stundenlabels)
-    for (uint16_t k = 0; k < n; k++) {
-      if (k % 2 == 0 || k == n - 1) {
-        char hhmm[8];
-        formatHHMM(wd.hourly[idx[k]].ts, hhmm, sizeof(hhmm));
-        drawTextCentered(xOf(k), py + ph + 14, hhmm, &FreeSans9pt7b);
-      }
-    }
-
-    // 4 Serien zeichnen
-    for (uint16_t k = 1; k < n; k++) {
-      int16_t x0 = xOf(k - 1), x1 = xOf(k);
-
-      const HourlyData& h0 = wd.hourly[idx[k - 1]];
-      const HourlyData& h1 = wd.hourly[idx[k]];
-
-      // Total (gewichtet) – schwarz solid 2px
-      float t0 = wd.astroHourly[idx[k - 1]].cloudScore;
-      float t1 = wd.astroHourly[idx[k]].cloudScore;
-      display.drawLine(x0, yOf(t0),     x1, yOf(t1),     GxEPD_BLACK);
-      display.drawLine(x0, yOf(t0) - 1, x1, yOf(t1) - 1, GxEPD_BLACK);
-
-      // Low – rot solid
-      display.drawLine(x0, yOf(h0.cloudLow),  x1, yOf(h1.cloudLow),  DISPLAY_RED);
-
-      // Mid – schwarz gepunktet
-      drawDottedLine(x0, yOf(h0.cloudMid),  x1, yOf(h1.cloudMid),  GxEPD_BLACK);
-
-      // High – schwarz gestrichelt
-      drawDashedLine(x0, yOf(h0.cloudHigh), x1, yOf(h1.cloudHigh), GxEPD_BLACK);
-    }
-
-    // Seeing + Transparenz aus 7Timer! (3-h-Intervall, normiert auf 0..100 %)
-    // Skala: 1 = exzellent (unten = 0 %), 8 = schlecht (oben = 100 %)
-    // konsistent mit Wolken: "schlecht = oben"
-    if (sd.valid && sd.count >= 2) {
-      time_t t0 = wd.hourly[idx[0]].ts;
-      time_t t1 = wd.hourly[idx[n - 1]].ts;
-      if (t1 > t0) {
-        auto tsToX = [&](time_t t) -> int16_t {
-          float r = (float)(t - t0) / (float)(t1 - t0);
-          if (r < 0.0f) r = 0.0f;
-          if (r > 1.0f) r = 1.0f;
-          return px + (int16_t)(r * (float)pw);
-        };
-        auto sToY = [&](uint8_t v) -> int16_t {
-          float pct = (float)(v - 1) / 7.0f * 100.0f;
-          return py + ph - (int16_t)((float)ph * pct / 100.0f);
-        };
-        for (uint8_t i = 1; i < sd.count; i++) {
-          time_t ta = sd.points[i - 1].ts;
-          time_t tb = sd.points[i].ts;
-          if (tb < t0 - 10800L || ta > t1 + 10800L) continue;
-          int16_t xa = tsToX(ta), xb = tsToX(tb);
-          // Seeing – gestrichelt rot, 2 px
-          int16_t ya = sToY(sd.points[i - 1].seeing);
-          int16_t yb = sToY(sd.points[i].seeing);
-          drawDashedLine(xa, ya,     xb, yb,     DISPLAY_RED, 4, 3);
-          drawDashedLine(xa, ya - 1, xb, yb - 1, DISPLAY_RED, 4, 3);
-          // Transparenz – gepunktet rot
-          drawDottedLine(xa, sToY(sd.points[i - 1].transparency),
-                         xb, sToY(sd.points[i].transparency), DISPLAY_RED);
-        }
-      }
+    for (uint8_t i = 1; i < sd.count; i++) {
+      time_t ta = sd.points[i - 1].ts;
+      time_t tb = sd.points[i].ts;
+      if (tb < t0 - 10800L || ta > t1 + 10800L) continue;
+      int16_t xa = tsToX(ta), xb = tsToX(tb);
+      if (xa == xb) continue;
+      drawThickLine(xa, sToY(sd.points[i - 1].seeing),
+                    xb, sToY(sd.points[i].seeing), DISPLAY_RED, false);
+      drawThickLine(xa, sToY(sd.points[i - 1].transparency),
+                    xb, sToY(sd.points[i].transparency), DISPLAY_RED, true);
     }
   }
 
-  // Legende rechts oben – drei Zeilen (Zeile 3 ragt leicht in den Plot)
-  int16_t lx = CH_X + CH_W - 260;
-  int16_t ly = CH_Y + 12;
-  // Zeile 1: Gesamt + Low
-  display.drawLine(lx, ly, lx + 16, ly, GxEPD_BLACK);
-  display.drawLine(lx, ly + 1, lx + 16, ly + 1, GxEPD_BLACK);
-  drawTextAt(lx + 20, ly + 4, "Gesamt", &FreeSans9pt7b);
-  display.drawLine(lx + 100, ly, lx + 116, ly, DISPLAY_RED);
-  drawTextAt(lx + 120, ly + 4, "Low", &FreeSans9pt7b, DISPLAY_RED);
-  // Zeile 2: Mid + High
-  drawDottedLine(lx, ly + 16, lx + 16, ly + 16, GxEPD_BLACK);
-  drawTextAt(lx + 20, ly + 20, "Mid", &FreeSans9pt7b);
-  drawDashedLine(lx + 100, ly + 16, lx + 116, ly + 16, GxEPD_BLACK);
-  drawTextAt(lx + 120, ly + 20, "High", &FreeSans9pt7b);
-  // Zeile 3: Seeing + Transp (7Timer!) – nur wenn Daten vorhanden
-  if (sd.valid) {
-    drawDashedLine(lx, ly + 32, lx + 16, ly + 32, DISPLAY_RED, 4, 3);
-    drawDashedLine(lx, ly + 31, lx + 16, ly + 31, DISPLAY_RED, 4, 3);
-    drawTextAt(lx + 20, ly + 36, "Seeing", &FreeSans9pt7b, DISPLAY_RED);
-    drawDottedLine(lx + 100, ly + 32, lx + 116, ly + 32, DISPLAY_RED);
-    drawTextAt(lx + 120, ly + 36, "Transp", &FreeSans9pt7b, DISPLAY_RED);
+  for (uint16_t k = 1; k < n; k++) {
+    drawThickLine(xOf(k - 1), yOf(wd.astroHourly[idx[k - 1]].cloudScore),
+                  xOf(k),     yOf(wd.astroHourly[idx[k]].cloudScore),
+                  GxEPD_BLACK, false);
   }
 }
 
 // ---------------------------------------------------------------------
 //  Einzelblock: STUNDENTABELLE
-//  Eine Zeile pro Stunde im Nachtfenster, kompakt.
-//  Spalten: HH | Cloud% | Wind | Hum | T
+//  Spalte je Nachtstunde: Uhrzeit, Wolken-Score, ggf. ISS-Aufgang.
+//  Ohne ISS-Pass werden die zwei Zeilen vertikal zentriert.
 // ---------------------------------------------------------------------
 static void drawHourTable(const WeatherData& wd, const ISSData& iss) {
   display.drawRect(TBL_X, TBL_Y, TBL_W, TBL_H, GxEPD_BLACK);
-  drawTextAt(TBL_X + 6, TBL_Y + 16, "STUNDENWERTE NACHT", &FreeSans9pt7b);
 
   uint16_t idx[16];
   uint16_t n = collectNightIndices(wd, idx, 16);
+  if (n > 12) n = 12;
+
+  // ISS-Aufgang je Spalte (0 = keiner)
+  time_t issAt[12] = {0};
+  bool anyIss = false;
+  for (uint16_t k = 0; k < n && iss.valid; k++) {
+    time_t hStart = wd.hourly[idx[k]].ts;
+    for (uint8_t p = 0; p < iss.count; p++) {
+      time_t rise = iss.passes[p].riseTime;
+      if (rise >= hStart && rise < hStart + 3600L) { issAt[k] = rise; anyIss = true; break; }
+    }
+  }
+
+  const int16_t y1 = TBL_Y + (anyIss ? 22 : 28);
+  const int16_t y2 = y1 + 22;
+  const int16_t y3 = y2 + 21;
+  const int16_t labelW = 92;
+
+  drawTextAt(TBL_X + 8, y1, "Uhr",      &FreeSansBold9pt7b);
+  drawTextAt(TBL_X + 8, y2, "Wolken %", &FreeSans9pt7b);
+  if (anyIss) drawTextAt(TBL_X + 8, y3, "ISS", &FreeSansBold9pt7b, DISPLAY_RED);
 
   if (n == 0) {
-    drawTextAt(TBL_X + 10, TBL_Y + 32, "—", &FreeSans9pt7b);
+    drawTextAt(TBL_X + labelW, y2, "Keine Nachtstunden", &FreeSans9pt7b);
     return;
   }
 
-  // Bis zu 12 Stunden anzeigen
-  if (n > 12) n = 12;
-  int16_t colW = (TBL_W - 60) / n;
-
-  // Header-Spalte ganz links
-  int16_t lx = TBL_X + 6;
-  int16_t headY = TBL_Y + 28;
-  drawTextAt(lx, headY,      "Std",   &FreeSans9pt7b);
-  drawTextAt(lx, headY + 12, "Wolk%", &FreeSans9pt7b);
-
-  // Jede Stunde als Spalte
+  int16_t colW = (TBL_W - labelW - 6) / n;
   for (uint16_t k = 0; k < n; k++) {
-    int16_t x = TBL_X + 50 + k * colW;
-    time_t hStart = wd.hourly[idx[k]].ts;
+    int16_t cx = TBL_X + labelW + k * colW + colW / 2;
 
-    struct tm lt; localtime_r(&hStart, &lt);
+    struct tm lt;
+    time_t hStart = wd.hourly[idx[k]].ts;
+    localtime_r(&hStart, &lt);
     char hh[8]; snprintf(hh, sizeof(hh), "%02d", lt.tm_hour);
-    drawTextCentered(x + colW / 2, headY, hh, &FreeSansBold9pt7b);
+    drawTextCentered(cx, y1, hh, &FreeSansBold9pt7b);
 
     int cs = (int)round(wd.astroHourly[idx[k]].cloudScore);
     char cb[8]; snprintf(cb, sizeof(cb), "%d", cs);
     uint16_t col = (cs > ASTRO_CLOUD_MODERATE) ? DISPLAY_RED : GxEPD_BLACK;
-    drawTextCentered(x + colW / 2, headY + 12, cb, &FreeSans9pt7b, col);
+    drawTextCentered(cx, y2, cb, &FreeSans9pt7b, col);
 
-    // ISS-Symbol wenn ein Pass in diese Stunde faellt
-    if (iss.valid) {
-      for (uint8_t p = 0; p < iss.count; p++) {
-        time_t rise = iss.passes[p].riseTime;
-        if (rise >= hStart && rise < hStart + 3600L) {
-          drawTextCentered(x + colW / 2, headY + 24, "ISS", &FreeSans9pt7b, DISPLAY_RED);
-          break;
-        }
-      }
+    if (issAt[k]) {
+      char hhmm[8];
+      formatHHMM(issAt[k], hhmm, sizeof(hhmm));
+      drawTextCentered(cx, y3, hhmm, &FreeSansBold9pt7b, DISPLAY_RED);
     }
   }
 }
@@ -711,12 +735,14 @@ static void drawMiniChart(int16_t x, int16_t y, int16_t w, int16_t h,
                           float vmin, float vmax,
                           bool barChart, uint16_t color) {
   display.drawRect(x, y, w, h, GxEPD_BLACK);
-  drawTextAt(x + 4, y + 13, title, &FreeSans9pt7b);
+  drawTextAt(x + 6, y + 17, title, &FreeSans9pt7b);
 
-  int16_t px = x + 4;
-  int16_t py = y + 16;
-  int16_t pw = w - 28;   // 24 px am rechten Rand fuer die Y-Achsen-Labels
-  int16_t ph = h - 20;
+  // Plot unter der Titelzeile, rechts eine Spalte fuer die Min/Max-Labels
+  const int16_t lblW = 32;
+  int16_t px = x + 6;
+  int16_t py = y + 25;
+  int16_t pw = w - 12 - lblW;
+  int16_t ph = h - 25 - 6;
 
   // Min/Max Auto wenn 0/0 übergeben
   if (vmin == 0 && vmax == 0) {
@@ -741,12 +767,12 @@ static void drawMiniChart(int16_t x, int16_t y, int16_t w, int16_t h,
     return px + (int16_t)((long)pw * k / (n - 1));
   };
 
-  // Min/Max Beschriftung rechts
+  // Min/Max Beschriftung rechts, auf Hoehe von Plot-Ober-/Unterkante
   char buf[12];
   snprintf(buf, sizeof(buf), "%.0f", vmax);
-  drawTextRight(x + w - 2, y + 19, buf, &FreeSans9pt7b);
+  drawTextRight(x + w - 6, py + 9, buf, &FreeSans9pt7b);
   snprintf(buf, sizeof(buf), "%.0f", vmin);
-  drawTextRight(x + w - 2, y + h - 2, buf, &FreeSans9pt7b);
+  drawTextRight(x + w - 6, py + ph, buf, &FreeSans9pt7b);
 
   if (n == 0) return;
 
@@ -786,14 +812,15 @@ static void drawMiniCharts(const WeatherData& wd) {
     pArr[i] = h.precipMm;
   }
 
-  int16_t cw = MC_W / 4;
-  drawMiniChart(MC_X + 0 * cw, MC_Y, cw - 4, MC_H, "Temp  (C)",
+  // 4 gleich breite Boxen mit 4 px Abstand, die letzte buendig am Rand
+  int16_t cw = (MC_W + 4) / 4;
+  drawMiniChart(MC_X + 0 * cw, MC_Y, cw - 4, MC_H, "Temperatur (`C)",
                 tArr, maxN, 0, 0, false, GxEPD_BLACK);
-  drawMiniChart(MC_X + 1 * cw, MC_Y, cw - 4, MC_H, "Wind  (km/h)",
+  drawMiniChart(MC_X + 1 * cw, MC_Y, cw - 4, MC_H, "Wind (km/h)",
                 wArr, maxN, 0, 0, false, GxEPD_BLACK);
-  drawMiniChart(MC_X + 2 * cw, MC_Y, cw - 4, MC_H, "Feuchte  (%)",
+  drawMiniChart(MC_X + 2 * cw, MC_Y, cw - 4, MC_H, "Feuchte (%)",
                 hArr, maxN, 0, 100, false, GxEPD_BLACK);
-  drawMiniChart(MC_X + 3 * cw, MC_Y, cw - 4, MC_H, "Regen  (mm)",
+  drawMiniChart(MC_X + 3 * cw, MC_Y, MC_X + MC_W - (MC_X + 3 * cw), MC_H, "Regen (mm)",
                 pArr, maxN, 0, 0, true, DISPLAY_RED);
 }
 
@@ -836,15 +863,14 @@ static AstroVerdict quickNightVerdict(const WeatherData& wd, time_t dayStart) {
 
 static void drawForecast(const WeatherData& wd) {
   display.drawRect(FC_X, FC_Y, FC_W, FC_H, GxEPD_BLACK);
-  drawTextAt(FC_X + 6, FC_Y + 14, "VORHERSAGE", &FreeSans9pt7b);
+  drawTextAt(FC_X + 6, FC_Y + 20, "VORHERSAGE", &FreeSansBold9pt7b);
 
   uint8_t n = wd.dailyCount;
   if (n > 5) n = 5;
   if (n < 1) return;
 
-  // Die Ueberschrift "VORHERSAGE" ist ~82 px breit - erste Spalte muss
-  // deutlich nach rechts rutschen, sonst ueberlappt "Mi" direkt darauf.
-  const int16_t labelW = 110;
+  // Erste Spalte rechts neben der Ueberschrift
+  const int16_t labelW = 124;
   int16_t cellW = (FC_W - labelW) / n;
   for (uint8_t i = 0; i < n; i++) {
     int16_t x = FC_X + labelW + i * cellW;
@@ -854,26 +880,26 @@ static void drawForecast(const WeatherData& wd) {
 
     // Wochentag
     char wd3[6]; snprintf(wd3, sizeof(wd3), "%s", shortWeekdayDE(d.date));
-    drawTextCentered(cx, FC_Y + 16, wd3, &FreeSansBold9pt7b);
+    drawTextCentered(cx, FC_Y + 20, wd3, &FreeSansBold9pt7b);
 
-    // Tmin / Tmax  – mit doppeltem Leerzeichen für optische Luft
+    // Tmin / Tmax
     char tb[24];
-    snprintf(tb, sizeof(tb), "%.0f / %.0f C",
+    snprintf(tb, sizeof(tb), "%.0f` / %.0f`",
              isnan(d.tMinC) ? 0.0f : d.tMinC,
              isnan(d.tMaxC) ? 0.0f : d.tMaxC);
-    drawTextCentered(cx, FC_Y + 31, tb, &FreeSans9pt7b);
+    drawTextCentered(cx, FC_Y + 41, tb, &FreeSans9pt7b);
 
-    // Nachtbewertung
+    // Nachtbewertung (gleiche Begriffe wie NACHT-BEWERTUNG)
     AstroVerdict v = quickNightVerdict(wd, d.date);
     const char* label;
     uint16_t col = GxEPD_BLACK;
     switch (v) {
-      case ASTRO_GOOD:     label = "GUT";    break;
-      case ASTRO_MODERATE: label = "MITTEL"; break;
-      case ASTRO_BAD:      label = "BAD";    col = DISPLAY_RED; break;
+      case ASTRO_GOOD:     label = "GUT";      break;
+      case ASTRO_MODERATE: label = "MITTEL";   break;
+      case ASTRO_BAD:      label = "SCHLECHT"; col = DISPLAY_RED; break;
       default:             label = "--";
     }
-    drawTextCentered(cx, FC_Y + 44, label, &FreeSansBold9pt7b, col);
+    drawTextCentered(cx, FC_Y + 62, label, &FreeSansBold9pt7b, col);
   }
 }
 
@@ -950,34 +976,22 @@ static void drawMoonBox(const WeatherData& wd) {
   snprintf(buf, sizeof(buf), "%.0f %% beleuchtet", m.illumination * 100.0f);
   drawTextAt(tx, ty, buf, &FreeSans9pt7b);
 
-  // Höhe (rot wenn Mond sehr hoch + hell steht = stört)
-  ty += 18;
+  // Höhe ueber/unter dem Horizont
+  ty += 20;
   if (m.altitudeDeg > 0.0f) {
-    snprintf(buf, sizeof(buf), "%.0f  ueber Hor.", m.altitudeDeg);
+    snprintf(buf, sizeof(buf), "Hoehe %.0f`", m.altitudeDeg);
   } else {
-    snprintf(buf, sizeof(buf), "%.0f  unter Hor.", -m.altitudeDeg);
+    snprintf(buf, sizeof(buf), "unter Horizont");
   }
-  // Grad-Symbol einfuegen: wir nutzen eine extra Darstellung
   drawTextAt(tx, ty, buf, &FreeSans9pt7b);
-  // Klein den ° als Kreis an die Zahl setzen
-  {
-    int16_t bx, by; uint16_t bw, bh;
-    display.setFont(&FreeSans9pt7b);
-    // Breite der ersten Zahl messen
-    char tmp[8];
-    snprintf(tmp, sizeof(tmp), "%.0f",
-             m.altitudeDeg > 0 ? m.altitudeDeg : -m.altitudeDeg);
-    display.getTextBounds(tmp, tx, ty, &bx, &by, &bw, &bh);
-    display.drawCircle(tx + bw + 2, ty - 8, 2, GxEPD_BLACK);
-  }
 
   // Sky-Impact – als Label, rot nur bei hoher Aufhellung
-  ty += 18;
+  ty += 20;
   const char* impactLabel;
   uint16_t    impactCol = GxEPD_BLACK;
-  if      (m.skyImpact < 0.10f) impactLabel = "Himmel:  dunkel";
-  else if (m.skyImpact < 0.35f) impactLabel = "Himmel:  mittel";
-  else                        { impactLabel = "Himmel:  HELL";
+  if      (m.skyImpact < 0.10f) impactLabel = "Himmel: dunkel";
+  else if (m.skyImpact < 0.35f) impactLabel = "Himmel: mittel";
+  else                        { impactLabel = "Himmel: HELL";
                                 impactCol   = DISPLAY_RED; }
   drawTextAt(tx, ty, impactLabel, &FreeSansBold9pt7b, impactCol);
 }
@@ -1327,6 +1341,9 @@ void renderSessionDashboard(const NinaData& data, const BatteryInfo& batt,
       if (seq.subsTotal > 0) {
         snprintf(subs, sizeof(subs), "  Sub %d/%d",
                  (int)seq.subsDone, (int)seq.subsTotal);
+      } else if (seq.subsDone > 0) {
+        // Zeitbasierte Schleife: keine Gesamtzahl bekannt
+        snprintf(subs, sizeof(subs), "  Sub %d", (int)seq.subsDone);
       }
 
       char eta[20] = "";

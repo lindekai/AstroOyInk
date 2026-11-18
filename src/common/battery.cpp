@@ -58,6 +58,14 @@ BatteryInfo readBattery() {
   b.voltageV = v;
   b.percent  = voltToPercent(v);
 
+  // Unter 2,5 V haengt kein Akku am Teiler (LiPo-Schutz schaltet vorher
+  // ab) — dann keine Akkuanzeige statt dauerhaft "0 %"
+  if (v < 2.5f) {
+    Serial.println("[BATT] Kein Akku erkannt, Anzeige aus");
+    b.status = BATT_UNKNOWN;
+    return b;
+  }
+
   if (usbPresent()) {
     b.status = BATT_USB;
     return b;
