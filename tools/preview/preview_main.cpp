@@ -5,6 +5,7 @@
 //  je Ansicht ein PNG (800x480, Panel-Farben).
 //
 //  Aufruf: tools/preview/build_preview.sh [ausgabe-ordner] [--scale N]
+//                                         [--time UNIXZEIT]
 // =====================================================================
 #include <Arduino.h>
 #include <GxEPD2_3C.h>
@@ -63,15 +64,20 @@ static void buildWeather(WeatherData& wd, time_t now) {
                         ? (wd.summary.nightStart + wd.summary.nightEnd) / 2
                         : now + 6 * 3600;
   wd.moonNight = computeMoon(nightMid, LOCATION_LAT, LOCATION_LON);
+  computeMoonTrack(wd, LOCATION_LAT, LOCATION_LON);
 }
 
+// Werte einer echten 7Timer-Antwort (Berlin, 18.11.2026): ab der zweiten
+// Nachthaelfte ist Seeing == Transparenz, die Linien liegen aufeinander
 static void buildSeeing(SeeingData& sd, time_t day0) {
+  static const uint8_t see[]  = {4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 4, 5, 5, 5, 5, 5};
+  static const uint8_t tra[]  = {3, 3, 3, 3, 3, 3, 3, 3, 4, 5, 6, 6, 8, 4, 4, 6};
   sd.valid = true;
   sd.count = MAX_SEEING_POINTS;
   for (uint8_t k = 0; k < sd.count; k++) {
     sd.points[k].ts           = day0 + (time_t)k * 3 * 3600;
-    sd.points[k].seeing       = (uint8_t)(3 + (k * 5) % 4);
-    sd.points[k].transparency = (uint8_t)(2 + (k * 3) % 5);
+    sd.points[k].seeing       = see[k % 16];
+    sd.points[k].transparency = tra[k % 16];
   }
 }
 
@@ -111,14 +117,17 @@ static void buildSession(NinaData& nd) {
 
 int main(int argc, char** argv) {
   std::string outDir = ".";
+  time_t fixedNow = 0;
   for (int i = 1; i < argc; i++) {
     std::string a = argv[i];
     if (a == "--scale" && i + 1 < argc) g_previewScale = atoi(argv[++i]);
+    else if (a == "--time" && i + 1 < argc) fixedNow = (time_t)atoll(argv[++i]);
     else outDir = a;
   }
   if (g_previewScale < 1) g_previewScale = 1;
 
   configTzTime(TIMEZONE_POSIX, "");
+  previewNowRef() = fixedNow;
   time_t now = time(nullptr);
 
   displayInit();
@@ -152,6 +161,7 @@ int main(int argc, char** argv) {
     h.humidity    = 70.0f;
   }
   computeAstroSummary(wd);
+  computeMoonTrack(wd, LOCATION_LAT, LOCATION_LON);
   SeeingData noSeeing = {};
   ISSData noIss = {};
   LocalSensorData noSensor = {NAN, NAN, NAN, false};

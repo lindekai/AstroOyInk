@@ -22,7 +22,7 @@ DisplayMode detectCurrentMode(const char* ninaHost, uint16_t ninaPort) {
 
   Serial.printf("[MODE] Pruefe N.I.N.A. %s:%u ...\n", ninaHost, ninaPort);
   if (!ninaIsSequenceRunning(ninaHost, ninaPort)) {
-    Serial.println("[MODE] N.I.N.A. nicht erreichbar oder keine Sequenz → WEATHER");
+    Serial.println("[MODE] Keine laufende N.I.N.A.-Sequenz → WEATHER");
     return MODE_WEATHER;
   }
 

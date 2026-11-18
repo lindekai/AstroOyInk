@@ -33,8 +33,8 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/display_weather.jpg" alt="AstroOyInk im WEATHER-Modus auf dem echten Waveshare 7,5″ B/W/R-Display" width="85%">
-  <br><sub>Das echte Display im WEATHER-Modus – Waveshare 7,5″ V3, Schwarz/Weiß/Rot</sub>
+  <img src="docs/images/display_weather_preview.png" alt="AstroOyInk im WEATHER-Modus, pixelgenaue Vorschau des Waveshare 7,5″ B/W/R-Displays" width="85%">
+  <br><sub>WEATHER-Modus als pixelgenaue Vorschau (<code>tools/preview</code>) – Waveshare 7,5″ V3, Schwarz/Weiß/Rot</sub>
 </p>
 
 ---
@@ -69,9 +69,9 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 - ⭐ **Nacht-Bewertung** aus gewichteter Wolkendecke<br><sub>Low 0,5 · Mid 0,3 · High 0,2 → GUT / MITTEL / SCHLECHT</sub>
 - 🕘 **Echtes Nachtfenster** – Sonnenuntergang +2 h bis Sonnenaufgang −2 h
 - 🌙 **Mond nach Meeus**, lokal berechnet: Phase, Beleuchtung, Höhe, Himmelsaufhellung
-- 📈 **Wolken-Verlauf** der Nacht (Gesamt/Low/Mid/High)
-- 🪐 **Seeing & Transparenz** von 7Timer! als rote Kurven im Chart
-- 🛰️ **ISS-Überflüge** direkt in der Stundentabelle markiert
+- 📈 **Wolken-Verlauf** der Nacht (gewichteter Wolken-Score)
+- 🪐 **Seeing & Transparenz** von 7Timer! als Kurven im Chart
+- 🌙 **Mondhöhe je Nachtstunde** in der Stundentabelle, ab 30° rot
 - ⚠️ **Wind- und Tau-Warnung** ab 25 km/h bzw. 90 % Feuchte
 - 📊 Mini-Charts (Temp, Wind, Feuchte, Regen) und **5-Tage-Vorschau**
 
@@ -288,13 +288,13 @@ Der Netz-Scan läuft nur von **1 h vor Sonnenuntergang bis 1 h nach Sonnenaufgan
 │           78 %     │          *****        │     25 % beleuchtet     │
 │  IN: 21 C  45 %    │  Nacht 22:17-03:54    │     Himmel: dunkel      │
 ├────────────────────┴───────────────────────┴─────────────────────────┤
-│ NACHT - WOLKEN-VERLAUF (%)      Gesamt / Low / Mid / High + Seeing   │
+│ WOLKEN IN DER NACHT (%)        Wolken / Seeing / Transparenz         │
 ├──────────────────────────────────────────────────────────────────────┤
-│ STUNDENWERTE NACHT   Std / Wolk% / ISS                               │
+│ Uhr / Wolken % / Mond (Hoehe je Nachtstunde)                         │
 ├──────────────────────────────────────────────────────────────────────┤
 │ Temp │ Wind │ Feuchte │ Regen      (Mini-Charts 24 h)                │
 ├──────────────────────────────────────────────────────────────────────┤
-│ VORHERSAGE   Mi   Do   Fr   Sa   So                                  │
+│    Mi        Do        Fr        Sa        So     (Tmin/Tmax/Nacht)  │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -333,7 +333,7 @@ AstroOyInk/
 │   └── rendering/            # GxEPD2, Wetter- und Session-Dashboard
 ├── tests/                    # Host-Tests mit g++, ohne ESP32
 ├── tools/                    # Generator für die README-Grafiken
-└── docs/images/              # Hero, Modus-Grafik, Display-Foto
+└── docs/images/              # Hero, Modus-Grafik, Display-Vorschau
 ```
 
 ## 🧪 Tests

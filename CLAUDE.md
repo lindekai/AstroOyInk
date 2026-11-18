@@ -194,6 +194,7 @@ Projekt-Includes sind deshalb **relativ zur einbindenden Datei**:
        disconnectWiFi()          → WLAN aus VOR dem 30-s-Refresh (Akku)
        computeAstroSummary()     → Cloud-Score, Verdict, Warnungen
        computeMoon() x2          → "jetzt" + "Mitte der Nacht"
+       computeMoonTrack()        → Mondhoehe je Nachtstunde (Stundentabelle)
        renderDashboard()         → setFullWindow + firstPage/nextPage Loop
                                    + waitBusyManual()
    - MODE_SESSION:
@@ -278,7 +279,8 @@ In dieser Reihenfolge geplant (Reihenfolge vom Nutzer gewählt):
   und das PNG prüfen, dann flashen. Die Vorschau kompiliert den
   unveränderten `display_base.cpp` mit echter Adafruit GFX + Fonts; nur
   GxEPD2 ist durch eine Leinwand ersetzt (gleiche Farblogik). Die
-  README-SVGs sind dagegen nur Mockups.
+  README-SVGs sind dagegen nur Mockups. Mit `--time UNIXZEIT` rendert
+  die Vorschau einen festen Zeitpunkt (z. B. eine Nacht mit hohem Mond).
 - **Text auf dem Display:** Grad-Zeichen als Backtick schreiben
   (`"12`C"`), die Helfer zeichnen daraus `°`. Zeilenabstand bei 9pt
   mindestens 20 px. Breite mit `textWidth()` prüfen, bei Platzmangel

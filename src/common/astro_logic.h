@@ -21,6 +21,10 @@
 // nehmen wir gestrigen Sonnenuntergang + heutigen Sonnenaufgang.
 void computeAstroSummary(WeatherData& wd);
 
+// Mondhoehe je Stunde im Nachtfenster (astroHourly[i].moonAltDeg).
+// Nach computeAstroSummary() aufrufen, alle anderen Stunden bleiben NAN.
+void computeMoonTrack(WeatherData& wd, float latitudeDeg, float longitudeDeg);
+
 // Hilfsfunktion: gewichteter Cloud-Score
 inline float weightedCloudScore(float low, float mid, float high) {
   // NaN-Schutz: behandle NaN als 0 (= klar)

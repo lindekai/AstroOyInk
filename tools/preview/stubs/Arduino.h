@@ -88,6 +88,16 @@ inline void configTzTime(const char* tz, const char*, const char* = nullptr,
   tzset();
 }
 
+// Feste Uhrzeit fuer die Vorschau (--time). 0 = echte Systemzeit.
+// Der Makro-Umweg erreicht auch die time(nullptr)-Aufrufe im src/-Code.
+inline time_t& previewNowRef() { static time_t v = 0; return v; }
+inline time_t previewTime(time_t* out) {
+  time_t v = previewNowRef() ? previewNowRef() : time(nullptr);
+  if (out) *out = v;
+  return v;
+}
+#define time(p) previewTime(p)
+
 #include "Print.h"
 
 #endif // PREVIEW_ARDUINO_H

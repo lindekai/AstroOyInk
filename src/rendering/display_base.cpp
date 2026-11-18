@@ -135,6 +135,9 @@ static const int16_t FC_W = 792, FC_H = 70;
 // ---------------------------------------------------------------------
 static const char DEG = '`';
 
+// Ab dieser Mondhoehe wird der Wert in der Stundentabelle rot
+#define MOON_ALT_RED_DEG 30.0f
+
 static int16_t degRadius(const GFXfont* f) {
   return f->yAdvance >= 40 ? 4 : (f->yAdvance >= 28 ? 3 : 2);
 }
@@ -543,11 +546,13 @@ static uint16_t collectNightIndices(const WeatherData& wd, uint16_t* outIdx, uin
 // ---------------------------------------------------------------------
 //  Einzelblock: NACHT-CHART
 //  X-Achse: Stunden im Nachtfenster, Y-Achse: 0..100 % ("oben = schlecht")
-//  Bewusst nur drei Linien, alle 2 px stark (duenne/gepunktete Linien
-//  flimmern auf dem 3-Farb-Panel):
+//  Wenige Linien, alle 2 px stark (duenne/gepunktete Linien flimmern
+//  auf dem 3-Farb-Panel):
 //    Wolken (gewichteter Score)  schwarz durchgezogen
 //    Seeing      (7Timer!)       rot durchgezogen
-//    Transparenz (7Timer!)       rot gestrichelt
+//    Transparenz (7Timer!)       schwarz gestrichelt, zuletzt gezeichnet:
+//                                7Timer liefert oft Seeing == Transparenz,
+//                                rot-auf-rot waere dann unsichtbar
 // ---------------------------------------------------------------------
 static void drawThickLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
                           uint16_t color, bool dashed) {
@@ -567,10 +572,13 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
   // Legende rechts in der Titelzeile
   {
     struct Item { const char* label; uint16_t color; bool dashed; };
-    Item items[3] = {{"Wolken", GxEPD_BLACK, false},
-                     {"Seeing", DISPLAY_RED, false},
-                     {"Transparenz", DISPLAY_RED, true}};
-    uint8_t cnt = sd.valid ? 3 : 1;
+    Item items[3];
+    uint8_t cnt = 0;
+    items[cnt++] = {"Wolken", GxEPD_BLACK, false};
+    if (sd.valid) {
+      items[cnt++] = {"Seeing", DISPLAY_RED, false};
+      items[cnt++] = {"Transparenz", GxEPD_BLACK, true};
+    }
     const int16_t sampleW = 20, gap = 6, itemGap = 18;
     int16_t total = 0;
     for (uint8_t i = 0; i < cnt; i++) {
@@ -631,7 +639,7 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
     drawTextAt(x, py + ph + 17, hhmm, &FreeSans9pt7b);
   }
 
-  // Seeing + Transparenz zuerst, damit die Wolkenlinie obenauf liegt.
+  // Seeing zuerst, damit die Wolkenlinie obenauf liegt.
   // Skala 1 (exzellent) .. 8 (schlecht) → 0..100 %
   if (sd.valid && sd.count >= 2) {
     time_t t0 = wd.hourly[idx[0]].ts;
@@ -653,8 +661,6 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
       if (xa == xb) continue;
       drawThickLine(xa, sToY(sd.points[i - 1].seeing),
                     xb, sToY(sd.points[i].seeing), DISPLAY_RED, false);
-      drawThickLine(xa, sToY(sd.points[i - 1].transparency),
-                    xb, sToY(sd.points[i].transparency), DISPLAY_RED, true);
     }
   }
 
@@ -663,12 +669,36 @@ static void drawNightChart(const WeatherData& wd, const SeeingData& sd) {
                   xOf(k),     yOf(wd.astroHourly[idx[k]].cloudScore),
                   GxEPD_BLACK, false);
   }
+
+  if (sd.valid && sd.count >= 2) {
+    time_t t0 = wd.hourly[idx[0]].ts;
+    time_t t1 = wd.hourly[idx[n - 1]].ts;
+    auto tsToX = [&](time_t t) -> int16_t {
+      float r = (float)(t - t0) / (float)(t1 - t0);
+      if (r < 0.0f) r = 0.0f;
+      if (r > 1.0f) r = 1.0f;
+      return px + (int16_t)(r * (float)pw);
+    };
+    auto sToY = [&](uint8_t v) -> int16_t {
+      return yOf((float)(v - 1) / 7.0f * 100.0f);
+    };
+    for (uint8_t i = 1; i < sd.count; i++) {
+      time_t ta = sd.points[i - 1].ts;
+      time_t tb = sd.points[i].ts;
+      if (tb < t0 - 10800L || ta > t1 + 10800L) continue;
+      int16_t xa = tsToX(ta), xb = tsToX(tb);
+      if (xa == xb) continue;
+      drawThickLine(xa, sToY(sd.points[i - 1].transparency),
+                    xb, sToY(sd.points[i].transparency), GxEPD_BLACK, true);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------
 //  Einzelblock: STUNDENTABELLE
-//  Spalte je Nachtstunde: Uhrzeit, Wolken-Score, ggf. ISS-Aufgang.
-//  Ohne ISS-Pass werden die zwei Zeilen vertikal zentriert.
+//  Spalte je Nachtstunde: Uhrzeit, Wolken-Score, Mondhoehe.
+//  Die ISS-Zeile (open-notify) erscheint nur, wenn keine Mondhoehen
+//  berechnet sind - fuer vier Zeilen ist die Tabelle zu niedrig.
 // ---------------------------------------------------------------------
 static void drawHourTable(const WeatherData& wd, const ISSData& iss) {
   display.drawRect(TBL_X, TBL_Y, TBL_W, TBL_H, GxEPD_BLACK);
@@ -680,7 +710,11 @@ static void drawHourTable(const WeatherData& wd, const ISSData& iss) {
   // ISS-Aufgang je Spalte (0 = keiner)
   time_t issAt[12] = {0};
   bool anyIss = false;
-  for (uint16_t k = 0; k < n && iss.valid; k++) {
+  bool moonRow = false;
+  for (uint16_t k = 0; k < n; k++) {
+    if (!isnan(wd.astroHourly[idx[k]].moonAltDeg)) { moonRow = true; break; }
+  }
+  for (uint16_t k = 0; k < n && iss.valid && !moonRow; k++) {
     time_t hStart = wd.hourly[idx[k]].ts;
     for (uint8_t p = 0; p < iss.count; p++) {
       time_t rise = iss.passes[p].riseTime;
@@ -688,14 +722,16 @@ static void drawHourTable(const WeatherData& wd, const ISSData& iss) {
     }
   }
 
-  const int16_t y1 = TBL_Y + (anyIss ? 22 : 28);
+  const bool thirdRow = anyIss || moonRow;
+  const int16_t y1 = TBL_Y + (thirdRow ? 22 : 28);
   const int16_t y2 = y1 + 22;
   const int16_t y3 = y2 + 21;
   const int16_t labelW = 92;
 
   drawTextAt(TBL_X + 8, y1, "Uhr",      &FreeSansBold9pt7b);
   drawTextAt(TBL_X + 8, y2, "Wolken %", &FreeSans9pt7b);
-  if (anyIss) drawTextAt(TBL_X + 8, y3, "ISS", &FreeSansBold9pt7b, DISPLAY_RED);
+  if (anyIss)  drawTextAt(TBL_X + 8, y3, "ISS", &FreeSansBold9pt7b, DISPLAY_RED);
+  if (moonRow) drawTextAt(TBL_X + 8, y3, "Mond", &FreeSans9pt7b);
 
   if (n == 0) {
     drawTextAt(TBL_X + labelW, y2, "Keine Nachtstunden", &FreeSans9pt7b);
@@ -716,6 +752,20 @@ static void drawHourTable(const WeatherData& wd, const ISSData& iss) {
     char cb[8]; snprintf(cb, sizeof(cb), "%d", cs);
     uint16_t col = (cs > ASTRO_CLOUD_MODERATE) ? DISPLAY_RED : GxEPD_BLACK;
     drawTextCentered(cx, y2, cb, &FreeSans9pt7b, col);
+
+    if (moonRow) {
+      // ueber dem Horizont Grad, sonst Strich. Hoch stehender Mond rot.
+      float alt = wd.astroHourly[idx[k]].moonAltDeg;
+      char mb[8];
+      uint16_t mcol = GxEPD_BLACK;
+      if (isnan(alt) || alt < 0) {
+        strlcpy(mb, "-", sizeof(mb));
+      } else {
+        snprintf(mb, sizeof(mb), "%d`", (int)lroundf(alt));
+        if (alt >= MOON_ALT_RED_DEG) mcol = DISPLAY_RED;
+      }
+      drawTextCentered(cx, y3, mb, &FreeSans9pt7b, mcol);
+    }
 
     if (issAt[k]) {
       char hhmm[8];
@@ -784,6 +834,7 @@ static void drawMiniChart(int16_t x, int16_t y, int16_t w, int16_t h,
       if (isnan(v) || v <= 0) continue;
       int16_t bx = px + i * bw;
       int16_t by = yOf(v);
+      if (py + ph - by < 3) by = py + ph - 3;   // 0,1 mm sonst nur ein Strich
       display.fillRect(bx, by, bw - 1, py + ph - by, color);
     }
   } else {
@@ -863,17 +914,14 @@ static AstroVerdict quickNightVerdict(const WeatherData& wd, time_t dayStart) {
 
 static void drawForecast(const WeatherData& wd) {
   display.drawRect(FC_X, FC_Y, FC_W, FC_H, GxEPD_BLACK);
-  drawTextAt(FC_X + 6, FC_Y + 20, "VORHERSAGE", &FreeSansBold9pt7b);
 
   uint8_t n = wd.dailyCount;
   if (n > 5) n = 5;
   if (n < 1) return;
 
-  // Erste Spalte rechts neben der Ueberschrift
-  const int16_t labelW = 124;
-  int16_t cellW = (FC_W - labelW) / n;
+  int16_t cellW = FC_W / n;
   for (uint8_t i = 0; i < n; i++) {
-    int16_t x = FC_X + labelW + i * cellW;
+    int16_t x = FC_X + i * cellW;
     int16_t cx = x + cellW / 2;
 
     const DailyData& d = wd.daily[i];
@@ -884,9 +932,10 @@ static void drawForecast(const WeatherData& wd) {
 
     // Tmin / Tmax
     char tb[24];
-    snprintf(tb, sizeof(tb), "%.0f` / %.0f`",
-             isnan(d.tMinC) ? 0.0f : d.tMinC,
-             isnan(d.tMaxC) ? 0.0f : d.tMaxC);
+    // ganzzahlig runden, sonst wird -0,4 zu "-0"
+    snprintf(tb, sizeof(tb), "%ld` / %ld`",
+             isnan(d.tMinC) ? 0L : lroundf(d.tMinC),
+             isnan(d.tMaxC) ? 0L : lroundf(d.tMaxC));
     drawTextCentered(cx, FC_Y + 41, tb, &FreeSans9pt7b);
 
     // Nachtbewertung (gleiche Begriffe wie NACHT-BEWERTUNG)

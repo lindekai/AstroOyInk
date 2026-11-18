@@ -5,6 +5,30 @@ Alle relevanten Änderungen am Projekt.
 ## [Unreleased]
 
 ### Hinzugefügt
+- 🌙 **Mondhöhe über die Nacht** — neue Zeile „Mond“ in der Stundentabelle
+  (Grad je Nachtstunde, ab 30° rot, unter dem Horizont „-“),
+  berechnet mit `computeMoonTrack()`.
+- 🖼️ **Pixelgenaue Host-Vorschau** `tools/preview/build_preview.sh` —
+  rendert alle Ansichten mit echter Adafruit GFX als PNG, `--time` für
+  feste Zeitpunkte. README-Bild ist vorerst diese Vorschau.
+- 🔭 **N.I.N.A.-Auto-Discovery** (leerer Host = automatisch, Scan nur
+  abends/nachts) und Sequenz-Auswertung über `sequence/state`.
+
+### Geändert (Layout)
+- WEATHER-Layout aufgeräumt: Zeilenabstände, Gradzeichen, einheitlich
+  GUT/MITTEL/SCHLECHT, ruhigeres Wolken-Chart mit drei 2-px-Linien.
+- Transparenz-Linie schwarz gestrichelt — bei gleichen Werten lag sie
+  unsichtbar unter der roten Seeing-Linie.
+- Vorhersage ohne Überschrift „VORHERSAGE“, fünf Tage über die volle Breite.
+- Regenbalken mindestens 3 px hoch (0,1 mm war nur ein Strich).
+- Log unterscheidet „N.I.N.A. nicht erreichbar“ und „keine laufende Sequenz“.
+
+### Behoben (Layout)
+- Vorhersage zeigte „-0°“ bei Werten wie -0,4 °C.
+- Akkuanzeige „0 %“ ohne angeschlossenen Akku — wird jetzt ausgeblendet.
+- N.I.N.A. wurde nicht gefunden: Probe-Pfad `/v2/api/version`
+  (`application/version` liefert 404).
+
 - 🔋 **Stromversorgung / Akkubetrieb** — Referenzaufbau wie DoorSign:
   TC4056 → LiPo 3500 mAh → TPS62827-Buck (Iq ~4 µA) → 3,3 V auf den
   `3V3`-Pin, 1500-µF-Puffer-Elko, Teiler 2 × 100 kΩ an GPIO34.

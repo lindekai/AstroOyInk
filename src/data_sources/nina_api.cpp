@@ -76,8 +76,13 @@ bool ninaProbe(const char* host, uint16_t port) {
 bool ninaIsSequenceRunning(const char* host, uint16_t port) {
   if (!host || host[0] == '\0') return false;
   JsonDocument doc;
-  if (!ninaGet(host, port, "/v2/api/sequence/state", doc)) return false;
-  return ninaSequenceTreeRunning(doc["Response"]);
+  if (!ninaGet(host, port, "/v2/api/sequence/state", doc)) {
+    Serial.println("[NINA] sequence/state nicht abrufbar (N.I.N.A. nicht erreichbar?)");
+    return false;
+  }
+  bool running = ninaSequenceTreeRunning(doc["Response"]);
+  if (!running) Serial.println("[NINA] Erreichbar, aber keine Sequenz mit Status RUNNING");
+  return running;
 }
 
 // ---------------------------------------------------------------------

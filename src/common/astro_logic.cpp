@@ -72,6 +72,7 @@ void computeAstroSummary(WeatherData& wd) {
     a.windKmh     = wd.hourly[i].windKmh;
     a.humidity    = wd.hourly[i].humidity;
     a.inNightWindow = false;
+    a.moonAltDeg    = NAN;
   }
 
   // 2) Nachtfenster bestimmen
@@ -153,4 +154,16 @@ void computeAstroSummary(WeatherData& wd) {
   if (s.humidityWarn) s.conclusion += " Tau wahrscheinlich.";
 
   wd.summary = s;
+}
+
+// ---------------------------------------------------------------------
+//  Mondhoehe ueber die Nacht
+// ---------------------------------------------------------------------
+void computeMoonTrack(WeatherData& wd, float latitudeDeg, float longitudeDeg) {
+  for (uint16_t i = 0; i < wd.hourlyCount; i++) {
+    AstroHour& a = wd.astroHourly[i];
+    a.moonAltDeg = a.inNightWindow
+                       ? computeMoon(a.ts, latitudeDeg, longitudeDeg).altitudeDeg
+                       : NAN;
+  }
 }

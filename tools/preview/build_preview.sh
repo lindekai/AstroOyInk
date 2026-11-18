@@ -5,9 +5,10 @@
 #  Nutzt den unveraenderten Rendering-Code aus src/ und die echte
 #  Adafruit-GFX-Bibliothek inkl. Fonts. Voraussetzung: g++ / clang, zlib.
 #
-#  Aufruf:  tools/preview/build_preview.sh [ausgabe-ordner] [--scale N]
+#  Aufruf:  tools/preview/build_preview.sh [ausgabe-ordner] [--scale N] [--time UNIXZEIT]
 #  Default-Ausgabe: tools/preview/out/
 #  Adafruit GFX anders: GFX_DIR=/pfad/zu/Adafruit_GFX_Library
+#  Zusaetzliche Defines: CXXFLAGS="-DFOO=1" tools/preview/build_preview.sh
 # =====================================================================
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -24,13 +25,14 @@ ARGS=()
 while [ $# -gt 0 ]; do
   case "$1" in
     --scale) ARGS+=("--scale" "$2"); shift 2 ;;
+    --time)  ARGS+=("--time" "$2"); shift 2 ;;
     *) OUT="$1"; shift ;;
   esac
 done
 mkdir -p "$OUT" "$HERE/build"
 
 # Reihenfolge der Include-Pfade: Stubs vor allem anderen
-g++ -std=c++17 -O1 -w -DARDUINO=100 \
+g++ -std=c++17 -O1 -w -DARDUINO=100 $CXXFLAGS \
     -I"$HERE/stubs" -I"$GFX_DIR" \
     -o "$HERE/build/preview" \
     "$HERE/preview_main.cpp" \

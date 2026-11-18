@@ -55,6 +55,7 @@ struct AstroHour {
   float   windKmh;
   float   humidity;
   bool    inNightWindow; // true = Stunde liegt im "echten" Nachtfenster
+  float   moonAltDeg;    // Mondhoehe in Grad (NAN = nicht berechnet)
 };
 
 // ---------------------------------------------------------------------

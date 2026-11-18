@@ -235,6 +235,7 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
       nightMid = time(nullptr) + 6 * 3600;
     }
     wd.moonNight = computeMoon(nightMid, g_cfg.lat, g_cfg.lon);
+    computeMoonTrack(wd, g_cfg.lat, g_cfg.lon);
     Serial.printf("         Moon now:    %s  illum=%.0f%%  alt=%.1f\n",
                   wd.moonNow.phaseName,
                   wd.moonNow.illumination * 100.0f,
