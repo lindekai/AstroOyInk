@@ -5,10 +5,10 @@
 //  Kein API-Key erforderlich.
 //
 //  Abgerufene Endpunkte:
-//    GET /v2/api/application/version     Probe / Erreichbarkeitstest
-//    GET /v2/api/sequence                Sequenzstatus + Fortschritt
+//    GET /v2/api/version                 Probe / Erreichbarkeitstest
+//    GET /v2/api/sequence/state          Sequenzbaum (nina_sequence.cpp)
 //    GET /v2/api/equipment/camera/info   Kameraname
-//    GET /v2/api/image-history/0         Letztes Bild (Filter, Exp, HFR)
+//    GET /v2/api/image-history?index=0   Letztes Bild (Filter, Exp, HFR)
 //    GET /v2/api/equipment/mount/info    Koordinaten, Alt/Az, Pier, Flip
 //    GET /v2/api/equipment/guider/info   Guiding RMS + Status
 //

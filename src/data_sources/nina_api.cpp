@@ -5,11 +5,11 @@
 //
 //  Feldzuordnung (N.I.N.A. 3.x Advanced API Plugin):
 //    Response-Wrapper:  {"Success": true/false, "Response": {...}}
-//    Sequence:   IsRunning, IsPaused, SequenceName, SelectedTarget{Name,
-//                CapturedFrames, TotalFrames}, ActiveTargetIndex,
-//                TotalTargets, EstimatedEndTime, CurrentInstruction
+//    Sequence:   sequence/state liefert einen Baum (Status je Knoten,
+//                Target{TargetName}, Iterations, Conditions) —
+//                Auswertung in nina_sequence.cpp
 //    Camera:     Connected, Name
-//    ImageHistory: Filter, ExposureTime, HFR
+//    ImageHistory: [ {Filter, ExposureTime, HFR}, ... ]
 //    Mount:      Connected, Name, RightAscension, Declination,
 //                Altitude, Azimuth, SideOfPier, TimeToMeridianFlip,
 //                Slewing
@@ -23,6 +23,7 @@
 // =====================================================================
 
 #include "nina_api.h"
+#include "nina_sequence.h"
 #include "../../config.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -52,7 +53,8 @@ static bool ninaGet(const char* host, uint16_t port, const char* path,
   String body = http.getString();
   http.end();
 
-  DeserializationError err = deserializeJson(doc, body);
+  DeserializationError err = deserializeJson(
+      doc, body, DeserializationOption::NestingLimit(NINA_SEQ_NESTING_LIMIT));
   if (err) {
     Serial.printf("[NINA] JSON-Fehler bei %s: %s\n", path, err.c_str());
     return false;
@@ -68,14 +70,14 @@ static bool ninaGet(const char* host, uint16_t port, const char* path,
 bool ninaProbe(const char* host, uint16_t port) {
   if (!host || host[0] == '\0') return false;
   JsonDocument doc;
-  return ninaGet(host, port, "/v2/api/application/version", doc);
+  return ninaGet(host, port, "/v2/api/version", doc);
 }
 
 bool ninaIsSequenceRunning(const char* host, uint16_t port) {
   if (!host || host[0] == '\0') return false;
   JsonDocument doc;
-  if (!ninaGet(host, port, "/v2/api/sequence", doc)) return false;
-  return doc["Response"]["IsRunning"].as<bool>();
+  if (!ninaGet(host, port, "/v2/api/sequence/state", doc)) return false;
+  return ninaSequenceTreeRunning(doc["Response"]);
 }
 
 // ---------------------------------------------------------------------
@@ -90,52 +92,10 @@ bool ninaFetchAll(const char* host, uint16_t port, NinaData& out) {
 
   JsonDocument doc;
 
-  // --- Sequenz ---
-  if (ninaGet(host, port, "/v2/api/sequence", doc)) {
-    JsonObject resp = doc["Response"].as<JsonObject>();
-
-    out.sequence.running = resp["IsRunning"] | false;
-    out.sequence.paused  = resp["IsPaused"]  | false;
-
-    strlcpy(out.sequence.sequenceName,
-            resp["SequenceName"] | "", sizeof(out.sequence.sequenceName));
-
-    // Target-Infos (N.I.N.A. 3.x Struktur)
-    JsonObject tgt = resp["SelectedTarget"].as<JsonObject>();
-    if (!tgt.isNull()) {
-      strlcpy(out.sequence.targetName,
-              tgt["Name"] | "", sizeof(out.sequence.targetName));
-      out.sequence.subsDone  = (int16_t)(tgt["CapturedFrames"] | 0);
-      out.sequence.subsTotal = (int16_t)(tgt["TotalFrames"]    | 0);
-    }
-    out.sequence.targetIndex = (int16_t)(resp["ActiveTargetIndex"] | -1);
-    out.sequence.targetTotal = (int16_t)(resp["TotalTargets"]      | 0);
-
-    // Geschaetzte Endzeit: absoluter Unix-Timestamp oder relative Sekunden
-    JsonVariant etaVar = resp["EstimatedEndTime"];
-    if (!etaVar.isNull()) {
-      uint32_t etaRaw = etaVar.as<uint32_t>();
-      time_t now = time(nullptr);
-      if (etaRaw > 1700000000UL) {
-        out.sequence.etaS = (etaRaw > (uint32_t)now) ? etaRaw - (uint32_t)now : 0;
-      } else {
-        out.sequence.etaS = etaRaw;
-      }
-    }
-
-    // Status ableiten
-    if (out.sequence.paused) {
-      strlcpy(out.sequence.status, "Pausiert", sizeof(out.sequence.status));
-    } else if (out.sequence.running) {
-      const char* step = resp["CurrentInstruction"] | "";
-      if (strstr(step, "Focus") || strstr(step, "Autofocus")) {
-        strlcpy(out.sequence.status, "Focusing", sizeof(out.sequence.status));
-      } else {
-        strlcpy(out.sequence.status, "Imaging",  sizeof(out.sequence.status));
-      }
-    } else {
-      strlcpy(out.sequence.status, "Idle", sizeof(out.sequence.status));
-    }
+  // --- Sequenz (Baum aus sequence/state) ---
+  strlcpy(out.sequence.status, "Idle", sizeof(out.sequence.status));
+  if (ninaGet(host, port, "/v2/api/sequence/state", doc)) {
+    ninaParseSequenceState(doc["Response"], out.sequence);
   }
 
   // --- Kamera ---
@@ -148,8 +108,10 @@ bool ninaFetchAll(const char* host, uint16_t port, NinaData& out) {
 
   // --- Letztes Bild (Filter, Belichtung, HFR) ---
   doc.clear();
-  if (ninaGet(host, port, "/v2/api/image-history/0", doc)) {
-    JsonObject resp = doc["Response"].as<JsonObject>();
+  // Response ist eine Liste; index=0 = neuestes Bild
+  if (ninaGet(host, port, "/v2/api/image-history?index=0", doc)) {
+    JsonVariant r = doc["Response"];
+    JsonObject resp = r.is<JsonArray>() ? r[0].as<JsonObject>() : r.as<JsonObject>();
     const char* filt = resp["Filter"] | nullptr;
     if (filt && filt[0] != '\0') {
       strlcpy(out.camera.filterName, filt, sizeof(out.camera.filterName));

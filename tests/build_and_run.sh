@@ -24,6 +24,21 @@ g++ -std=c++14 -Wall -Wextra \
 echo "=== Building test_scan_window ==="
 g++ -std=c++14 -Wall -Wextra -o build/test_scan_window test_scan_window.cpp
 
+# test_nina_sequence braucht ArduinoJson (header-only). Standard: Arduino-
+# Library-Ordner; anders per ARDUINOJSON_DIR=/pfad/zu/ArduinoJson/src
+ARDUINOJSON_DIR="${ARDUINOJSON_DIR:-$HOME/Documents/Arduino/libraries/ArduinoJson/src}"
+HAVE_AJ=0
+if [ -f "$ARDUINOJSON_DIR/ArduinoJson.h" ]; then
+  HAVE_AJ=1
+  echo "=== Building test_nina_sequence ==="
+  g++ -std=c++14 -Wall -Wextra \
+      -I. -I"$ARDUINOJSON_DIR" \
+      -o build/test_nina_sequence \
+      test_nina_sequence.cpp ../src/data_sources/nina_sequence.cpp
+else
+  echo "=== SKIP test_nina_sequence (ArduinoJson nicht gefunden: $ARDUINOJSON_DIR) ==="
+fi
+
 echo
 echo "=== Running test_astro ==="
 build/test_astro
@@ -35,6 +50,12 @@ build/test_moon
 echo
 echo "=== Running test_scan_window ==="
 build/test_scan_window
+
+if [ "$HAVE_AJ" = 1 ]; then
+  echo
+  echo "=== Running test_nina_sequence ==="
+  build/test_nina_sequence
+fi
 
 echo
 echo "All tests done."
