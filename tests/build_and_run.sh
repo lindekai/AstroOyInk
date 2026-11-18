@@ -21,6 +21,9 @@ g++ -std=c++14 -Wall -Wextra \
     -o build/test_moon \
     test_moon.cpp ../src/common/moon_calc.cpp
 
+echo "=== Building test_scan_window ==="
+g++ -std=c++14 -Wall -Wextra -o build/test_scan_window test_scan_window.cpp
+
 echo
 echo "=== Running test_astro ==="
 build/test_astro
@@ -28,6 +31,10 @@ build/test_astro
 echo
 echo "=== Running test_moon ==="
 build/test_moon
+
+echo
+echo "=== Running test_scan_window ==="
+build/test_scan_window
 
 echo
 echo "All tests done."

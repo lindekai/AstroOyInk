@@ -86,6 +86,7 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 - 🧭 **Guiding:** RMS RA/Dec/Total mit Status OK / WARN / LOST
 - 🌐 **Mount:** RA/Dec, Pier-Seite, Meridian-Flip-Countdown
 - 🚨 **Warnungen** rot hervorgehoben: RMS ≥ 1,0″, Flip < 10 min, Slewing, Pause
+- 📡 **Auto-Discovery** – findet den N.I.N.A.-PC im Heimnetz selbst
 
 ### 🧰 Rund ums Gerät
 
@@ -225,7 +226,7 @@ Die ausführliche Anleitung steht in **[INSTALL.md](INSTALL.md)**. Kurzfassung:
 1. **Arduino IDE 2.x** und das **ESP32-Boardpaket** (≥ 2.0.14) installieren
 2. Bibliotheken über den Library Manager: `GxEPD2`, `Adafruit GFX`, **`ArduinoJson 7.x`**, `WiFiManager` (tzapu)
 3. Board **„ESP32 Dev Module“** wählen, `AstroOyInk.ino` öffnen und flashen
-4. Mit dem WLAN **`AstroOyInk-XXXXXX`** verbinden (der Name steht auch auf dem Display) und im Portal WLAN, Standort und optional den N.I.N.A.-Host eintragen
+4. Mit dem WLAN **`AstroOyInk-XXXXXX`** verbinden (der Name steht auch auf dem Display) und im Portal WLAN, Standort und optional den N.I.N.A.-Host eintragen (leer = automatische Suche)
 5. Fertig – das erste Dashboard erscheint nach etwa einer Minute
 
 ## ⚙️ Konfiguration
@@ -260,14 +261,20 @@ Ersteinrichtung stehen in `config.h`:
 ### SESSION-Modus aktivieren
 
 1. In N.I.N.A. das Plugin **Advanced API** installieren und aktivieren (Port 1888).
-2. Im Portal das Feld **„N.I.N.A. Host“** ausfüllen – oder in `config.h`:
-
-   ```cpp
-   #define NINA_HOST_DEFAULT   "nina-pc.local"   // oder IP, z. B. "192.168.1.42"
-   #define NINA_PORT_DEFAULT   1888
-   ```
-
+2. Das Feld **„N.I.N.A. Host“** im Portal **leer lassen** – AstroOyInk findet den
+   N.I.N.A.-PC dann selbst (siehe unten). Wer lieber einen festen Host will,
+   trägt Hostname oder IP ein, z. B. `nina-pc.local` oder `192.168.1.42`.
 3. Sequenz starten. Beim nächsten Zyklus wechselt das Display von selbst.
+
+### 📡 Auto-Discovery
+
+Ist kein Host eingetragen, sucht AstroOyInk den N.I.N.A.-PC selbst:
+
+1. Zuerst wird die **zuletzt gefundene Adresse** (im Flash gespeichert) geprüft – das passiert bei jedem Aufwachen und kostet kaum Zeit.
+2. Antwortet sie nicht, werden alle Adressen des **eigenen /24-Netzes** auf offenen Port 1888 geprüft (8 parallele Verbindungsversuche, ca. 8 s).
+3. Jeder Treffer wird per `GET` an die Advanced API bestätigt, bevor er übernommen wird.
+
+Der Netz-Scan läuft nur von **1 h vor Sonnenuntergang bis 1 h nach Sonnenaufgang**, damit tagsüber kein Akku verloren geht. Nach einem Kaltstart sind die Sonnenzeiten noch unbekannt, dann wird immer gesucht. Mit `NINA_AUTO_DISCOVERY 0` in `config.h` ist die Suche aus, `NINA_SCAN_MARGIN_S` ändert den Puffer.
 
 ## 🖼️ Display-Layout
 
@@ -381,11 +388,18 @@ dokumentiert das [CHANGELOG.md](CHANGELOG.md). AstroOyInk ist die offizielle Lin
 
 ## 🙏 Credits
 
-- **Autor:** Kai Linde
+- **Autor:** Kai Linde – [github.com/lindekai](https://github.com/lindekai)
 - **Community:** Dark Matters Discord
-- **Daten:** [Open-Meteo](https://open-meteo.com), [7Timer!](https://www.7timer.info), [open-notify](http://open-notify.org), [N.I.N.A.](https://nighttime-imaging.eu/) mit Advanced API
+- **Daten:** [Open-Meteo](https://open-meteo.com), [7Timer!](https://www.7timer.info), [open-notify](http://open-notify.org)
+- **Software:** [N.I.N.A.](https://nighttime-imaging.eu/) mit [Advanced API](https://github.com/christian-photo/ninaAPI), [GxEPD2](https://github.com/ZinggJM/GxEPD2), [Adafruit GFX](https://github.com/adafruit/Adafruit-GFX-Library), [ArduinoJson](https://arduinojson.org), [WiFiManager](https://github.com/tzapu/WiFiManager), [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280_Library)
+
+Fragen, Ideen oder Fotos von deinem Setup? Gerne als [Issue](https://github.com/lindekai/AstroOyInk/issues).
 
 ## 📄 Lizenz
 
-MIT – siehe [LICENSE](LICENSE). Für Open-Meteo-Daten gelten die Bedingungen
+[MIT](LICENSE) © 2026 Kai Linde. Für Open-Meteo-Daten gelten die Bedingungen
 von <https://open-meteo.com>.
+
+---
+
+<p align="center"><sub>N.I.N.A. ist ein eigenständiges Open-Source-Projekt. Dieses Projekt steht in keiner offiziellen Verbindung zu N.I.N.A. oder Waveshare.</sub></p>

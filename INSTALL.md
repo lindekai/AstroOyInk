@@ -172,7 +172,7 @@ Die Arduino IDE kennt von Haus aus keinen ESP32. Wir fügen ihn hinzu:
 > **WiFiManager** ist ab Roadmap-Feature 2 erforderlich. Installiere es
 > zusammen mit den anderen Bibliotheken in diesem Schritt.
 
-**Werkzeuge → Bibliotheken verwalten** öffnen und die folgenden vier
+**Werkzeuge → Bibliotheken verwalten** öffnen und die folgenden
 Bibliotheken installieren (Suchbegriff → Installieren):
 
 | Suche nach | Autor | Version |
@@ -251,7 +251,10 @@ Falls du einen **anderen Pin** für das Display verwendest, hier ändern:
 3. Empfohlene weitere Einstellungen:
    - **Upload Speed:** `921600`
    - **Flash Frequency:** `80 MHz`
-   - **Partition Scheme:** `Default 4MB with spiffs`
+   - **Partition Scheme:** `Minimal SPIFFS (1.9MB APP with OTA)` —
+     **wichtig:** Mit ESP32-Core 3.x ist die Firmware ~1,34 MB groß und
+     passt nicht mehr in die Default-Partition (1,25 MB). OTA bleibt mit
+     diesem Schema erhalten.
    - **PSRAM:** *Disabled* (ein Standard-WROOM hat kein PSRAM; bei
      einem WROVER kann es *Enabled* bleiben)
 
@@ -381,18 +384,33 @@ direkt auf dem Display. Der Wechsel WEATHER ↔ SESSION passiert **automatisch**
 - **N.I.N.A. 3.x** mit installiertem **Advanced API Plugin**
   (im N.I.N.A. Plugin-Manager suchen: „Advanced API")
 - ESP32 und N.I.N.A.-PC im **gleichen Heimnetz**
-- N.I.N.A.-PC-Hostname oder IP bekannt (z. B. `astro-pc.local` oder `192.168.1.42`)
+- Nur für einen festen Host: N.I.N.A.-PC-Hostname oder IP (z. B. `astro-pc.local` oder `192.168.1.42`).
+  Ohne Eintrag findet AstroOyInk den PC per **Auto-Discovery** selbst.
 
-### N.I.N.A.-Host eintragen
+### N.I.N.A.-Host: automatisch oder fest
 
-**Option A — WiFiManager-Portal (empfohlen, kein Re-Flash):**
+**Automatisch (Standard):** Das Feld **„N.I.N.A. Host"** im Portal leer lassen.
+AstroOyInk prüft bei jedem Aufwachen die zuletzt gefundene Adresse. Antwortet
+sie nicht, durchsucht es das eigene /24-Netz (z. B. `192.168.1.x`) nach Port
+1888 und bestätigt jeden Treffer über die Advanced API. Der Scan dauert ca. 8 s
+und läuft nur von 1 h vor Sonnenuntergang bis 1 h nach Sonnenaufgang:
+
+```cpp
+#define NINA_AUTO_DISCOVERY  1      // 0 = aus, leerer Host = kein SESSION-Modus
+#define NINA_SCAN_MARGIN_S   3600   // Puffer um Sonnenuntergang/-aufgang
+```
+
+Im Serial Monitor erscheint die Suche als `[NINA] Suche N.I.N.A. in …` bzw.
+`[NINA] Gefunden: …`.
+
+**Fester Host — WiFiManager-Portal (kein Re-Flash):**
 
 1. Portal öffnen (WLAN trennen oder `WIFI_MANAGER_TIMEOUT_S 0` setzen → neu flashen).
 2. Im Formular die Felder **„N.I.N.A. Host"** und **„N.I.N.A. Port"** ausfüllen.
 3. Port ist standardmäßig **1888**.
 4. Speichern → Gerät startet neu.
 
-**Option B — `config.h`:**
+**Fester Host — `config.h`:**
 
 ```cpp
 // In config.h die Zeile auskommentieren und anpassen:
@@ -512,8 +530,10 @@ Direkt nach dem Hochladen passiert Folgendes:
 | Sommer/Winter-Zeit stimmt nicht | `TIMEZONE_POSIX` in `config.h` korrekt gesetzt? Default `CET-1CEST,M3.5.0,M10.5.0/3` ist für Mitteleuropa korrekt. |
 | Kompilierfehler `'GxEPD2_750c_Z08' was not declared` | GxEPD2-Bibliothek auf ≥ 1.5.x aktualisieren. Für 800×480 B/W/R ist `Z08` korrekt (in `src/rendering/display_base.cpp`). |
 | Kompilierfehler `'JsonDocument' was not declared` | ArduinoJson **7.x** notwendig. Update über Library Manager. |
+| Kompilierfehler `WiFiManager.h: No such file or directory` (oder `Adafruit_BME280.h`) | Bibliothek fehlt, z. B. nach Neuinstallation der Arduino IDE. Laut [Abschnitt 5](#5-bibliotheken-installieren) über den Library Manager nachinstallieren. |
+| Fehler `Der Sketch ist zu groß` / `Textbereich überschreitet den verfügbaren Platz` | Partition Scheme auf `Minimal SPIFFS (1.9MB APP with OTA)` stellen (siehe [Abschnitt 8](#8-board-und-port-auswählen)). |
 | Display sieht aus wie gewünscht, aber **Werte sehen falsch aus** | Koordinaten geprüft? Lat/Lon vertauscht? Der erste Test: `LOCATION_LAT=52.52` und `LOCATION_LON=13.405` sollte „Berlin" plausibles Wetter geben. |
-| **SESSION-Modus erscheint nie**, obwohl N.I.N.A. läuft | Advanced API Plugin in N.I.N.A. installiert und gestartet? Port 1888 in der Windows-Firewall freigegeben? Host-Eintrag im Portal/`config.h` korrekt? Mit `http://HOST:1888/v2/api/application/version` im Browser testen. |
+| **SESSION-Modus erscheint nie**, obwohl N.I.N.A. läuft | Advanced API Plugin in N.I.N.A. installiert und gestartet? Port 1888 in der Windows-Firewall freigegeben? Host-Eintrag im Portal/`config.h` korrekt? Bei Auto-Discovery: N.I.N.A.-PC im gleichen /24-Netz und tagsüber gestartet? Dann bis zum Abend warten oder ESP32 per Reset neu starten (Kaltstart sucht immer). Mit `http://HOST:1888/v2/api/application/version` im Browser testen. |
 | SESSION-Modus zeigt **„N.I.N.A. nicht erreichbar"** | Sequenz wirklich gestartet? `ninaIsSequenceRunning` antwortet nur `true` wenn eine Sequenz aktiv läuft (nicht nur geöffnet). |
 | **Guiding-Werte immer 0** | N.I.N.A. Guider (PHD2 / DirectGuider) muss mit N.I.N.A. verbunden und aktiv sein. Wert bleibt 0 solange kein Guider angebunden ist. |
 | **Meridian-Flip-Countdown fehlt** | Einige Mount-Treiber liefern `TimeToMeridianFlip` nicht. Bekanntes API-Limit — Wert zeigt dann „--". |

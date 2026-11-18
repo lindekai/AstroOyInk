@@ -30,24 +30,26 @@
 #include "config.h"
 
 // common
-#include "data_types.h"
-#include "time_utils.h"
-#include "astro_logic.h"
-#include "moon_calc.h"
-#include "battery.h"
-#include "app_config.h"
-#include "ota_updater.h"
-#include "local_sensor.h"
+#include "src/common/data_types.h"
+#include "src/common/time_utils.h"
+#include "src/common/astro_logic.h"
+#include "src/common/moon_calc.h"
+#include "src/common/battery.h"
+#include "src/common/app_config.h"
+#include "src/common/ota_updater.h"
+#include "src/common/local_sensor.h"
+#include "src/common/scan_window.h"
 
 // data sources
-#include "weather_api.h"
-#include "seeing_api.h"
-#include "iss_api.h"
+#include "src/data_sources/weather_api.h"
+#include "src/data_sources/seeing_api.h"
+#include "src/data_sources/iss_api.h"
+#include "src/data_sources/nina_discovery.h"
 // modes
-#include "mode_state_machine.h"
+#include "src/modes/mode_state_machine.h"
 
 // rendering
-#include "display_base.h"
+#include "src/rendering/display_base.h"
 
 // ---------------------------------------------------------------------
 //  Persistente Daten ueber Deep-Sleep hinweg (RTC-RAM)
@@ -55,11 +57,20 @@
 RTC_DATA_ATTR uint32_t bootCount       = 0;
 RTC_DATA_ATTR bool     hasEverRendered = false;
 
+// Sonnenzeiten aus dem letzten Wetterabruf (Sekunden seit lokaler
+// Mitternacht) fuer das Scan-Fenster der Auto-Discovery. -1 = unbekannt.
+RTC_DATA_ATTR int32_t  sunriseTodS     = -1;
+RTC_DATA_ATTR int32_t  sunsetTodS      = -1;
+
 // Laufzeit-Konfiguration (aus NVS oder config.h-Defaults)
 static AppConfig g_cfg;
 
 // Zuletzt ermittelter Modus — bestimmt Sleep-Strategie in setup()
 static DisplayMode g_lastMode = MODE_WEATHER;
+
+// Wirksamer N.I.N.A.-Host dieses Zyklus: fest aus dem Portal oder per
+// Auto-Discovery gefunden. Leer = kein N.I.N.A.
+static char g_ninaHost[64] = "";
 
 // ---------------------------------------------------------------------
 //  WiFi + Captive Portal (WiFiManager)
@@ -82,7 +93,11 @@ static bool connectWithPortal() {
   WiFiManagerParameter p_lon("lon", "Laengengrad",           lonStr,             15);
   WiFiManagerParameter p_tz( "tz",  "Zeitzone (POSIX)",      g_cfg.timezone,     47);
   WiFiManagerParameter p_iv( "iv",  "Update-Intervall (s)",  ivStr,              11);
+#if NINA_AUTO_DISCOVERY
+  WiFiManagerParameter p_nh( "nh",  "N.I.N.A. Host (leer = automatisch)", g_cfg.ninaHost, 63);
+#else
   WiFiManagerParameter p_nh( "nh",  "N.I.N.A. Host (opt.)", g_cfg.ninaHost,     63);
+#endif
   WiFiManagerParameter p_np( "np",  "N.I.N.A. Port",        portStr,             5);
 
   wm.addParameter(&p_loc);
@@ -144,6 +159,13 @@ static void disconnectWiFi() {
 // ---------------------------------------------------------------------
 //  alignToHour: im WEATHER-Modus auf die volle Stunde ausrichten,
 //  im SESSION-Modus exakt intervalS schlafen.
+// Sekunden seit lokaler Mitternacht
+static int32_t localTodS(time_t t) {
+  struct tm lt;
+  localtime_r(&t, &lt);
+  return lt.tm_hour * 3600 + lt.tm_min * 60 + lt.tm_sec;
+}
+
 static void goDeepSleep(uint32_t intervalS, bool alignToHour) {
   uint64_t sleepUs = (uint64_t)intervalS * 1000000ULL;
 
@@ -182,6 +204,10 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
   if (wifiOk && timeOk) {
     Serial.println("[STEP 4] Fetch Open-Meteo ...");
     apiOk = fetchWeather(g_cfg.lat, g_cfg.lon, FORECAST_DAYS, wd);
+    if (apiOk) {
+      sunriseTodS = localTodS(wd.daily[0].sunrise);
+      sunsetTodS  = localTodS(wd.daily[0].sunset);
+    }
 
     Serial.println("[STEP 4b] Fetch 7Timer! Seeing ...");
     fetchSeeing(g_cfg.lat, g_cfg.lon, seeing);
@@ -247,6 +273,31 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
 }
 
 // ---------------------------------------------------------------------
+//  N.I.N.A.-Host fuer diesen Zyklus bestimmen
+//  Fester Host aus dem Portal hat Vorrang. Sonst Auto-Discovery: die
+//  gemerkte Adresse wird immer geprueft, ein Netz-Scan laeuft nur im
+//  Fenster rund um die Nacht (ohne NTP-Zeit: immer).
+// ---------------------------------------------------------------------
+static void resolveNinaHost(bool wifiOk, bool timeOk) {
+  g_ninaHost[0] = '\0';
+  if (g_cfg.ninaHost[0] != '\0') {
+    strlcpy(g_ninaHost, g_cfg.ninaHost, sizeof(g_ninaHost));
+    return;
+  }
+#if NINA_AUTO_DISCOVERY
+  if (!wifiOk) return;
+  bool scanAllowed = !timeOk ||
+      inNinaScanWindow(localTodS(time(nullptr)), sunriseTodS, sunsetTodS,
+                       NINA_SCAN_MARGIN_S);
+  Serial.printf("[STEP 5] N.I.N.A. Auto-Discovery (Scan %s) ...\n",
+                scanAllowed ? "erlaubt" : "ausserhalb Fenster");
+  ninaAutoHost(g_cfg.ninaPort, scanAllowed, g_ninaHost, sizeof(g_ninaHost));
+#else
+  (void)wifiOk; (void)timeOk;
+#endif
+}
+
+// ---------------------------------------------------------------------
 //  Modus SESSION: N.I.N.A.-Session-Telemetrie
 // ---------------------------------------------------------------------
 static void runSessionMode(bool wifiOk, bool /*timeOk*/) {
@@ -255,9 +306,9 @@ static void runSessionMode(bool wifiOk, bool /*timeOk*/) {
   static NinaData nd;
   bool ok = false;
 
-  if (wifiOk && g_cfg.ninaHost[0] != '\0') {
+  if (wifiOk && g_ninaHost[0] != '\0') {
     Serial.println("[STEP 5] Fetch N.I.N.A. Session-Daten ...");
-    ok = ninaFetchAll(g_cfg.ninaHost, g_cfg.ninaPort, nd);
+    ok = ninaFetchAll(g_ninaHost, g_cfg.ninaPort, nd);
   }
   disconnectWiFi();
 
@@ -271,7 +322,7 @@ static void runSessionMode(bool wifiOk, bool /*timeOk*/) {
   } else {
     if (!hasEverRendered) {
       const char* msg = !wifiOk ? "Kein WLAN"
-                       : (g_cfg.ninaHost[0] == '\0') ? "N.I.N.A. nicht konfiguriert"
+                       : (g_ninaHost[0] == '\0') ? "N.I.N.A. nicht gefunden"
                        : "N.I.N.A. nicht erreichbar";
       Serial.printf("[STEP 6] Fallback: %s\n", msg);
       renderFallback(msg);
@@ -324,8 +375,9 @@ static void doCycle() {
     timeOk = timeSyncNTP(g_cfg.timezone);
   }
 
-  // 5) Modus ermitteln
-  DisplayMode mode = detectCurrentMode(g_cfg.ninaHost, g_cfg.ninaPort);
+  // 5) N.I.N.A.-Host bestimmen (fest oder Auto-Discovery), dann Modus
+  resolveNinaHost(wifiOk, timeOk);
+  DisplayMode mode = detectCurrentMode(g_ninaHost, g_cfg.ninaPort);
   g_lastMode = mode;
   Serial.printf("[STEP 5] Modus = %s\n", modeName(mode));
 

@@ -89,13 +89,15 @@ AstroOyInk/
 │   │   ├── battery.h/.cpp         # LiPo-Ladestand (ADC + Lookup-Tabelle)
 │   │   ├── app_config.h/.cpp      # NVS-Konfiguration (Preferences)
 │   │   ├── ota_updater.h/.cpp     # ArduinoOTA-Fenster nach WLAN-Connect
-│   │   └── local_sensor.h/.cpp    # BME280 I2C, Innentemperatur/Feuchte/Druck
+│   │   ├── local_sensor.h/.cpp    # BME280 I2C, Innentemperatur/Feuchte/Druck
+│   │   └── scan_window.h          # Zeitfenster der Auto-Discovery (Host-Test)
 │   │
 │   ├── data_sources/              # External APIs / Datenquellen
 │   │   ├── weather_api.h/.cpp     # Open-Meteo HTTPS-Client
 │   │   ├── seeing_api.h/.cpp      # 7Timer! HTTP-Client, Seeing & Transparenz
 │   │   ├── iss_api.h/.cpp         # open-notify.org, ISS-Ueberflugvorhersage
-│   │   └── nina_api.h/.cpp        # N.I.N.A. Advanced API v2 (SESSION-Modus)
+│   │   ├── nina_api.h/.cpp        # N.I.N.A. Advanced API v2 (SESSION-Modus)
+│   │   └── nina_discovery.h/.cpp  # Auto-Discovery: /24-Scan nach Port 1888
 │   │
 │   ├── modes/
 │   │   └── mode_state_machine.h/.cpp   # detectCurrentMode() - aktuell Stub
@@ -111,6 +113,7 @@ AstroOyInk/
 ├── tests/                         # Host-Tests (g++, kein ESP32 noetig)
 │   ├── test_astro.cpp
 │   ├── test_moon.cpp
+│   ├── test_scan_window.cpp
 │   ├── Arduino.h                  # Stub fuer Host-Kompilierung
 │   └── build_and_run.sh
 │
@@ -130,9 +133,13 @@ AstroOyInk/
 ### Wichtig zur `src/`-Struktur
 
 Die Arduino IDE kompiliert **alle** `.cpp`-Dateien unter `src/` automatisch
-rekursiv. Includes bleiben **flach** (z. B. `#include "data_types.h"`), weil
-die IDE alle Unterordner zum Include-Path hinzufügt. Voraussetzung:
-keine zwei Dateien gleichen Namens in verschiedenen Unterordnern.
+rekursiv, nimmt die Unterordner aber **nicht** in den Include-Pfad auf.
+Projekt-Includes sind deshalb **relativ zur einbindenden Datei**:
+
+- im Sketch: `#include "src/common/data_types.h"`
+- gleicher Ordner: `#include "time_utils.h"`
+- anderer Unterordner: `#include "../common/time_utils.h"`
+- `config.h` aus `src/<x>/`: `#include "../../config.h"`
 
 ## Architektur-Prinzipien
 
@@ -166,7 +173,11 @@ keine zwei Dateien gleichen Namens in verschiedenen Unterordnern.
 3b. otaSetup() + otaWaitWindow(30s)  → ArduinoOTA-Fenster, NUR beim Kaltstart
                                         (esp_reset_reason != DEEPSLEEP) oder DEBUG_MODE
 4. timeSyncNTP(tz)         → configTzTime + 3 NTP-Server
-5. detectCurrentMode()     → MODE_SESSION wenn N.I.N.A. erreichbar + Sequenz laeuft
+5. resolveNinaHost()       → fester Portal-Host ODER Auto-Discovery:
+                              gemerkte Adresse (NVS "nha") pruefen, sonst
+                              /24-Scan — nur sunset-1h … sunrise+1h
+                              (Sonnenzeiten aus letztem Wetterabruf, RTC-RAM)
+   detectCurrentMode()     → MODE_SESSION wenn N.I.N.A. erreichbar + Sequenz laeuft
 6+7. switch(mode):
    - MODE_WEATHER:
        fetchWeather/Seeing/ISS() → Open-Meteo, 7Timer!, open-notify
@@ -228,6 +239,8 @@ Penalty: Wind > 25 km/h ODER humidity > 90 % → eine Stufe schlechter
 | `Busy Timeout!` im Render | V3 braucht 25-30 s, GxEPD2 default 20 s | `waitBusyManual()` nach Page-Loop |
 | Display zeigt nichts, Render < 1 s | Falsche Display-Klasse | `Z08` für 800×480 |
 | Arduino-IDE findet `.cpp` in Unterordner nicht | Nur `src/` wird rekursiv kompiliert | Unter `src/` legen, nicht z. B. `modes/` direkt im Root |
+| `data_types.h: No such file or directory` | Flacher Include, `src/`-Unterordner sind nicht im Include-Pfad | Relativ includen (siehe „Wichtig zur `src/`-Struktur") |
+| `Textbereich überschreitet den verfügbaren Platz` | ESP32-Core 3.x: Firmware ~1,34 MB > Default-Partition 1,25 MB | Partition Scheme „Minimal SPIFFS (1.9MB APP with OTA)" |
 
 ## Roadmap
 

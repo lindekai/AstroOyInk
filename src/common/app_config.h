@@ -32,4 +32,9 @@ void saveConfig(const AppConfig& cfg);
 // Loescht den gesamten NVS-Namespace (Factory-Reset der Konfiguration).
 void clearConfig();
 
+// Zuletzt per Auto-Discovery gefundener N.I.N.A.-Host. Bewusst getrennt
+// von cfg.ninaHost, damit ein Fund nie zum festen Portal-Host wird.
+void loadNinaAutoHost(char* out, size_t outLen);
+void saveNinaAutoHost(const char* host);
+
 #endif // ASTROOYINK_APP_CONFIG_H

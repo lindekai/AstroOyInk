@@ -10,7 +10,7 @@
 #define ASTRO_DATA_TYPES_H
 
 #include <Arduino.h>
-#include "config.h"
+#include "../../config.h"
 #include "moon_calc.h"
 
 // Wir lesen 5 Tage * 24 Stunden hourly = 120 Werte. Reserve.

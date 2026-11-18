@@ -23,7 +23,7 @@
 // =====================================================================
 
 #include "nina_api.h"
-#include "config.h"
+#include "../../config.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>

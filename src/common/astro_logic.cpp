@@ -4,7 +4,7 @@
 //  Credits: Dark Matters Discord
 // =====================================================================
 #include "astro_logic.h"
-#include "config.h"
+#include "../../config.h"
 #include "time_utils.h"
 
 #include <math.h>

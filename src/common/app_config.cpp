@@ -5,7 +5,7 @@
 //  Credits: Dark Matters Discord
 // =====================================================================
 #include "app_config.h"
-#include "config.h"
+#include "../../config.h"
 #include <Preferences.h>
 
 static const char* kNS = "aoi";  // NVS-Namespace (max 15 Zeichen)
@@ -68,4 +68,20 @@ void clearConfig() {
     prefs.end();
     Serial.println("[CFG] NVS geloescht");
   }
+}
+
+void loadNinaAutoHost(char* out, size_t outLen) {
+  out[0] = '\0';
+  Preferences prefs;
+  if (!prefs.begin(kNS, /*readOnly=*/true)) return;
+  if (prefs.isKey("nha")) prefs.getString("nha", out, outLen);
+  prefs.end();
+}
+
+void saveNinaAutoHost(const char* host) {
+  Preferences prefs;
+  if (!prefs.begin(kNS, /*readOnly=*/false)) return;
+  prefs.putString("nha", host);
+  prefs.end();
+  Serial.printf("[CFG] N.I.N.A.-Host gemerkt: %s\n", host);
 }

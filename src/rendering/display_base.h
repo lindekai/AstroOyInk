@@ -20,12 +20,12 @@
 #ifndef ASTROOYINK_DISPLAY_BASE_H
 #define ASTROOYINK_DISPLAY_BASE_H
 
-#include "data_types.h"
-#include "battery.h"
-#include "local_sensor.h"
-#include "seeing_api.h"
-#include "iss_api.h"
-#include "nina_api.h"
+#include "../common/data_types.h"
+#include "../common/battery.h"
+#include "../common/local_sensor.h"
+#include "../data_sources/seeing_api.h"
+#include "../data_sources/iss_api.h"
+#include "../data_sources/nina_api.h"
 
 // Initialisiert das Display (SPI, RST, etc.). Einmal pro Zyklus aufrufen.
 void displayInit();

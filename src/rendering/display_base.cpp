@@ -31,13 +31,13 @@
 // =====================================================================
 
 #include "display_base.h"
-#include "config.h"
-#include "time_utils.h"
-#include "astro_logic.h"
-#include "local_sensor.h"
-#include "seeing_api.h"
-#include "iss_api.h"
-#include "nina_api.h"
+#include "../../config.h"
+#include "../common/time_utils.h"
+#include "../common/astro_logic.h"
+#include "../common/local_sensor.h"
+#include "../data_sources/seeing_api.h"
+#include "../data_sources/iss_api.h"
+#include "../data_sources/nina_api.h"
 
 #include <SPI.h>
 #include <GxEPD2_3C.h>

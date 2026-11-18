@@ -9,7 +9,7 @@
 //  Credits: Dark Matters Discord
 // =====================================================================
 #include "local_sensor.h"
-#include "config.h"
+#include "../../config.h"
 #include <Arduino.h>
 
 #if LOCAL_SENSOR_ENABLED

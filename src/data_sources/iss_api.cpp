@@ -18,7 +18,7 @@
 //  Credits: Dark Matters Discord
 // =====================================================================
 #include "iss_api.h"
-#include "config.h"
+#include "../../config.h"
 
 #include <Arduino.h>
 #include <WiFi.h>

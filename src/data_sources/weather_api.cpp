@@ -14,8 +14,8 @@
 //  Credits: Dark Matters Discord
 // =====================================================================
 #include "weather_api.h"
-#include "time_utils.h"
-#include "config.h"
+#include "../common/time_utils.h"
+#include "../../config.h"
 
 #include <WiFi.h>
 #include <HTTPClient.h>

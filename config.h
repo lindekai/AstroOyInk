@@ -103,6 +103,15 @@
 // #define NINA_HOST_DEFAULT   "nina-pc.local"  // oder "192.168.1.42"
 // #define NINA_PORT_DEFAULT   1888
 
+// Auto-Discovery: Host im Portal leer lassen → AstroOyInk sucht den
+// N.I.N.A.-PC selbst im eigenen /24-Netz und merkt sich die Adresse.
+// Die gemerkte Adresse wird bei jedem Aufwachen geprueft; ein voller
+// Scan (~8 s WLAN) laeuft nur von NINA_SCAN_MARGIN_S vor Sonnenuntergang
+// bis NINA_SCAN_MARGIN_S nach Sonnenaufgang (spart Akku).
+// 0 = aus → leerer Host deaktiviert den SESSION-Modus.
+#define NINA_AUTO_DISCOVERY  1
+#define NINA_SCAN_MARGIN_S   3600   // 1 Stunde
+
 // Aktualisierungsintervall im SESSION-Modus (Deep-Sleep dazwischen)
 #define SESSION_REFRESH_INTERVAL_S  300UL   // 5 Minuten
 

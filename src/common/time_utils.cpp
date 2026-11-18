@@ -4,7 +4,7 @@
 //  Credits: Dark Matters Discord
 // =====================================================================
 #include "time_utils.h"
-#include "config.h"
+#include "../../config.h"
 
 bool timeSyncNTP(const char* posixTz) {
   // configTzTime setzt den POSIX-TZ-String UND die NTP-Server in einem Rutsch

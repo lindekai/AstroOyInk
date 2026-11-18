@@ -7,7 +7,7 @@
 #ifndef ASTRO_WEATHER_API_H
 #define ASTRO_WEATHER_API_H
 
-#include "data_types.h"
+#include "../common/data_types.h"
 
 // Baut die Open-Meteo-URL zusammen (für Logging/Debug).
 String buildOpenMeteoUrl(float lat, float lon, uint8_t days);

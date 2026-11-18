@@ -21,7 +21,7 @@
 //  Credits: Dark Matters Discord
 // =====================================================================
 #include "seeing_api.h"
-#include "config.h"
+#include "../../config.h"
 
 #include <Arduino.h>
 #include <WiFi.h>

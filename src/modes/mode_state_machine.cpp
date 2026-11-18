@@ -3,7 +3,7 @@
 //  Modus-Erkennung: WEATHER ↔ SESSION.
 //
 //  Logik:
-//    1. ninaHost leer → sofort MODE_WEATHER
+//    1. ninaHost leer (nicht konfiguriert / nicht gefunden) → MODE_WEATHER
 //    2. N.I.N.A. nicht erreichbar → MODE_WEATHER
 //    3. Keine Sequenz aktiv → MODE_WEATHER
 //    4. Sequenz laeuft → MODE_SESSION
@@ -12,11 +12,11 @@
 //  Credits: Dark Matters Discord
 // =====================================================================
 #include "mode_state_machine.h"
-#include "nina_api.h"
+#include "../data_sources/nina_api.h"
 
 DisplayMode detectCurrentMode(const char* ninaHost, uint16_t ninaPort) {
   if (!ninaHost || ninaHost[0] == '\0') {
-    Serial.println("[MODE] N.I.N.A.-Host nicht konfiguriert → WEATHER");
+    Serial.println("[MODE] Kein N.I.N.A.-Host (nicht konfiguriert/gefunden) → WEATHER");
     return MODE_WEATHER;
   }
 

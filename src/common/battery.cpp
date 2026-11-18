@@ -5,7 +5,7 @@
 //  Credits: Dark Matters Discord
 // =====================================================================
 #include "battery.h"
-#include "config.h"
+#include "../../config.h"
 
 #if BATT_ENABLED
 
