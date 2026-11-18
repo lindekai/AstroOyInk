@@ -7,6 +7,13 @@ Alle relevanten Änderungen am Projekt.
 ### Hinzugefügt
 - 📸 **Foto vom echten Display** im README (`docs/images/display_weather.jpg`,
   WEATHER-Modus).
+- 🎨 **README überarbeitet:** Hero-Banner und Modus-Grafik (hell/dunkel, SVG),
+  Badges, Navigation, Funktionsübersicht, Layout-Skizzen für beide Modi.
+  Generator unter `tools/make_readme_svgs.py`.
+
+### Behoben
+- README: tote CI-Badges, nicht existierende `SETUP_NEW_MACHINE.md` und die
+  entfernte FAZIT-Zeile aus der Doku genommen.
 - 🔭 **SESSION-Modus** — `src/data_sources/nina_api.h/.cpp` +
   `renderSessionDashboard()` in `display_base.cpp`
   N.I.N.A. Advanced API v2, Port 1888, kein Key. Automatischer Wechsel

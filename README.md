@@ -1,200 +1,147 @@
-# AstroOyInk 🌌🔭
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/hero-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/hero-light.svg">
+    <img alt="AstroOyInk – Tagsüber Astro-Wetter, nachts Live-Telemetrie deiner N.I.N.A.-Session auf E-Ink" src="docs/images/hero-light.svg" width="100%">
+  </picture>
+</p>
 
-> **E-Ink Astro-Display für Astrofotografen.**
-> Ein Gerät, zwei Modi: tagsüber Astro-Wetter-Dashboard, nachts Live-
-> Telemetrie deiner N.I.N.A.-Aufnahmesession. Wechsel automatisch, je nach
-> dem, ob N.I.N.A. im Netz erreichbar ist.
+<p align="center">
+  <img alt="Plattform ESP32" src="https://img.shields.io/badge/Plattform-ESP32-C8102E?style=flat-square&logo=espressif&logoColor=white">
+  <img alt="Arduino IDE" src="https://img.shields.io/badge/Arduino%20IDE-2.x-00878F?style=flat-square&logo=arduino&logoColor=white">
+  <img alt="Display Waveshare 7,5 Zoll" src="https://img.shields.io/badge/Display-Waveshare%207%2C5%E2%80%B3%20B%2FW%2FR-1B1B1B?style=flat-square">
+  <img alt="N.I.N.A. Advanced API" src="https://img.shields.io/badge/N.I.N.A.-Advanced%20API%20v2-0B1020?style=flat-square">
+  <img alt="Open-Meteo" src="https://img.shields.io/badge/Wetter-Open--Meteo-2F6FDE?style=flat-square">
+  <a href="LICENSE"><img alt="Lizenz MIT" src="https://img.shields.io/badge/Lizenz-MIT-5B6672?style=flat-square"></a>
+</p>
 
-[![Host Tests](https://github.com/lindekai/AstroOyInk/actions/workflows/test.yml/badge.svg)](https://github.com/lindekai/AstroOyInk/actions/workflows/test.yml)
-[![Arduino Build](https://github.com/lindekai/AstroOyInk/actions/workflows/arduino-compile.yml/badge.svg)](https://github.com/lindekai/AstroOyInk/actions/workflows/arduino-compile.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<p align="center">
+  <a href="#-die-zwei-modi"><b>Modi</b></a> ·
+  <a href="#-funktionen"><b>Funktionen</b></a> ·
+  <a href="#-hardware"><b>Hardware</b></a> ·
+  <a href="INSTALL.md"><b>Installation</b></a> ·
+  <a href="#%EF%B8%8F-konfiguration"><b>Konfiguration</b></a> ·
+  <a href="#%EF%B8%8F-roadmap"><b>Roadmap</b></a> ·
+  <a href="CONTRIBUTING.md"><b>Mitmachen</b></a>
+</p>
 
-## Warum „AstroOyInk“?
+<p align="center">
+  <b>Ein E-Ink-Display an der Wand, das weiß, ob heute Nacht etwas geht – und was gerade am Teleskop passiert.</b><br>
+  Ein ESP32 mit Waveshare-7,5″-E-Paper zeigt tagsüber das Astro-Wetter für deinen Standort.<br>
+  Sobald <a href="https://nighttime-imaging.eu/">N.I.N.A.</a> eine Sequenz fährt, wechselt es von selbst auf Live-Telemetrie deiner Session.
+</p>
 
-AstroOyInk entstand aus einer ungewöhnlich ehrlichen Beschreibung moderner Astrofotografie.
-
-Der Name kombiniert den bekannten jiddischen Ausdruck Oy Vey — sinngemäß:
-
-„Oh nein. Nicht schon wieder.“
-
-…mit „Ink“ als Verweis auf die verwendete eInk/ePaper-Technologie.
-
-Der Ausdruck „Oy Vey“ beschreibt dabei erstaunlich präzise den emotionalen Zustand vieler Astrofotografen:
-
-> meist kurz nach erfolgreichem Polar Alignment, 
-> während des Meridian Flips oder genau in dem Moment,
-> 6h nach Sessionstart, wenn Du merkst, dass Du die Tauheizung vergessen hast,  
-> in dem trotz perfekter Wettervorhersage Wolken aufziehen.
-
-Zusammen steht AstroOyInk für die besondere Mischung aus Technik, Hoffnung, Schlafmangel und leichtem Wahnsinn, die Astrofotografie so einzigartig macht.
-
-Oder einfacher gesagt:
-
-**AstroOyInk**
-Ein kleines ePaper-Astrodisplay für Menschen, die „klarer Himmel“ eher als theoretisches Konzept betrachten.
-
----
-
-## Die zwei Modi
-
-```
-┌─────────────────────────────────────────────────────┐
-│  EIN ESP32 + EIN E-Ink Display                      │
-├─────────────────────────────────────────────────────┤
-│                                                     │
-│  Modus „Wetter"           Modus „Session"           │
-│  ┌──────────────┐         ┌──────────────┐          │
-│  │ Astro-Wetter │  ←────→ │ Session-Live │          │
-│  │ Mond, Wolken │ AUTO    │ Kamera, Mount│          │
-│  │ Open-Meteo   │ DETECT  │ ninaAPI      │          │
-│  └──────────────┘         └──────────────┘          │
-│         ↑                        ↑                  │
-│    Default-Modus         Aktiv wenn N.I.N.A.        │
-│    immer wenn keine      im Netzwerk erreichbar     │
-│    Session läuft         und eine Sequenz läuft     │
-│                                                     │
-└─────────────────────────────────────────────────────┘
-```
-
-**Aktueller Stand:** WEATHER-Modus und SESSION-Modus sind vollständig implementiert
-(siehe Roadmap). Automatischer Wechsel je nach N.I.N.A.-Erreichbarkeit.
+<p align="center">
+  <img src="docs/images/display_weather.jpg" alt="AstroOyInk im WEATHER-Modus auf dem echten Waveshare 7,5″ B/W/R-Display" width="85%">
+  <br><sub>Das echte Display im WEATHER-Modus – Waveshare 7,5″ V3, Schwarz/Weiß/Rot</sub>
+</p>
 
 ---
 
-## Inhaltsverzeichnis
+## 🔁 Die zwei Modi
 
-1. [Warum „AstroOyInk"?](#warum-astrooyink)
-2. [Was es kann](#was-es-kann)
-3. [Hardware](#hardware)
-4. [Display-Layout im WEATHER-Modus](#display-layout-im-weather-modus)
-5. [Installation](#installation)
-6. [Projektstruktur](#projektstruktur)
-7. [Konfiguration](#konfiguration)
-8. [Tests](#tests)
-9. [Roadmap](#roadmap)
-10. [Vorgeschichte: AstroWeatherEPD](#vorgeschichte-astroweatherepd)
-11. [Credits](#credits)
-12. [Lizenz](#lizenz)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/modi-dark.svg">
+    <img alt="WEATHER-Modus und SESSION-Modus mit automatischem Wechsel" src="docs/images/modi-light.svg" width="100%">
+  </picture>
+</p>
 
----
+Ein Gerät, zwei Code-Pfade. Zu Beginn jedes Zyklus prüft AstroOyInk, ob die
+N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 
-## Was es kann
+| | ☁️ **WEATHER** | 🔭 **SESSION** |
+|---|---|---|
+| **Wann** | Standard – immer, wenn keine Session läuft | N.I.N.A. erreichbar und Sequenz aktiv |
+| **Quellen** | Open-Meteo, 7Timer!, open-notify, Mond lokal | N.I.N.A. Advanced API v2 (Port 1888) |
+| **Takt** | stündlich, dazwischen Deep-Sleep | alle 5 min, Gerät bleibt wach |
+| **Zurück** | – | automatisch, sobald N.I.N.A. weg ist |
 
-### Heute (WEATHER-Modus)
+## ✨ Funktionen
 
-- ✅ Stündliches Update von Open-Meteo (kein API-Key)
-- 🌙 Mondberechnung lokal nach Meeus (Phase, Illumination, Höhe, Himmelsaufhellung)
-- ⭐ Astro-Score aus gewichteter Wolkenbedeckung (Low 0.5 / Mid 0.3 / High 0.2)
-- 🕘 Echtes Nachtfenster (Sonnenuntergang +2h … Sonnenaufgang −2h)
-- ⚠️ Wind- und Tau-Warnungen (>25 km/h, >90 % Feuchte)
-- 📊 Dashboard mit Nacht-Verlauf, Stundenwerten, 24h-Charts, 5-Tage-Vorschau
-- 💤 Deep-Sleep zwischen Updates
-- 🎨 3-Color-Design ohne Grün (Sterne + Outline statt grüner Ampelfarbe)
-- 🔋 Batterieanzeige im Header (LiPo-Ladestand, USB-Erkennung, rot bei < 20 %)
-- 📶 WiFiManager: Captive Portal bei fehlendem/falschem WLAN — alle Parameter (Ort, Lat/Lon, Zeitzone, Intervall, N.I.N.A.) ohne Re-Flash konfigurierbar
-- 📤 OTA-Updates: 30-s-Flashfenster nach jedem WLAN-Connect — Firmware-Update aus der Arduino IDE ohne USB-Kabel
-- 🌡️ Lokaler BME280-Sensor: Innentemperatur, Feuchte und Luftdruck direkt am Gerät als „IN:"-Zeile im Dashboard
-- 🪐 7Timer! Seeing & Transparenz: astronomisches Seeing + Durchsicht als rote Kurven im Nacht-Wolken-Chart
-- 🛰️ ISS-Überflüge: nächster Pass rechts in der FAZIT-Zeile (open-notify.org, kein Key)
+<table>
+<tr>
+<td width="50%" valign="top">
 
-### SESSION-Modus (N.I.N.A. Advanced API)
+### ☁️ WEATHER-Modus
 
-- 🔭 Automatischer Wechsel WEATHER → SESSION wenn N.I.N.A. läuft
-- 📋 Sequenzfortschritt: Target i/n, Sub i/n, Restzeit, Status
-- 🎯 Objekt-Höhe und Azimut (aus N.I.N.A.)
-- 📷 Kamera: Name, Filter, Belichtungszeit, HFR
-- 🔭 Guiding: RMS RA/Dec/Total, Warnungen ab 1,0″
-- 🌐 Mount: Name, RA/Dec, Pier-Seite, Meridian-Flip-Countdown
+- ⭐ **Nacht-Bewertung** aus gewichteter Wolkendecke<br><sub>Low 0,5 · Mid 0,3 · High 0,2 → GUT / MITTEL / SCHLECHT</sub>
+- 🕘 **Echtes Nachtfenster** – Sonnenuntergang +2 h bis Sonnenaufgang −2 h
+- 🌙 **Mond nach Meeus**, lokal berechnet: Phase, Beleuchtung, Höhe, Himmelsaufhellung
+- 📈 **Wolken-Verlauf** der Nacht (Gesamt/Low/Mid/High)
+- 🪐 **Seeing & Transparenz** von 7Timer! als rote Kurven im Chart
+- 🛰️ **ISS-Überflüge** direkt in der Stundentabelle markiert
+- ⚠️ **Wind- und Tau-Warnung** ab 25 km/h bzw. 90 % Feuchte
+- 📊 Mini-Charts (Temp, Wind, Feuchte, Regen) und **5-Tage-Vorschau**
 
-## Hardware
+</td>
+<td width="50%" valign="top">
 
-| Komponente | Modell |
-|---|---|
-| MCU | ESP32 (Standard-DevKit oder Waveshare e-Paper Driver Board) |
-| Display | Waveshare **7.5″ E-Paper V3** (B/W/R, 800×480) |
-| Stromversorgung | USB 5 V (kurzfristig bis 200 mA) |
-| Optional | 7×5″ Bilderrahmen für die Wand |
+### 🔭 SESSION-Modus
 
-## Display-Layout im WEATHER-Modus
+- 📋 **Sequenz:** Name, Target i/n, Sub i/n, Restzeit, Status
+- 🎯 **Objekt:** Höhe und Azimut
+- 📷 **Kamera:** Name, Filter, Belichtungszeit, HFR
+- 🧭 **Guiding:** RMS RA/Dec/Total mit Status OK / WARN / LOST
+- 🌐 **Mount:** RA/Dec, Pier-Seite, Meridian-Flip-Countdown
+- 🚨 **Warnungen** rot hervorgehoben: RMS ≥ 1,0″, Flip < 10 min, Slewing, Pause
 
-![AstroOyInk im WEATHER-Modus auf dem echten Waveshare 7.5″ BWR-Display](docs/images/display_weather.jpg)
+### 🧰 Rund ums Gerät
 
-*Echtes Display im WEATHER-Modus (Waveshare 7.5″ V3, B/W/R).*
+- 📶 **WiFiManager** – Captive Portal, alle Einstellungen ohne Re-Flash
+- 📤 **OTA-Updates** – 30-s-Fenster nach jedem WLAN-Connect
+- 🌡️ **BME280** – Innentemperatur, Feuchte, Luftdruck
+- 🔋 **Akkuanzeige** im Header, USB-Erkennung
+- 💤 **Deep-Sleep** zwischen den Updates
 
-Schematischer Aufbau:
+</td>
+</tr>
+</table>
 
-```
-┌─── Saarmund ─── 01:18 ─── [████  ] 72%  Update 01:18 ──┐
-│ AKTUELL          │ NACHT-BEWERTUNG    │ MOND            │
-│  🌙  3.7°C       │  ┌──┐   GUT        │ 🌒 Zun. Sichel  │
-│      6 km/h     │  │0%│  ★★★★★      │    25 % beleucht │
-│      78 %       │  └──┘             │    42° u. Hor.   │
-│      Tau 0.2 C  │  Nacht 22:17-03:54│    Himmel: dunkel│
-├──────────────────┴────────────────────┴──────────────────┤
-│ NACHT - WOLKEN VERLAUF (%)             Gesamt — Low      │
-│ 100, 75, 50, 25, 0 ─────────────       Mid ··· High      │
-├──────────────────────────────────────────────────────────┤
-│ Stundenwerte Nacht  / Mini-Charts (24h)                  │
-├──────────────────────────────────────────────────────────┤
-│ Vorhersage   Mi  Do  Fr  Sa  So                          │
-├──────────────────────────────────────────────────────────┤
-│ FAZIT:  Klare Nacht erwartet — Teleskop bereitstellen!   │
-└──────────────────────────────────────────────────────────┘
-```
+> [!NOTE]
+> **Drei Farben, kein Grün.** Das Panel kann nur Schwarz, Weiß und Rot. „Gute“
+> Zustände zeigt AstroOyInk deshalb mit Sternen, Rahmen und fetter Schrift –
+> Rot ist für Warnungen reserviert. Für reine B/W-Panels gibt es
+> `DISPLAY_HAS_RED 0`.
 
-## Installation
+## 🔩 Hardware
 
-Siehe **[INSTALL.md](INSTALL.md)** für die ausführliche Schritt-für-Schritt-Anleitung.
+| Komponente | Modell | Hinweis |
+|---|---|---|
+| Mikrocontroller | ESP32-WROOM-32 | getestet mit dem Waveshare ESP32 e-Paper Driver Board |
+| Display | Waveshare **7,5″ E-Paper V3**, B/W/R, 800×480 | Treiber `GxEPD2_750c_Z08` |
+| Stromversorgung | USB 5 V | Refresh zieht kurz bis 200 mA |
+| *optional* | BME280 (I²C) | Innenklima im AKTUELL-Block |
+| *optional* | LiPo-Akku + Spannungsteiler an GPIO 34 | Akkuanzeige im Header |
+| *optional* | Bilderrahmen 7×5″ | für die Wand |
 
-Kurzversion:
-1. Arduino IDE 2.x installieren
-2. ESP32-Boardpaket installieren (Version ≥2.0.14)
-3. Bibliotheken: GxEPD2, Adafruit GFX, **ArduinoJson 7.x**
-4. `config.h` editieren (WLAN, Lat/Lon)
-5. Board „ESP32 Dev Module" auswählen
-6. Flashen → fertig
+<details>
+<summary><b>Pinbelegung Display</b></summary>
 
-## Projektstruktur
+| Signal | BUSY | RST | DC | CS | SCK | MOSI |
+|---|---|---|---|---|---|---|
+| GPIO | 25 | 26 | 27 | 15 | 13 | 14 |
 
-```
-AstroOyInk/
-├── AstroOyInk.ino                 # Hauptsketch + State-Machine-Hook
-├── config.h                       # WLAN, Standort, Pins, Schwellwerte
-│
-├── src/                           # automatisch rekursiv kompiliert
-│   ├── common/                    # querschnittlich
-│   │   ├── data_types.h
-│   │   ├── time_utils.h/.cpp
-│   │   ├── astro_logic.h/.cpp
-│   │   ├── moon_calc.h/.cpp
-│   │   ├── battery.h/.cpp         # Batteriemessung (Roadmap #1)
-│   │   ├── app_config.h/.cpp      # NVS-Konfiguration (Roadmap #2)
-│   │   ├── ota_updater.h/.cpp     # OTA-Flashfenster (Roadmap #3)
-│   │   └── local_sensor.h/.cpp   # BME280-Innensensor (Roadmap #4)
-│   │
-│   ├── data_sources/
-│   │   ├── weather_api.h/.cpp     # Open-Meteo
-│   │   ├── seeing_api.h/.cpp      # 7Timer! Seeing & Transparenz (Roadmap #5)
-│   │   └── iss_api.h/.cpp         # ISS-Überflüge open-notify (Roadmap #6)
-│   │
-│   ├── modes/
-│   │   └── mode_state_machine.h/.cpp  # WEATHER ↔ SESSION (Skelett)
-│   │
-│   └── rendering/
-│       └── display_base.h/.cpp    # GxEPD2-Init + Wetter-Render
-│
-├── tests/                         # Host-Tests (g++)
-├── .github/                       # CI + Issue-Templates
-├── CLAUDE.md                      # Projektkontext für Claude Code
-├── INSTALL.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-└── SETUP_NEW_MACHINE.md
-```
+</details>
 
-## Konfiguration
+> [!TIP]
+> Ein voller Drei-Farben-Refresh dauert auf dem V3-Panel **25–30 Sekunden**.
+> Das Flackern dabei ist normal.
 
-Alles in `config.h` (Ersteinrichtung) oder per **WiFiManager-Portal** (zur Laufzeit ohne Re-Flash):
+## 🚀 Schnellstart
+
+Die ausführliche Anleitung steht in **[INSTALL.md](INSTALL.md)**. Kurzfassung:
+
+1. **Arduino IDE 2.x** und das **ESP32-Boardpaket** (≥ 2.0.14) installieren
+2. Bibliotheken über den Library Manager: `GxEPD2`, `Adafruit GFX`, **`ArduinoJson 7.x`**, `WiFiManager` (tzapu)
+3. Board **„ESP32 Dev Module“** wählen, `AstroOyInk.ino` öffnen und flashen
+4. Mit dem WLAN **`AstroOyInk-XXXXXX`** verbinden (der Name steht auch auf dem Display) und im Portal WLAN, Standort und optional den N.I.N.A.-Host eintragen
+5. Fertig – das erste Dashboard erscheint nach etwa einer Minute
+
+## ⚙️ Konfiguration
+
+Alles lässt sich im **WiFiManager-Portal** einstellen. Die Defaults für die
+Ersteinrichtung stehen in `config.h`:
 
 ```cpp
 // Standort
@@ -203,19 +150,17 @@ Alles in `config.h` (Ersteinrichtung) oder per **WiFiManager-Portal** (zur Laufz
 #define LOCATION_LON    13.4050f
 #define TIMEZONE_POSIX  "CET-1CEST,M3.5.0,M10.5.0/3"
 
-// Update-Intervall WEATHER-Modus
-#define REFRESH_INTERVAL_S        3600UL   // 1 Stunde
+// Update-Intervalle
+#define REFRESH_INTERVAL_S          3600UL  // WEATHER: 1 Stunde, Deep-Sleep
+#define SESSION_REFRESH_INTERVAL_S   300UL  // SESSION: 5 Minuten, wach
 
-// Update-Intervall SESSION-Modus (Gerät bleibt wach)
-#define SESSION_REFRESH_INTERVAL_S  300UL  // 5 Minuten
-
-// Display-Typ: 1 = BWR (Schwarz/Weiss/Rot, Standard), 0 = nur B/W
+// Display: 1 = Schwarz/Weiss/Rot (Standard), 0 = nur B/W
 #define DISPLAY_HAS_RED  1
 
 // Guiding-Warnschwelle im SESSION-Modus
-#define GUIDING_WARN_RMS_ARCSEC  1.0f     // Warnung ab 1,0 Bogensekunden
+#define GUIDING_WARN_RMS_ARCSEC  1.0f
 
-// Batterieanzeige (optionaler LiPo-Akku)
+// Akkuanzeige (optionaler LiPo)
 #define BATT_ENABLED         1
 #define BATT_ADC_PIN         34
 #define BATT_VOLTAGE_DIVIDER 2.0f
@@ -223,58 +168,133 @@ Alles in `config.h` (Ersteinrichtung) oder per **WiFiManager-Portal** (zur Laufz
 
 ### SESSION-Modus aktivieren
 
-N.I.N.A.-Host im WiFiManager-Portal eintragen (Feld „N.I.N.A. Host") oder
-direkt in `config.h`:
+1. In N.I.N.A. das Plugin **Advanced API** installieren und aktivieren (Port 1888).
+2. Im Portal das Feld **„N.I.N.A. Host“** ausfüllen – oder in `config.h`:
 
-```cpp
-// Auskommentieren und eigenen Host eintragen:
-// #define NINA_HOST_DEFAULT   "nina-pc.local"   // oder IP, z.B. "192.168.1.42"
-// #define NINA_PORT_DEFAULT   1888
+   ```cpp
+   #define NINA_HOST_DEFAULT   "nina-pc.local"   // oder IP, z. B. "192.168.1.42"
+   #define NINA_PORT_DEFAULT   1888
+   ```
+
+3. Sequenz starten. Beim nächsten Zyklus wechselt das Display von selbst.
+
+## 🖼️ Display-Layout
+
+<details>
+<summary><b>WEATHER-Modus</b> (800 × 480)</summary>
+
+```
+┌─ Saarmund ────────────── 22:41 ───────── [███ ] 72 %  Update 22:41 ─┐
+│ AKTUELL            │ NACHT-BEWERTUNG       │ MOND                    │
+│  3.7 °C   6 km/h   │  ( 8% )  GUT          │  ◐  Zun. Sichel         │
+│           78 %     │          ★★★★★        │     25 % beleuchtet     │
+│  IN: 21 °C 45 %    │  Nacht 22:17–03:54    │     Himmel: dunkel      │
+├────────────────────┴───────────────────────┴─────────────────────────┤
+│ NACHT – WOLKEN-VERLAUF (%)      Gesamt / Low / Mid / High + Seeing   │
+├──────────────────────────────────────────────────────────────────────┤
+│ STUNDENWERTE NACHT   Std / Wolk% / ISS                               │
+├──────────────────────────────────────────────────────────────────────┤
+│ Temp │ Wind │ Feuchte │ Regen      (Mini-Charts 24 h)                │
+├──────────────────────────────────────────────────────────────────────┤
+│ VORHERSAGE   Mi   Do   Fr   Sa   So                                  │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
-Sobald N.I.N.A. Advanced API Plugin installiert ist und eine Sequenz läuft,
-wechselt das Display **automatisch** in den SESSION-Modus.
+</details>
 
-## Tests
+<details>
+<summary><b>SESSION-Modus</b> (800 × 480)</summary>
+
+```
+┌─ Saarmund ────────────── 23:12 ───────────────────── [███ ] 72 % ─┐
+│ SEQUENZ  M31-LRGB   Target 1/3   Sub 42/120   Restzeit 2:35       │
+│ Status: Imaging     Alt 58° / Az 112°                             │
+├──────────────────────┬──────────────────────┬─────────────────────┤
+│ KAMERA               │ GUIDING              │ MOUNT               │
+│ ZWO ASI2600MM        │ RA   0.42″           │ EQ6-R Pro           │
+│ Filter: L            │ Dec  0.38″           │ RA/Dec              │
+│ 180 s                │ Tot  0.57″           │ Alt/Az              │
+│ HFR 2.1              │ [Guiding OK]         │ Pier: East          │
+│                      │                      │ Flip in 1:12        │
+└──────────────────────┴──────────────────────┴─────────────────────┘
+```
+
+</details>
+
+## 🗂️ Projektstruktur
+
+```
+AstroOyInk/
+├── AstroOyInk.ino            # setup() / loop() / doCycle() mit Modus-Switch
+├── config.h                  # Standort, Pins, Schwellwerte, Defaults
+├── src/                      # wird von der Arduino IDE rekursiv kompiliert
+│   ├── common/               # Datentypen, Zeit, Astro-Logik, Mond, Akku,
+│   │                         # NVS-Config, OTA, BME280
+│   ├── data_sources/         # Open-Meteo, 7Timer!, open-notify, N.I.N.A.
+│   ├── modes/                # mode_state_machine: WEATHER ↔ SESSION
+│   └── rendering/            # GxEPD2, Wetter- und Session-Dashboard
+├── tests/                    # Host-Tests mit g++, ohne ESP32
+├── tools/                    # Generator für die README-Grafiken
+└── docs/images/              # Hero, Modus-Grafik, Display-Foto
+```
+
+## 🧪 Tests
 
 ```bash
 cd tests
 ./build_and_run.sh
 ```
 
-Validiert Astro-Bewertung (8 Szenarien) und Mondberechnung gegen
-bekannte Mondereignisse 2026.
+Prüft die Astro-Bewertung (8 Szenarien) und die Mondberechnung gegen bekannte
+Mondereignisse 2026 – komplett auf dem Rechner, ohne Hardware.
 
-## Roadmap
+## 🗺️ Roadmap
 
-In dieser Reihenfolge geplant:
+| # | Feature | Status |
+|---|---|---|
+| 1 | 🔋 Akkuanzeige im Header | ✅ |
+| 2 | 📶 WiFiManager (Captive Portal) | ✅ |
+| 3 | 📤 OTA-Updates | ✅ |
+| 4 | 🌡️ Lokaler Sensor (BME280) | ✅ |
+| 5 | 🪐 7Timer! Seeing & Transparenz | ✅ |
+| 6 | 🛰️ ISS-Überflüge | ✅ |
+| 7 | 📷 Screenshot-Export auf SD | ❌ gestrichen |
+| 8 | 🔭 SESSION-Modus (N.I.N.A. Advanced API) | ✅ |
 
-1. ~~🔋 Batterieanzeige im Header (ADC)~~ ✅
-2. ~~📶 WiFiManager (Captive Portal)~~ ✅
-3. ~~📤 OTA-Updates~~ ✅
-4. ~~🌡️ Lokaler Sensor (BME280)~~ ✅
-5. ~~🪐 7Timer! Seeing & Transparenz~~ ✅
-6. ~~🛰️ ISS-Überflüge~~ ✅
-7. ~~📷 Screenshot-Export auf SD~~ *(entfällt)*
-8. ~~🔭 **SESSION-Modus** (N.I.N.A. Advanced API)~~ ✅
+Die Versionshistorie steht im [CHANGELOG.md](CHANGELOG.md).
 
-Siehe [CHANGELOG.md](CHANGELOG.md) für die Versionshistorie.
+## 🤔 Warum „AstroOyInk“?
 
-## Vorgeschichte: AstroWeatherEPD
+Der Name verbindet den jiddischen Ausruf **Oy Vey** – sinngemäß *„Oh nein.
+Nicht schon wieder.“* – mit **Ink** für die E-Ink-Technik. „Oy Vey“ beschreibt
+erstaunlich präzise den Gemütszustand vieler Astrofotografen:
 
-AstroOyInk geht aus dem Vorgängerprojekt **AstroWeatherEPD v1.0** hervor.
-Dort wurde der WEATHER-Modus ursprünglich entwickelt. Wenn dich der Weg
-dorthin interessiert: siehe `CHANGELOG.md`. Das frühere Repo wurde nicht
-veröffentlicht — AstroOyInk ist die offizielle Linie.
+> meist kurz nach erfolgreichem Polar Alignment,
+> während des Meridian Flips oder genau in dem Moment,
+> 6 h nach Sessionstart, wenn du merkst, dass du die Tauheizung vergessen hast,
+> in dem trotz perfekter Wettervorhersage Wolken aufziehen.
 
-## Credits
+AstroOyInk steht für die besondere Mischung aus Technik, Hoffnung, Schlafmangel
+und leichtem Wahnsinn, die Astrofotografie ausmacht. Oder kürzer:
+**ein kleines E-Paper-Astrodisplay für Menschen, die „klarer Himmel“ eher für
+ein theoretisches Konzept halten.**
 
-**Autor:** Kai Linde  
-**Community:** Dark Matters Discord
+<details>
+<summary><b>Vorgeschichte: AstroWeatherEPD</b></summary>
 
----
+AstroOyInk ist aus dem unveröffentlichten Vorgänger **AstroWeatherEPD v1.0**
+hervorgegangen, in dem der WEATHER-Modus entstanden ist. Den Weg dorthin
+dokumentiert das [CHANGELOG.md](CHANGELOG.md). AstroOyInk ist die offizielle Linie.
 
-## Lizenz
+</details>
 
-MIT — siehe [LICENSE](LICENSE).
-Open-Meteo-Daten unterliegen den Bedingungen von <https://open-meteo.com>.
+## 🙏 Credits
+
+- **Autor:** Kai Linde
+- **Community:** Dark Matters Discord
+- **Daten:** [Open-Meteo](https://open-meteo.com), [7Timer!](https://www.7timer.info), [open-notify](http://open-notify.org), [N.I.N.A.](https://nighttime-imaging.eu/) mit Advanced API
+
+## 📄 Lizenz
+
+MIT – siehe [LICENSE](LICENSE). Für Open-Meteo-Daten gelten die Bedingungen
+von <https://open-meteo.com>.

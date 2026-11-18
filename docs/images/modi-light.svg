@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-labelledby="t d">
+  <title id="t">Die zwei Modi von AstroOyInk</title>
+  <desc id="d">WEATHER-Modus und SESSION-Modus, automatischer Wechsel je nachdem, ob N.I.N.A. erreichbar ist und eine Sequenz läuft.</desc>
+  <rect width="1280" height="360" rx="24" fill="#F4F5F8"/>
+  <g font-family="ui-sans-serif, -apple-system, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+    <rect x="80" y="60" width="440" height="240" rx="18" fill="#FFFFFF" stroke="#D3D8E4" stroke-width="1.5"/>
+    <rect x="112" y="84" width="56" height="5" rx="2.5" fill="#111522"/>
+    <text x="112" y="126" font-size="26" font-weight="800" fill="#111522">☁  WEATHER</text>
+    <text x="112" y="164" font-size="18" fill="#4E586F">Open-Meteo + 7Timer! Seeing</text>
+    <text x="112" y="194" font-size="18" fill="#4E586F">Mond nach Meeus, Nacht-Bewertung</text>
+    <text x="112" y="224" font-size="18" fill="#4E586F">5-Tage-Vorschau, ISS-Überflüge</text>
+    <text x="112" y="276" font-size="14" font-weight="700" letter-spacing="1.6" fill="#111522">STANDARD · DEEP-SLEEP · 1×/STUNDE</text>
+    <rect x="760" y="60" width="440" height="240" rx="18" fill="#FFFFFF" stroke="#D3D8E4" stroke-width="1.5"/>
+    <rect x="792" y="84" width="56" height="5" rx="2.5" fill="#C8102E"/>
+    <text x="792" y="126" font-size="26" font-weight="800" fill="#111522">🔭  SESSION</text>
+    <text x="792" y="164" font-size="18" fill="#4E586F">Target, Subs, Restzeit, Status</text>
+    <text x="792" y="194" font-size="18" fill="#4E586F">Kamera, HFR, Guiding-RMS</text>
+    <text x="792" y="224" font-size="18" fill="#4E586F">Mount, Pier-Seite, Meridian-Flip</text>
+    <text x="792" y="276" font-size="14" font-weight="700" letter-spacing="1.6" fill="#C8102E">N.I.N.A. AKTIV · WACH · ALLE 5 MIN</text>
+    <g stroke="#4E586F" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M548 150 H732"/><path d="M720 140 L734 150 L720 160"/>
+      <path d="M732 210 H548"/><path d="M560 200 L546 210 L560 220"/>
+    </g>
+    <text x="640" y="136" text-anchor="middle" font-size="14" fill="#4E586F">Sequenz läuft</text>
+    <text x="640" y="244" text-anchor="middle" font-size="14" fill="#4E586F">N.I.N.A. weg</text>
+    <text x="640" y="185" text-anchor="middle" font-size="13" font-weight="700" letter-spacing="1.6" fill="#C8102E">AUTO</text>
+  </g>
+</svg>
