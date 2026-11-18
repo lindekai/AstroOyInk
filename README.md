@@ -117,6 +117,12 @@ Ein kleines ePaper-Astrodisplay für Menschen, die „klarer Himmel“ eher als 
 
 ## Display-Layout im WEATHER-Modus
 
+![AstroOyInk im WEATHER-Modus auf dem echten Waveshare 7.5″ BWR-Display](docs/images/display_weather.jpg)
+
+*Echtes Display im WEATHER-Modus (Waveshare 7.5″ V3, B/W/R).*
+
+Schematischer Aufbau:
+
 ```
 ┌─── Saarmund ─── 01:18 ─── [████  ] 72%  Update 01:18 ──┐
 │ AKTUELL          │ NACHT-BEWERTUNG    │ MOND            │

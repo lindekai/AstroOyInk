@@ -5,6 +5,8 @@ Alle relevanten Änderungen am Projekt.
 ## [Unreleased]
 
 ### Hinzugefügt
+- 📸 **Foto vom echten Display** im README (`docs/images/display_weather.jpg`,
+  WEATHER-Modus).
 - 🔭 **SESSION-Modus** — `src/data_sources/nina_api.h/.cpp` +
   `renderSessionDashboard()` in `display_base.cpp`
   N.I.N.A. Advanced API v2, Port 1888, kein Key. Automatischer Wechsel
