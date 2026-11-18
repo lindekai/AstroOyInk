@@ -16,7 +16,7 @@
     <text x="792" y="164" font-size="18" fill="#4E586F">Target, Subs, Restzeit, Status</text>
     <text x="792" y="194" font-size="18" fill="#4E586F">Kamera, HFR, Guiding-RMS</text>
     <text x="792" y="224" font-size="18" fill="#4E586F">Mount, Pier-Seite, Meridian-Flip</text>
-    <text x="792" y="276" font-size="14" font-weight="700" letter-spacing="1.6" fill="#C8102E">N.I.N.A. AKTIV · WACH · ALLE 5 MIN</text>
+    <text x="792" y="276" font-size="14" font-weight="700" letter-spacing="1.6" fill="#C8102E">N.I.N.A. AKTIV · DEEP-SLEEP · 5 MIN</text>
     <g stroke="#4E586F" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path d="M548 150 H732"/><path d="M720 140 L734 150 L720 160"/>
       <path d="M732 210 H548"/><path d="M560 200 L546 210 L560 220"/>

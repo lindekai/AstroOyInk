@@ -5,13 +5,35 @@ Alle relevanten Änderungen am Projekt.
 ## [Unreleased]
 
 ### Hinzugefügt
+- 🔋 **Stromversorgung / Akkubetrieb** — Referenzaufbau wie DoorSign:
+  TC4056 → LiPo 3500 mAh → TPS62827-Buck (Iq ~4 µA) → 3,3 V auf den
+  `3V3`-Pin, 1500-µF-Puffer-Elko, Teiler 2 × 100 kΩ an GPIO34.
+  Doku in README (Abschnitt „Stromversorgung“ mit Laufzeit-Hochrechnung),
+  INSTALL.md und CLAUDE.md.
+- ⚙️ **`BATT_USB_SENSE_PIN`** in `config.h` — optionale USB-Erkennung über
+  einen zweiten Teiler am 5-V-Eingang des TC4056 (Standard `-1` = aus).
 - 📸 **Foto vom echten Display** im README (`docs/images/display_weather.jpg`,
   WEATHER-Modus).
 - 🎨 **README überarbeitet:** Hero-Banner und Modus-Grafik (hell/dunkel, SVG),
   Badges, Navigation, Funktionsübersicht, Layout-Skizzen für beide Modi.
   Generator unter `tools/make_readme_svgs.py`.
 
+### Geändert
+- 💤 **SESSION-Modus schläft zwischen den Updates** (Deep-Sleep, 5 min)
+  statt dauerhaft wach zu bleiben. Eine Session-Nacht kostet damit
+  rechnerisch ~60 mAh statt mehrerer Hundert.
+- 📡 **WLAN aus vor dem Display-Refresh** — die Daten sind geholt, der
+  30-s-Refresh läuft ohne Funk.
+- 📤 **OTA-Fenster nur noch beim Kaltstart** (Reset-Taste / Strom an) bzw.
+  im `DEBUG_MODE`, nicht mehr nach jedem Deep-Sleep-Wake (~1 mAh je Fenster).
+- 🔋 **Akkumessung mit `analogReadMilliVolts()`** — nutzt die
+  Werkskalibrierung und bleibt korrekt, wenn der Buck bei leerem Akku
+  keine 3,3 V mehr liefert.
+
 ### Behoben
+- Akkuanzeige: „USB“ wurde erst ab 4,3 V Akkuspannung erkannt — hinter dem
+  TC4056 (Ladeschluss 4,2 V) nie erreicht. Jetzt über `BATT_USB_SENSE_PIN`.
+- README: Layout-Skizzen auf reines ASCII umgestellt (verrutschte Rahmen).
 - README: tote CI-Badges, nicht existierende `SETUP_NEW_MACHINE.md` und die
   entfernte FAZIT-Zeile aus der Doku genommen.
 - 🔭 **SESSION-Modus** — `src/data_sources/nina_api.h/.cpp` +

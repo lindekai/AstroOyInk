@@ -2,6 +2,7 @@
 //  src/common/battery.h
 //  Liest den LiPo-Ladestand ueber den internen ADC des ESP32.
 //  Externer Spannungsteiler: Akku+ → 100k → BATT_ADC_PIN → 100k → GND
+//  Optional USB-Erkennung:   USB 5V → 100k → BATT_USB_SENSE_PIN → 100k → GND
 //  Author:  Kai Linde
 //  Credits: Dark Matters Discord
 // =====================================================================
@@ -12,7 +13,7 @@
 
 enum BatteryStatus : uint8_t {
   BATT_UNKNOWN  = 0,  // Messung deaktiviert (BATT_ENABLED == 0)
-  BATT_USB,           // Spannung > 4,3 V → USB-Betrieb / Laden
+  BATT_USB,           // USB am Lademodul (nur mit BATT_USB_SENSE_PIN)
   BATT_OK,            // >= 20 %
   BATT_LOW,           // < 20 %
   BATT_CRITICAL,      // < 5 %

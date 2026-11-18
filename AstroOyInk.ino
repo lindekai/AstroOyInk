@@ -2,19 +2,20 @@
 //  AstroOyInk.ino
 //  Astro-Display fuer Astrofotografen.  Zwei Modi:
 //    - WEATHER:  Astro-Wetter-Dashboard (Open-Meteo + Mond)
-//    - SESSION:  N.I.N.A.-Live-Anzeige  (geplant, siehe Roadmap)
+//    - SESSION:  N.I.N.A.-Live-Anzeige  (N.I.N.A. Advanced API)
 //
 //  Ablauf pro Zyklus:
 //    1) Display-Init
 //    2) Konfiguration aus NVS laden (oder config.h-Defaults)
 //    3) WiFi via WiFiManager verbinden (bei Fehler: Captive Portal)
-//    3b) OTA-Fenster (30 s) fuer Firmware-Updates per Netzwerk
+//    3b) OTA-Fenster (30 s) fuer Firmware-Updates — nur beim Kaltstart
 //    4) NTP-Zeit synchronisieren
 //    5) Modus ermitteln (detectCurrentMode)
 //    6) Modus-spezifisch: Daten holen + rendern
 //    7) Display in Hibernate
 //
-//  Produktiv (DEBUG_MODE=0):  Zyklus in setup(), danach Deep-Sleep.
+//  Produktiv (DEBUG_MODE=0):  Zyklus in setup(), danach Deep-Sleep —
+//                            in beiden Modi, damit der Akku lange haelt.
 //  Debug    (DEBUG_MODE=1):  Zyklus in setup() UND in loop() alle 30 s,
 //                            kein Deep-Sleep → Serial Monitor bleibt an.
 //
@@ -141,11 +142,13 @@ static void disconnectWiFi() {
 // ---------------------------------------------------------------------
 //  Tiefschlaf bis zum naechsten Update (nur im Produktivmodus)
 // ---------------------------------------------------------------------
-static void goDeepSleep(uint32_t intervalS) {
+//  alignToHour: im WEATHER-Modus auf die volle Stunde ausrichten,
+//  im SESSION-Modus exakt intervalS schlafen.
+static void goDeepSleep(uint32_t intervalS, bool alignToHour) {
   uint64_t sleepUs = (uint64_t)intervalS * 1000000ULL;
 
   time_t now = time(nullptr);
-  if (now > 1700000000) {
+  if (alignToHour && now > 1700000000) {
     struct tm lt; localtime_r(&now, &lt);
     uint32_t toNextHour = (uint32_t)((59 - lt.tm_min) * 60 + (60 - lt.tm_sec));
     if (toNextHour < 60) toNextHour += 3600;
@@ -186,6 +189,8 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
     Serial.println("[STEP 4c] Fetch ISS-Passes ...");
     fetchISSPasses(g_cfg.lat, g_cfg.lon, iss);
   }
+  // Alle Daten da — WLAN vor dem 30-s-Refresh abschalten (spart Akku)
+  disconnectWiFi();
 
   if (apiOk) {
     Serial.println("[STEP 5] Compute Astro-Summary ...");
@@ -254,6 +259,7 @@ static void runSessionMode(bool wifiOk, bool /*timeOk*/) {
     Serial.println("[STEP 5] Fetch N.I.N.A. Session-Daten ...");
     ok = ninaFetchAll(g_cfg.ninaHost, g_cfg.ninaPort, nd);
   }
+  disconnectWiFi();
 
   if (ok) {
     Serial.println("[STEP 6] Render Session-Dashboard ...");
@@ -301,8 +307,11 @@ static void doCycle() {
   Serial.println("[STEP 3] WiFi / Portal ...");
   bool wifiOk = connectWithPortal();
 
-  // 3b) OTA-Fenster: 30 s nach WLAN-Connect fuer Firmware-Updates offenhalten
-  if (wifiOk) {
+  // 3b) OTA-Fenster: 30 s fuer Firmware-Updates offenhalten — nur beim
+  //     Kaltstart (Reset-Taste, Strom an), nicht nach jedem Deep-Sleep-Wake.
+  //     Jedes Fenster kostet ~1 mAh; stuendlich waere das der groesste Posten.
+  bool coldBoot = (esp_reset_reason() != ESP_RST_DEEPSLEEP);
+  if (wifiOk && (coldBoot || DEBUG_MODE)) {
     Serial.println("[STEP 3b] OTA ...");
     otaSetup(OTA_HOSTNAME, OTA_PASSWORD);
     otaWaitWindow(OTA_WINDOW_MS);
@@ -360,23 +369,13 @@ void setup() {
   doCycle();
 
 #if !DEBUG_MODE
+  // SESSION: alle 5 Minuten aufwachen, sonst Deep-Sleep wie WEATHER.
+  // Der Modus wird bei jedem Wake neu ermittelt — ist N.I.N.A. weg,
+  // geht es automatisch zurueck in den stuendlichen WEATHER-Takt.
   if (g_lastMode == MODE_SESSION) {
-    // SESSION: wach bleiben und alle 5 Minuten aktualisieren.
-    // Sobald N.I.N.A. nicht mehr laeuft, wechselt doCycle() zurueck
-    // zu WEATHER und wir gehen in den normalen Deep-Sleep.
-    Serial.println("[SLEEP] SESSION-Modus: Wake-Loop aktiv.");
-    while (true) {
-      uint32_t remaining = (uint32_t)SESSION_REFRESH_INTERVAL_S * 1000UL;
-      while (remaining > 0) {
-        uint32_t tick = (remaining >= 500) ? 500 : remaining;
-        delay(tick);
-        remaining -= tick;
-      }
-      doCycle();
-      if (g_lastMode != MODE_SESSION) break;
-    }
+    goDeepSleep(SESSION_REFRESH_INTERVAL_S, false);
   }
-  goDeepSleep(g_cfg.refreshIntervalS);
+  goDeepSleep(g_cfg.refreshIntervalS, true);
 #else
  
   Serial.println("[DEBUG] Kein Deep-Sleep - loop() uebernimmt.");

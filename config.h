@@ -46,8 +46,8 @@
 
 // ---------------------------------------------------------------------
 //  Refresh-Intervall in Sekunden (3600 = 1 Stunde) im WEATHER-Modus.
-//  Im SESSION-Modus (geplant) wird ein kürzeres Intervall (~60-120 s)
-//  verwendet, weil sich Belichtungs- und Guiding-Daten häufiger ändern.
+//  Im SESSION-Modus gilt SESSION_REFRESH_INTERVAL_S (weiter unten),
+//  weil sich Belichtungs- und Guiding-Daten häufiger ändern.
 // ---------------------------------------------------------------------
 #define REFRESH_INTERVAL_S  3600UL
 
@@ -103,7 +103,7 @@
 // #define NINA_HOST_DEFAULT   "nina-pc.local"  // oder "192.168.1.42"
 // #define NINA_PORT_DEFAULT   1888
 
-// Aktualisierungsintervall im SESSION-Modus (Geraet bleibt wach)
+// Aktualisierungsintervall im SESSION-Modus (Deep-Sleep dazwischen)
 #define SESSION_REFRESH_INTERVAL_S  300UL   // 5 Minuten
 
 // ---------------------------------------------------------------------
@@ -124,12 +124,21 @@
 
 // ---------------------------------------------------------------------
 //  Batterieanzeige (Feature 1)
+//  Referenzaufbau Stromversorgung (wie DoorSign, siehe README):
+//    USB-C → TC4056 → LiPo 3500 mAh → TPS62827 Buck → 3,3 V auf 3V3-Pin
 //  Spannungsteiler: 100k + 100k zwischen Akku-Plus und GPIO34 (1:2).
-//  Empfehlung Aufbau: Akku+ → 100k → GPIO34 → 100k → GND
+//    Akku+ → 100k → GPIO34 → 100k → GND   (Dauerstrom ~20 µA)
+//  Ohne Akku/Teiler: BATT_ENABLED 0.
 // ---------------------------------------------------------------------
 #define BATT_ENABLED         1
 #define BATT_ADC_PIN         34
 #define BATT_VOLTAGE_DIVIDER 2.0f
+
+//  Optionale USB-Erkennung ("USB" statt Prozent im Header).
+//  Zweiter Teiler am 5-V-Eingang des TC4056:
+//    USB 5V (IN+) → 100k → GPIO35 → 100k → GND
+//  -1 = nicht verbaut (Header zeigt dann immer den Ladestand).
+#define BATT_USB_SENSE_PIN   -1
 //
 // ---------------------------------------------------------------------
 //  Lokaler Umgebungssensor (Feature 4, BME280 via I2C)
@@ -156,6 +165,9 @@
 //            Heimnetz mit fremden Gaesten).
 //  Fenster:  Millisekunden nach dem WLAN-Connect, in denen ein
 //            Update aus der Arduino IDE eingespielt werden kann.
+//            Nur beim Kaltstart (Reset-Taste / Strom an), nicht nach
+//            jedem Deep-Sleep-Wake — spart Akku. Fuer ein OTA-Update
+//            also kurz RST druecken, dann in der IDE hochladen.
 // ---------------------------------------------------------------------
 #define OTA_HOSTNAME    "astrooyink"
 #define OTA_PASSWORD    ""

@@ -161,7 +161,7 @@ def modes(theme):
   <rect width="{W}" height="{H}" rx="24" fill="{t["bg"]}"/>
   <g font-family="{FONT}">
     {card(80, "☁  WEATHER", ink, ["Open-Meteo + 7Timer! Seeing", "Mond nach Meeus, Nacht-Bewertung", "5-Tage-Vorschau, ISS-Überflüge"], "STANDARD · DEEP-SLEEP · 1×/STUNDE")}
-    {card(760, "🔭  SESSION", t["eyebrow"], ["Target, Subs, Restzeit, Status", "Kamera, HFR, Guiding-RMS", "Mount, Pier-Seite, Meridian-Flip"], "N.I.N.A. AKTIV · WACH · ALLE 5 MIN")}
+    {card(760, "🔭  SESSION", t["eyebrow"], ["Target, Subs, Restzeit, Status", "Kamera, HFR, Guiding-RMS", "Mount, Pier-Seite, Meridian-Flip"], "N.I.N.A. AKTIV · DEEP-SLEEP · 5 MIN")}
     <g stroke="{t["sub"]}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path d="M548 150 H732"/><path d="M720 140 L734 150 L720 160"/>
       <path d="M732 210 H548"/><path d="M560 200 L546 210 L560 220"/>

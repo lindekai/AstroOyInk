@@ -38,6 +38,8 @@ auch wenn du **noch nie etwas mit Arduino oder ESP32 gemacht hast**.
 - Verbindungsleitung (HAT-Kabel ist im Waveshare-Lieferumfang dabei)
 - USB-Kabel zum Programmieren (meist Micro-USB oder USB-C, **kein reines
   Ladekabel!** — es muss Datenübertragung können)
+- Optional: Akkubetrieb – TC4056-Lademodul, LiPo 3500 mAh, TPS62827-Buck,
+  1500-µF-Elko, 2 × 100 kΩ (siehe „Optional: Akkubetrieb“ in Abschnitt 2)
 - Optional: 7 × 5″ Bilderrahmen für die schöne Optik
 
 ### Software
@@ -96,30 +98,42 @@ Danach Sensor aktivieren:
 
 Ohne Sensor: `LOCAL_SENSOR_ENABLED 0` lassen — das Dashboard zeigt dann keine INNEN-Zeile.
 
-### Optional: Batterieanzeige
+### Optional: Akkubetrieb mit Ladestandsanzeige
 
-Wenn du einen LiPo-Akku anschließen und den Ladestand anzeigen willst,
-baue einen Spannungsteiler zwischen Akku-Plus und GPIO34:
+Der Referenzaufbau ist derselbe wie beim Türschild-Projekt DoorSign. Alle
+Details mit Begründung stehen im README unter **Stromversorgung**.
 
 ```
-Akku+ ── 100 kΩ ── GPIO34 ── 100 kΩ ── GND
+USB-C ──> TC4056 ──> LiPo 3500 mAh ──> TPS62827 Buck ──> 3,3 V ──> ESP32 3V3-Pin
+                          │                                   └── 1500 µF ── GND
+                          └── 100 kΩ ── GPIO34 ── 100 kΩ ── GND
 ```
 
 | Verbindung | Bemerkung |
 |---|---|
-| Akku+ → 100 kΩ → GPIO34 | Spannungsteiler-Mitte an GPIO34 |
-| GPIO34 → 100 kΩ → GND | Spannungsteiler-Ende |
-| Akku+ direkt an ESP32-VBAT / 3V3-Ladepin | je nach deinem Lademodul |
+| TC4056 `B+`/`B−` → LiPo-Zelle | Zelle am Lademodul, geladen wird per USB-C am TC4056 |
+| TC4056 `OUT+`/`OUT−` → TPS62827 `VIN`/`GND` | Ausgang des Lademoduls (mit Tiefentladeschutz) |
+| TPS62827 `VOUT` → ESP32 **`3V3`** | **nicht** an `VIN`/5V – sonst läuft alles über den Board-LDO |
+| 1500 µF Elko zwischen `3V3` und `GND` | nah am ESP32, Plus an 3V3 |
+| Akku+ → 100 kΩ → GPIO34 → 100 kΩ → GND | Spannungsteiler für die Anzeige |
 
-Danach in `config.h` aktivieren:
+In `config.h`:
 
 ```cpp
 #define BATT_ENABLED         1
 #define BATT_ADC_PIN         34
 #define BATT_VOLTAGE_DIVIDER 2.0f
+#define BATT_USB_SENSE_PIN   -1   // optional: 35, siehe unten
 ```
 
-Ohne Akku: `BATT_ENABLED 0` lassen — dann wird kein Widget gezeichnet.
+**Optional „USB“ im Header:** zweiter Teiler am 5-V-Eingang des TC4056,
+`USB 5V → 100 kΩ → GPIO35 → 100 kΩ → GND`, dann `BATT_USB_SENSE_PIN 35`.
+
+> **Flashen per USB:** Hängt das Board am USB-Kabel, speisen Board-LDO und
+> Buck gleichzeitig in 3V3. Zum Flashen per Kabel den Buck-Ausgang
+> abklemmen – oder per OTA flashen (Abschnitt 11).
+
+Ohne Akku (Netzteil an USB): `BATT_ENABLED 0` – dann wird kein Widget gezeichnet.
 
 ---
 
@@ -313,13 +327,15 @@ installiert werden.
 
 ### Wie es funktioniert
 
-Nach jedem WLAN-Connect öffnet AstroOyInk **30 Sekunden** lang ein
-OTA-Empfangsfenster. In dieser Zeit ist der ESP32 als
+Nach einem **Kaltstart** (Reset-Taste oder Strom an) öffnet AstroOyInk
+**30 Sekunden** lang ein OTA-Empfangsfenster. Nach dem Aufwachen aus dem
+Deep-Sleep nicht – jedes Fenster kostet rund 1 mAh Akku. Im `DEBUG_MODE`
+ist es bei jedem Zyklus offen. In dieser Zeit ist der ESP32 als
 **`astrooyink`** (mDNS: `astrooyink.local`) im Netz sichtbar.
 
 ### OTA-Update einspielen
 
-1. ESP32 starten (USB-Strom reicht, kein Datenkabel nötig).
+1. **RST** am ESP32 drücken (oder Strom kurz trennen).
 2. Im Seriellen Monitor (optional) siehst du:
    ```
    [OTA] Bereit — Hostname: 'astrooyink'
@@ -331,8 +347,7 @@ OTA-Empfangsfenster. In dieser Zeit ist der ESP32 als
 4. Sketch wie gewohnt hochladen (→). Der Upload läuft nun per Netzwerk.
 5. Nach dem Update startet der ESP32 automatisch neu.
 
-> **Fenster verpasst?** Kein Problem — beim nächsten Aufwachen aus dem
-> Deep-Sleep öffnet sich das Fenster erneut für 30 Sekunden.
+> **Fenster verpasst?** Einfach noch einmal RST drücken.
 
 ### Passwort setzen (optional)
 
@@ -429,7 +444,8 @@ Wer ein reines Schwarz/Weiß-E-Paper-Display verwendet:
 
 ### Update-Intervall
 
-Im SESSION-Modus bleibt das Gerät wach und aktualisiert alle 5 Minuten.
+Im SESSION-Modus wacht das Gerät alle 5 Minuten auf, aktualisiert und
+schläft dazwischen im Deep-Sleep.
 Das Intervall ist anpassbar:
 
 ```cpp
@@ -490,6 +506,8 @@ Direkt nach dem Hochladen passiert Folgendes:
 | Display zeigt **Streifen / Geisterbild** | Einmal komplettes Refresh abwarten (15–25 s). Bei dauerhaftem Geisterbild: Display 30 s vom Strom trennen, danach erneut starten. |
 | Serielle Ausgabe: `[HTTP] GET failed: -1` | Open-Meteo nicht erreichbar (DNS-Problem? WLAN ohne Internet?). Versuche die URL aus dem Log im Browser. |
 | Serielle Ausgabe: `[API] JSON parse error: NoMemory` | ArduinoJson **6.x** statt **7.x** installiert. Im Library Manager auf 7.x updaten. |
+| `Brownout detector was triggered` im Serial Monitor | Die Versorgung schafft die WLAN-Spitzen (~500 mA) nicht. Pufferelko (1500 µF an 3V3) prüfen bzw. vergrößern. |
+| Akkuanzeige springt oder zeigt Unsinn | Teiler wirklich 2 × 100 kΩ an GPIO34? `BATT_VOLTAGE_DIVIDER` passend? Im Serial Monitor `[BATT] V=…` mit Multimeter am Akku vergleichen. |
 | Anzeige steht **stundenlang still**, kein Update | Im seriellen Monitor prüfen (USB anschließen → RST drücken). Gerät kommt aus Deep-Sleep nur über internen Timer; bei stark verbrauchter Batterie ggf. neu laden. |
 | Sommer/Winter-Zeit stimmt nicht | `TIMEZONE_POSIX` in `config.h` korrekt gesetzt? Default `CET-1CEST,M3.5.0,M10.5.0/3` ist für Mitteleuropa korrekt. |
 | Kompilierfehler `'GxEPD2_750c_Z08' was not declared` | GxEPD2-Bibliothek auf ≥ 1.5.x aktualisieren. Für 800×480 B/W/R ist `Z08` korrekt (in `src/rendering/display_base.cpp`). |

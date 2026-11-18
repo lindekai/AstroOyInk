@@ -45,7 +45,8 @@ zu AstroOyInk nachvollziehen will, findet die Iterationen in `CHANGELOG.md`.
 |---|---|
 | MCU | ESP32 (WROOM-32, getestet mit Waveshare ESP32 e-Paper Driver Board) |
 | Display | Waveshare 7.5″ E-Paper **V3** (B/W/R, 800×480), Treiber `GxEPD2_750c_Z08` |
-| Stromversorgung | USB 5V (Refresh zieht kurz bis 200 mA) |
+| Stromversorgung | USB 5V **oder** Akku-Referenzaufbau wie DoorSign: TC4056 → LiPo 3500 mAh (EEMB LP104567) → TPS62827-Buck (Iq ~4 µA) → 3,3 V auf **3V3-Pin** (nicht VIN), 1500 µF Puffer-Elko |
+| Akkuanzeige | Teiler 100k/100k Akku+ → GPIO34; optional USB-Sense 100k/100k an GPIO35 (`BATT_USB_SENSE_PIN`) |
 
 ## Pinbelegung (`config.h`)
 
@@ -162,22 +163,26 @@ keine zwei Dateien gleichen Namens in verschiedenen Unterordnern.
 1. displayInit()           → SPI + Panel-Init
 2. loadConfig()            → NVS lesen (Preferences) oder config.h-Defaults
 3. connectWithPortal()     → WiFiManager autoConnect + Captive Portal
-3b. otaSetup() + otaWaitWindow(30s)  → ArduinoOTA-Fenster fuer Firmware-Update
+3b. otaSetup() + otaWaitWindow(30s)  → ArduinoOTA-Fenster, NUR beim Kaltstart
+                                        (esp_reset_reason != DEEPSLEEP) oder DEBUG_MODE
 4. timeSyncNTP(tz)         → configTzTime + 3 NTP-Server
-5. detectCurrentMode()     → aktuell: immer MODE_WEATHER
+5. detectCurrentMode()     → MODE_SESSION wenn N.I.N.A. erreichbar + Sequenz laeuft
 6+7. switch(mode):
    - MODE_WEATHER:
-       fetchWeather()            → Open-Meteo HTTPS-Client
+       fetchWeather/Seeing/ISS() → Open-Meteo, 7Timer!, open-notify
+       disconnectWiFi()          → WLAN aus VOR dem 30-s-Refresh (Akku)
        computeAstroSummary()     → Cloud-Score, Verdict, Warnungen
        computeMoon() x2          → "jetzt" + "Mitte der Nacht"
        renderDashboard()         → setFullWindow + firstPage/nextPage Loop
                                    + waitBusyManual()
-   - MODE_SESSION (geplant):
-       ninaProbe()               → /v2/api/equipment/camera/info
-       ninaFetchSessionState()   → /v2/api/sequence/state, etc.
+   - MODE_SESSION:
+       ninaFetchAll()            → Sequenz, Kamera, Guider, Mount
+       disconnectWiFi()
        renderSessionDashboard()
 7. displaySleep() + disconnectWiFi()
-8. esp_deep_sleep_start()  → bis zum naechsten Update
+8. esp_deep_sleep_start()  → WEATHER: bis zur vollen Stunde,
+                              SESSION: SESSION_REFRESH_INTERVAL_S (5 min)
+                              Kein Wach-Bleiben mehr im SESSION-Modus (Akku).
 ```
 
 Im **DEBUG_MODE** (config.h) wird Schritt 8 übersprungen; `loop()`

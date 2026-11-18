@@ -19,6 +19,7 @@
   <a href="#-die-zwei-modi"><b>Modi</b></a> ·
   <a href="#-funktionen"><b>Funktionen</b></a> ·
   <a href="#-hardware"><b>Hardware</b></a> ·
+  <a href="#-stromversorgung"><b>Strom</b></a> ·
   <a href="INSTALL.md"><b>Installation</b></a> ·
   <a href="#%EF%B8%8F-konfiguration"><b>Konfiguration</b></a> ·
   <a href="#%EF%B8%8F-roadmap"><b>Roadmap</b></a> ·
@@ -54,7 +55,7 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 |---|---|---|
 | **Wann** | Standard – immer, wenn keine Session läuft | N.I.N.A. erreichbar und Sequenz aktiv |
 | **Quellen** | Open-Meteo, 7Timer!, open-notify, Mond lokal | N.I.N.A. Advanced API v2 (Port 1888) |
-| **Takt** | stündlich, dazwischen Deep-Sleep | alle 5 min, Gerät bleibt wach |
+| **Takt** | stündlich, dazwischen Deep-Sleep | alle 5 min, dazwischen Deep-Sleep |
 | **Zurück** | – | automatisch, sobald N.I.N.A. weg ist |
 
 ## ✨ Funktionen
@@ -91,8 +92,9 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 - 📶 **WiFiManager** – Captive Portal, alle Einstellungen ohne Re-Flash
 - 📤 **OTA-Updates** – 30-s-Fenster nach jedem WLAN-Connect
 - 🌡️ **BME280** – Innentemperatur, Feuchte, Luftdruck
-- 🔋 **Akkuanzeige** im Header, USB-Erkennung
-- 💤 **Deep-Sleep** zwischen den Updates
+- 🔋 **Akkubetrieb** mit Low-Iq-Buck – rechnerisch Monate pro Ladung
+- 🪫 **Akkuanzeige** im Header, optional mit USB-Erkennung
+- 💤 **Deep-Sleep** zwischen den Updates, in beiden Modi
 
 </td>
 </tr>
@@ -110,9 +112,8 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 |---|---|---|
 | Mikrocontroller | ESP32-WROOM-32 | getestet mit dem Waveshare ESP32 e-Paper Driver Board |
 | Display | Waveshare **7,5″ E-Paper V3**, B/W/R, 800×480 | Treiber `GxEPD2_750c_Z08` |
-| Stromversorgung | USB 5 V | Refresh zieht kurz bis 200 mA |
+| Stromversorgung | USB 5 V **oder** LiPo-Akku | siehe [Stromversorgung](#-stromversorgung) |
 | *optional* | BME280 (I²C) | Innenklima im AKTUELL-Block |
-| *optional* | LiPo-Akku + Spannungsteiler an GPIO 34 | Akkuanzeige im Header |
 | *optional* | Bilderrahmen 7×5″ | für die Wand |
 
 <details>
@@ -127,6 +128,95 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 > [!TIP]
 > Ein voller Drei-Farben-Refresh dauert auf dem V3-Panel **25–30 Sekunden**.
 > Das Flackern dabei ist normal.
+
+## 🔋 Stromversorgung
+
+### Netzteil
+
+USB 5 V direkt am Board. Mehr braucht es nicht – die Akkuanzeige dann mit
+`BATT_ENABLED 0` abschalten.
+
+### Akku – Referenzaufbau
+
+Gleiche Bauteile und Schaltung wie beim Türschild-Projekt **DoorSign**, dort
+gemessen und im Dauereinsatz. Über die Laufzeit entscheidet nicht der ESP32,
+sondern der **Ruhestrom der Stromversorgung**.
+
+```
+USB-C ──> TC4056 ──> LiPo 3,7 V ──┬──> TPS62827 Buck ──> 3,3 V ──> ESP32 3V3-Pin
+          Lademodul  3500 mAh     │    Iq ~4 µA              │
+                                  │                          └── 1500 µF Elko ── GND
+                                  └── 100 kΩ ──┬── GPIO34
+                                               └── 100 kΩ ── GND
+```
+
+| Bauteil | Typ | Warum dieser |
+|---|---|---|
+| Lademodul | TC4056, USB-C, 1 A | Ladeschluss 4,2 V, Tiefentladeschutz integriert |
+| Zelle | LiPo 3,7 V – EEMB LP104567, 3500 mAh | Kapazität nach gewünschter Laufzeit |
+| Spannungswandler | **TPS62827** Buck 3,3 V / 2 A (Adafruit 4920) | Ruhestrom ~4 µA, liefert 3,3 V direkt |
+| Pufferelko | 1500 µF zwischen 3V3 und GND am ESP32 | fängt WLAN-Spitzen (~500 mA) ab |
+| Spannungsteiler | 2 × 100 kΩ, Akku+ → GPIO34 → GND | Akkuanzeige, zieht dauerhaft ~20 µA |
+
+> [!IMPORTANT]
+> **Die 3,3 V gehen auf den `3V3`-Pin, nicht auf `VIN`/5V.** Über `VIN` liefe der
+> Strom durch den AMS1117-LDO des Boards, der Spannung verheizt und selbst
+> Ruhestrom zieht. Am Waveshare-Board muss dafür nichts ausgelötet werden: Der
+> LDO ist umgangen, und der USB-Chip hängt an USB-5 V, die im Akkubetrieb fehlt.
+
+<details>
+<summary><b>Ersatzteile, Grenzen und USB-Erkennung</b></summary>
+
+**Ersatz für den TPS62827:** entscheidend ist der Ruhestrom (Iq) im
+einstelligen µA-Bereich, 3,3 V direkt am Ausgang und ein LiPo-tauglicher
+Eingang (3,0–4,2 V). Geeignet sind z. B. TPS62827, TPS62840 oder TPS63802.
+**Ungeeignet sind LM2596-Module** („3 A Step-Down“, 150 kHz) – ~5 mA
+Eigenverbrauch, das Vielfache des schlafenden ESP32. Auch kein Boost auf 5 V.
+
+**Grenze nach unten:** Unter ~3,4 V geht der Buck in Durchgang, der Ausgang
+folgt der Zelle. WLAN braucht stabile ~3,0 V – nutzbar ist die Zelle also bis
+etwa 3,0 V, die Anzeige steht dort auf 0 %. Die Messung nutzt
+`analogReadMilliVolts()` mit Werkskalibrierung und bleibt dadurch auch bei
+sinkender Versorgungsspannung korrekt.
+
+**USB-Erkennung (optional):** Die Akkuspannung allein verrät nicht, ob
+geladen wird. Wer im Header „USB“ sehen möchte, setzt einen zweiten Teiler an
+den 5-V-Eingang des TC4056 – `USB 5V → 100 kΩ → GPIO35 → 100 kΩ → GND` – und
+trägt in `config.h` `BATT_USB_SENSE_PIN 35` ein.
+
+**Flashen per USB:** Während das Board am USB-Kabel hängt, speisen Board-LDO
+und Buck gleichzeitig in 3V3. Sicherer ist es, dafür den Buck-Ausgang
+abzuklemmen – oder per OTA zu flashen.
+
+**Brownout:** `Brownout detector was triggered` im Serial Monitor heißt, die
+Versorgung schafft die WLAN-Spitzen nicht – Pufferelko prüfen.
+
+</details>
+
+### Laufzeit
+
+> [!NOTE]
+> Die Zahlen sind **gerechnet, nicht gemessen**. Der Ruhestrom stammt aus der
+> DoorSign-Messung mit identischer Versorgung, die Wake-Kosten sind geschätzt.
+
+| Posten | Annahme | mAh/Tag |
+|---|---|---|
+| Ruhestrom | 0,4 mA (DoorSign gemessen) + 0,02 mA Teiler | ~10 |
+| WEATHER-Wakes | 24 × (~10 s WLAN à 120 mA + 30 s Refresh à ~50 mA) ≈ 24 × 0,75 mAh | ~18 |
+| **Summe** | | **~28** |
+
+Rechnerisch reichen 3500 mAh (~90 % nutzbar) damit für **rund 110 Tage** im
+WEATHER-Betrieb. DoorSign hat in der Praxis nur gut ein Drittel seiner
+eigenen Hochrechnung erreicht – realistisch sind daher eher **1–2 Monate**.
+
+Eine **Session-Nacht** (8 h, Update alle 5 min) kostet zusätzlich etwa
+**60 mAh**, also ungefähr zwei Tage WEATHER-Betrieb.
+
+Was die Firmware dafür tut:
+
+- **Deep-Sleep auch im SESSION-Modus** zwischen den 5-Minuten-Updates
+- **WLAN aus vor dem Refresh** – die Daten sind dann schon geholt, der 30-s-Refresh läuft ohne Funk
+- **OTA-Fenster nur beim Kaltstart** – für ein Update kurz RST drücken
 
 ## 🚀 Schnellstart
 
@@ -152,7 +242,7 @@ Ersteinrichtung stehen in `config.h`:
 
 // Update-Intervalle
 #define REFRESH_INTERVAL_S          3600UL  // WEATHER: 1 Stunde, Deep-Sleep
-#define SESSION_REFRESH_INTERVAL_S   300UL  // SESSION: 5 Minuten, wach
+#define SESSION_REFRESH_INTERVAL_S   300UL  // SESSION: 5 Minuten, Deep-Sleep
 
 // Display: 1 = Schwarz/Weiss/Rot (Standard), 0 = nur B/W
 #define DISPLAY_HAS_RED  1
@@ -160,10 +250,11 @@ Ersteinrichtung stehen in `config.h`:
 // Guiding-Warnschwelle im SESSION-Modus
 #define GUIDING_WARN_RMS_ARCSEC  1.0f
 
-// Akkuanzeige (optionaler LiPo)
+// Akkuanzeige (siehe Stromversorgung)
 #define BATT_ENABLED         1
 #define BATT_ADC_PIN         34
 #define BATT_VOLTAGE_DIVIDER 2.0f
+#define BATT_USB_SENSE_PIN   -1     // 35 = USB-Erkennung verbaut
 ```
 
 ### SESSION-Modus aktivieren
