@@ -89,6 +89,8 @@ bool ninaIsSequenceRunning(const char* host, uint16_t port) {
 bool ninaFetchAll(const char* host, uint16_t port, NinaData& out) {
   memset(&out, 0, sizeof(out));
   out.mount.flipEtaS = -1;
+  out.camera.tempC     = NAN;
+  out.camera.setpointC = NAN;
   // Standardwerte fuer Strings damit das Display "--" zeigt
   strlcpy(out.camera.filterName, "--", sizeof(out.camera.filterName));
   strlcpy(out.guiding.state,     "---", sizeof(out.guiding.state));
@@ -109,6 +111,17 @@ bool ninaFetchAll(const char* host, uint16_t port, NinaData& out) {
     JsonObject resp = doc["Response"].as<JsonObject>();
     out.camera.connected = resp["Connected"] | false;
     strlcpy(out.camera.name, resp["Name"] | "--", sizeof(out.camera.name));
+
+    // Kuehlung: TemperatureSetPoint ist der Wert im Treiber und steht bei
+    // ausgeschaltetem Kuehler auf einem Default (z. B. 10). TargetTemp ist
+    // das in N.I.N.A. eingestellte Ziel - das ist ohne Kuehler das "Soll".
+    out.camera.canCool        = resp["CanSetTemperature"] | false;
+    out.camera.coolerOn       = resp["CoolerOn"] | false;
+    out.camera.tempC          = resp["Temperature"] | NAN;
+    out.camera.coolerPowerPct = resp["CoolerPower"] | 0.0f;
+    out.camera.setpointC      = out.camera.coolerOn
+                                    ? (resp["TemperatureSetPoint"] | NAN)
+                                    : (resp["TargetTemp"] | NAN);
   }
 
   // --- Letztes Bild (Filter, Belichtung, HFR) ---
@@ -143,9 +156,13 @@ bool ninaFetchAll(const char* host, uint16_t port, NinaData& out) {
     else if (strcmp(pier, "East") == 0 || strcmp(pier, "1") == 0) out.mount.pierSide = 1;
     else                                                           out.mount.pierSide = 2;
 
-    // Meridian-Flip ETA
+    // Meridian-Flip: TimeToMeridianFlip kommt in STUNDEN (double).
+    // 24 h meldet N.I.N.A., wenn kein Flip ansteht (z. B. Tracking aus).
     JsonVariant flip = resp["TimeToMeridianFlip"];
-    out.mount.flipEtaS = flip.isNull() ? -1L : (int32_t)flip.as<long>();
+    if (!flip.isNull()) {
+      float h = flip.as<float>();
+      if (h >= 0.0f && h < 23.9f) out.mount.flipEtaS = (int32_t)(h * 3600.0f);
+    }
 
     // Slewing ueberschreibt den abgeleiteten Status
     if (resp["Slewing"] | false) {

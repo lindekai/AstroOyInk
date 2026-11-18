@@ -77,12 +77,11 @@ def panel(x, y, w, h):
         a(f'<text x="{hx:.1f}" y="{ty+18}" text-anchor="middle" font-size="11" font-weight="700" fill="{INK}">{hh}</text>')
         col = RED if int(vv) >= 30 else INK
         a(f'<text x="{hx:.1f}" y="{ty+35}" text-anchor="middle" font-size="11" fill="{col}">{vv}</text>')
-    a(f'<text x="{x+40+3*(w-70)/7+16:.1f}" y="{ty+18}" font-size="8" font-weight="700" fill="{RED}">ISS</text>')
     # Forecast
     fy = ty + 52
     fh = y + h - 10 - fy
     a(f'<rect x="{x+10}" y="{fy}" width="{w-20}" height="{fh}" fill="none" stroke="{INK}" stroke-width="1.5"/>')
-    days = [("Mi", "GUT", INK), ("Do", "MITTEL", INK), ("Fr", "BAD", RED), ("Sa", "BAD", RED), ("So", "GUT", INK)]
+    days = [("Mi", "GUT", INK), ("Do", "MITTEL", INK), ("Fr", "SCHLECHT", RED), ("Sa", "SCHLECHT", RED), ("So", "GUT", INK)]
     for i, (d, v, c) in enumerate(days):
         dx = x + 50 + i * (w - 100) / 4
         a(f'<text x="{dx:.1f}" y="{fy+18}" text-anchor="middle" font-size="11" font-weight="700" fill="{INK}">{d}</text>')
@@ -160,8 +159,8 @@ def modes(theme):
   <desc id="d">WEATHER-Modus und SESSION-Modus, automatischer Wechsel je nachdem, ob N.I.N.A. erreichbar ist und eine Sequenz läuft.</desc>
   <rect width="{W}" height="{H}" rx="24" fill="{t["bg"]}"/>
   <g font-family="{FONT}">
-    {card(80, "☁  WEATHER", ink, ["Open-Meteo + 7Timer! Seeing", "Mond nach Meeus, Nacht-Bewertung", "5-Tage-Vorschau, ISS-Überflüge"], "STANDARD · DEEP-SLEEP · 1×/STUNDE")}
-    {card(760, "🔭  SESSION", t["eyebrow"], ["Target, Subs, Restzeit, Status", "Kamera, HFR, Guiding-RMS", "Mount, Pier-Seite, Meridian-Flip"], "N.I.N.A. AKTIV · DEEP-SLEEP · 5 MIN")}
+    {card(80, "☁  WEATHER", ink, ["Open-Meteo + 7Timer! Seeing", "Mond nach Meeus, Nacht-Bewertung", "6-Tage-Vorschau, Mondhöhe je Stunde"], "STANDARD · DEEP-SLEEP · 1×/STUNDE")}
+    {card(760, "🔭  SESSION", t["eyebrow"], ["Target, Sub-Fortschritt, Status", "Kamera, HFR, Guiding-RMS", "Mount, Pier-Seite, Meridian-Flip"], "N.I.N.A. AKTIV · DEEP-SLEEP · 5 MIN")}
     <g stroke="{t["sub"]}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path d="M548 150 H732"/><path d="M720 140 L734 150 L720 160"/>
       <path d="M732 210 H548"/><path d="M560 200 L546 210 L560 220"/>

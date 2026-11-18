@@ -46,8 +46,11 @@ void renderDashboard(const WeatherData& wd, BatteryInfo batt,
 // fuer spaetere Revision vorgesehen).
 //   data.valid == false     →  "N.I.N.A. nicht erreichbar"-Meldung.
 //   locationName            →  aus AppConfig (fuer den Header).
+//   moon                    →  lokal berechnet (computeMoon), kein Netz noetig
+//   sunriseTodS             →  Sonnenaufgang in s seit Mitternacht, -1 = unbekannt
 void renderSessionDashboard(const NinaData& data, const BatteryInfo& batt,
-                            const char* locationName);
+                            const char* locationName,
+                            const MoonInfo& moon, int32_t sunriseTodS);
 
 // Reine Fallback-Anzeige (Erststart, kein WLAN, kein API).
 void renderFallback(const char* msg);

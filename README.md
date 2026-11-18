@@ -32,11 +32,6 @@
   Sobald <a href="https://nighttime-imaging.eu/">N.I.N.A.</a> eine Sequenz fährt, wechselt es von selbst auf Live-Telemetrie deiner Session.
 </p>
 
-<p align="center">
-  <img src="docs/images/display_weather_preview.png" alt="AstroOyInk im WEATHER-Modus, pixelgenaue Vorschau des Waveshare 7,5″ B/W/R-Displays" width="85%">
-  <br><sub>WEATHER-Modus als pixelgenaue Vorschau (<code>tools/preview</code>) – Waveshare 7,5″ V3, Schwarz/Weiß/Rot</sub>
-</p>
-
 ---
 
 ## 🔁 Die zwei Modi
@@ -54,9 +49,23 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 | | ☁️ **WEATHER** | 🔭 **SESSION** |
 |---|---|---|
 | **Wann** | Standard – immer, wenn keine Session läuft | N.I.N.A. erreichbar und Sequenz aktiv |
-| **Quellen** | Open-Meteo, 7Timer!, open-notify, Mond lokal | N.I.N.A. Advanced API v2 (Port 1888) |
+| **Quellen** | Open-Meteo, 7Timer!, Mond lokal | N.I.N.A. Advanced API v2 (Port 1888) |
 | **Takt** | stündlich, dazwischen Deep-Sleep | alle 5 min, dazwischen Deep-Sleep |
 | **Zurück** | – | automatisch, sobald N.I.N.A. weg ist |
+
+### ☁️ WEATHER
+
+<p align="center">
+  <img src="docs/images/display_weather_preview.png" alt="AstroOyInk im WEATHER-Modus, pixelgenaue Vorschau des Waveshare 7,5″ B/W/R-Displays" width="85%">
+  <br><sub>Pixelgenaue Vorschau (<code>tools/preview</code>) – Waveshare 7,5″ V3, Schwarz/Weiß/Rot</sub>
+</p>
+
+### 🔭 SESSION
+
+<p align="center">
+  <img src="docs/images/display_session_preview.png" alt="AstroOyInk im SESSION-Modus, pixelgenaue Vorschau mit Beispieldaten einer laufenden N.I.N.A.-Sequenz" width="85%">
+  <br><sub>Pixelgenaue Vorschau mit Beispieldaten einer laufenden Sequenz</sub>
+</p>
 
 ## ✨ Funktionen
 
@@ -80,12 +89,14 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 
 ### 🔭 SESSION-Modus
 
-- 📋 **Sequenz:** Name, Target i/n, Sub i/n, Restzeit, Status
-- 🎯 **Objekt:** Höhe und Azimut
-- 📷 **Kamera:** Name, Filter, Belichtungszeit, HFR
-- 🧭 **Guiding:** RMS RA/Dec/Total mit Status OK / WARN / LOST
-- 🌐 **Mount:** RA/Dec, Pier-Seite, Meridian-Flip-Countdown
-- 🚨 **Warnungen** rot hervorgehoben: RMS ≥ 1,0″, Flip < 10 min, Slewing, Pause
+- 📋 **Sequenz:** Target groß, Target i/n, Status, Fortschrittsbalken Sub i/n
+- 📷 **Kamera:** HFR des letzten Bildes groß, dazu Name, Filter, Belichtung,
+  Sensor-Temperatur ist/soll und Kühlerleistung
+- 🧭 **Guiding:** RMS gesamt groß, dazu RA/Dec und „OK / unruhig / verloren“
+- 🌐 **Mount:** Zeit bis zum Meridian-Flip groß mit ungefährer Uhrzeit, dazu RA/Dec, Alt/Az, Pier-Seite
+- 🌙 **Nacht:** Mondphase, -höhe und Himmelsaufhellung (lokal berechnet), Sonnenaufgang
+- 🚨 **Warnungen** rot hervorgehoben: RMS ≥ 1,0″, Flip < 10 min, Höhe < 20°,
+  Sensor > 1,5 K vom Soll oder Kühler aus, Slewing, Pause
 - 📡 **Auto-Discovery** – findet den N.I.N.A.-PC im Heimnetz selbst
 
 ### 🧰 Rund ums Gerät
@@ -304,17 +315,23 @@ Der Netz-Scan läuft nur von **1 h vor Sonnenuntergang bis 1 h nach Sonnenaufgan
 <summary><b>SESSION-Modus</b> (800 × 480)</summary>
 
 ```
-┌─ Saarmund ────────────── 23:12 ───────────────────── [### ] 72 % ─┐
-│ SEQUENZ  M31-LRGB   Target 1/3   Sub 42/120   Restzeit 2:35       │
-│ Status: Imaging     Alt 58 / Az 112                               │
-├──────────────────────┬──────────────────────┬─────────────────────┤
-│ KAMERA               │ GUIDING              │ MOUNT               │
-│ ZWO ASI2600MM        │ RA   0.42"           │ EQ6-R Pro           │
-│ Filter: L            │ Dec  0.38"           │ RA/Dec              │
-│ 180 s                │ Tot  0.57"           │ Alt/Az              │
-│ HFR 2.1              │ [Guiding OK]         │ Pier: East          │
-│                      │                      │ Flip in 1:12        │
-└──────────────────────┴──────────────────────┴─────────────────────┘
+┌─ Saarmund ─────────────── So 22.11. ─────── [### ] 72 %  Stand 23:12 ─┐
+│ SEQUENZ                                                  Target 1 / 3 │
+│ M31-LRGB                                                      Imaging │
+│ Sub 42 / 120  [##############..............................]          │
+├───────────────────────┬───────────────────────┬───────────────────────┤
+│ KAMERA                │ GUIDING               │ MOUNT                 │
+│        2.10           │        0.57"          │       1h 12m          │
+│      HFR (px)         │      RMS gesamt       │  bis Flip ~00:25      │
+│ ZWO ASI2600MM         │ RA              0.42" │ EQ6-R Pro             │
+│ Filter              L │ Dec             0.38" │ RA          00h 43m   │
+│ Belichtung      180 s │ Status       Guiding  │ Dec         +41° 16'  │
+│ Sensor         -9.8°C │ Guiding OK            │ Alt / Az  58° / 112°  │
+│ Soll/Kuehler -10°/42% │                       │ Pier              Ost │
+├───────────────────────┴───────────────────────┴───────────────────────┤
+│ NACHT  ( ) Zun. Mond, 69 % beleuchtet             Sonnenaufgang 07:42 │
+│            Hoehe 12°   Himmel: mittel                                 │
+└───────────────────────────────────────────────────────────────────────┘
 ```
 
 </details>
@@ -328,7 +345,7 @@ AstroOyInk/
 ├── src/                      # wird von der Arduino IDE rekursiv kompiliert
 │   ├── common/               # Datentypen, Zeit, Astro-Logik, Mond, Akku,
 │   │                         # NVS-Config, OTA, BME280
-│   ├── data_sources/         # Open-Meteo, 7Timer!, open-notify, N.I.N.A.
+│   ├── data_sources/         # Open-Meteo, 7Timer!, N.I.N.A. (+ open-notify, derzeit aus)
 │   ├── modes/                # mode_state_machine: WEATHER ↔ SESSION
 │   └── rendering/            # GxEPD2, Wetter- und Session-Dashboard
 ├── tests/                    # Host-Tests mit g++, ohne ESP32
@@ -355,7 +372,7 @@ Mondereignisse 2026 – komplett auf dem Rechner, ohne Hardware.
 | 3 | 📤 OTA-Updates | ✅ |
 | 4 | 🌡️ Lokaler Sensor (BME280) | ✅ |
 | 5 | 🪐 7Timer! Seeing & Transparenz | ✅ |
-| 6 | 🛰️ ISS-Überflüge | ✅ |
+| 6 | 🛰️ ISS-Überflüge | ⏸️ pausiert – open-notify hat die Überflug-Vorhersage abgeschaltet |
 | 7 | 📷 Screenshot-Export auf SD | ❌ gestrichen |
 | 8 | 🔭 SESSION-Modus (N.I.N.A. Advanced API) | ✅ |
 
@@ -390,7 +407,7 @@ dokumentiert das [CHANGELOG.md](CHANGELOG.md). AstroOyInk ist die offizielle Lin
 
 - **Autor:** Kai Linde – [github.com/lindekai](https://github.com/lindekai)
 - **Community:** Dark Matters Discord
-- **Daten:** [Open-Meteo](https://open-meteo.com), [7Timer!](https://www.7timer.info), [open-notify](http://open-notify.org)
+- **Daten:** [Open-Meteo](https://open-meteo.com), [7Timer!](https://www.7timer.info)
 - **Software:** [N.I.N.A.](https://nighttime-imaging.eu/) mit [Advanced API](https://github.com/christian-photo/ninaAPI), [GxEPD2](https://github.com/ZinggJM/GxEPD2), [Adafruit GFX](https://github.com/adafruit/Adafruit-GFX-Library), [ArduinoJson](https://arduinojson.org), [WiFiManager](https://github.com/tzapu/WiFiManager), [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280_Library)
 
 Fragen, Ideen oder Fotos von deinem Setup? Gerne als [Issue](https://github.com/lindekai/AstroOyInk/issues).

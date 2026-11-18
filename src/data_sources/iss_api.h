@@ -4,7 +4,8 @@
 //  Kostenloses HTTP-API, kein Key noetig.
 //  Liefert die naechsten N ISS-Passes mit Aufgangszeit und Dauer.
 //
-//  Wenn der API-Aufruf scheitert: valid=false — FAZIT laeuft normal.
+//  Wenn der API-Aufruf scheitert: valid=false — die Stundentabelle
+//  laeuft ohne ISS-Zeile. Derzeit abgeschaltet, siehe ISS_ENABLED.
 //
 //  Author:  Kai Linde
 //  Credits: Dark Matters Discord
@@ -16,6 +17,13 @@
 #include <stdint.h>
 
 #define MAX_ISS_PASSES  5
+
+// open-notify.org hat die Ueberflug-Vorhersage (iss-pass.json) abgeschaltet,
+// der Abruf liefert nur noch HTTP 404. Abruf deshalb aus (spart Zeit/Akku).
+// Wieder einschalten, sobald es eine neue Quelle gibt.
+#ifndef ISS_ENABLED
+#define ISS_ENABLED 0
+#endif
 
 struct ISSPass {
   time_t   riseTime;  // Unix-Zeitstempel des Aufgangs (lokal interpretierbar)

@@ -15,6 +15,16 @@ Alle relevanten Änderungen am Projekt.
   abends/nachts) und Sequenz-Auswertung über `sequence/state`.
 
 ### Geändert (Layout)
+- 🔭 **SESSION-Ansicht neu geordnet** wie WEATHER: Sequenz-Kasten mit
+  großem Targetnamen und Sub-Fortschrittsbalken; KAMERA / GUIDING / MOUNT
+  mit je einem großen Leitwert (HFR, RMS gesamt, Zeit bis Flip); neue
+  NACHT-Zeile mit Mond (lokal berechnet) und Sonnenaufgang. Gradzeichen bei
+  Dec/Alt/Az, Pier-Seite „Ost/West“. README/INSTALL mit Vorschau-Bild.
+- 📷 **Kamera-Temperatur** im SESSION-Modus: Sensor ist/soll und
+  Kühlerleistung, rot bei > 1,5 K Abweichung oder ausgeschaltetem Kühler.
+- 🌐 **Flip-Uhrzeit:** unter dem Countdown „bis Flip ~23:15“.
+- Portal- und Fallback-Bildschirm: Titel „AstroOyInk“, Texte ohne fehlende
+  Glyphen („ausfuellen“ statt „ausfullen“, Bindestrich statt Gedankenstrich).
 - WEATHER-Layout aufgeräumt: Zeilenabstände, Gradzeichen, einheitlich
   GUT/MITTEL/SCHLECHT, ruhigeres Wolken-Chart mit drei 2-px-Linien.
 - Transparenz-Linie schwarz gestrichelt — bei gleichen Werten lag sie
@@ -26,12 +36,21 @@ Alle relevanten Änderungen am Projekt.
 - Regenbalken mindestens 3 px hoch (0,1 mm war nur ein Strich).
 - Log unterscheidet „N.I.N.A. nicht erreichbar“ und „keine laufende Sequenz“.
 
+### Entfernt / pausiert
+- 🛰️ **ISS-Überflüge pausiert** — open-notify liefert für die Überflug-
+  Vorhersage nur noch HTTP 404. Abruf per `ISS_ENABLED 0` (in `iss_api.h`)
+  aus, README/Roadmap angepasst. Der Code bleibt für eine neue Quelle.
+
 ### Behoben (Layout)
 - Vorhersage zeigte „-0°“ bei Werten wie -0,4 °C.
 - Akkuanzeige „0 %“ ohne angeschlossenen Akku — wird jetzt ausgeblendet.
 - N.I.N.A. wurde nicht gefunden: Probe-Pfad `/v2/api/version`
   (`application/version` liefert 404).
+- Meridian-Flip-Countdown: `TimeToMeridianFlip` kommt in **Stunden**, wurde
+  aber als Sekunden gelesen (zeigte „0 min“ in Rot). 24 h = kein Flip
+  ansteht → Anzeige „--“.
 
+### Hinzugefügt (Stromversorgung, README)
 - 🔋 **Stromversorgung / Akkubetrieb** — Referenzaufbau wie DoorSign:
   TC4056 → LiPo 3500 mAh → TPS62827-Buck (Iq ~4 µA) → 3,3 V auf den
   `3V3`-Pin, 1500-µF-Puffer-Elko, Teiler 2 × 100 kΩ an GPIO34.
@@ -40,7 +59,8 @@ Alle relevanten Änderungen am Projekt.
 - ⚙️ **`BATT_USB_SENSE_PIN`** in `config.h` — optionale USB-Erkennung über
   einen zweiten Teiler am 5-V-Eingang des TC4056 (Standard `-1` = aus).
 - 📸 **Foto vom echten Display** im README (`docs/images/display_weather.jpg`,
-  WEATHER-Modus).
+  WEATHER-Modus) — inzwischen durch die pixelgenauen Vorschau-Bilder ersetzt,
+  weil es noch das alte Layout zeigte.
 - 🎨 **README überarbeitet:** Hero-Banner und Modus-Grafik (hell/dunkel, SVG),
   Badges, Navigation, Funktionsübersicht, Layout-Skizzen für beide Modi.
   Generator unter `tools/make_readme_svgs.py`.

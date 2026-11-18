@@ -49,6 +49,11 @@ struct NinaCameraInfo {
   char  filterName[NINA_STR_SHORT];  // aus letztem Bild (image-history)
   float exposureS;                   // Belichtungszeit letztes Bild in s
   float hfr;                         // Half-Flux-Radius letztes Bild in px
+  bool  canCool;                     // Kamera hat regelbare Kuehlung
+  bool  coolerOn;
+  float tempC;                       // Sensor-Temperatur ist, NAN = unbekannt
+  float setpointC;                   // Soll-Temperatur, NAN = unbekannt
+  float coolerPowerPct;              // Kuehlerleistung 0..100 %
 };
 
 struct NinaGuidingInfo {
@@ -67,7 +72,7 @@ struct NinaMountInfo {
   float   altDeg;     // Hoehe ueber Horizont in Grad
   float   azDeg;      // Azimut in Grad (0=N, 90=O, 180=S, 270=W)
   uint8_t pierSide;   // 0 = West, 1 = East, 2 = Unknown
-  int32_t flipEtaS;   // Sekunden bis Meridian-Flip; -1 = unbekannt
+  int32_t flipEtaS;   // Sekunden bis Meridian-Flip; -1 = unbekannt / keiner
 };
 
 struct NinaData {

@@ -26,8 +26,9 @@ ESP32, das **automatisch zwischen zwei Modi wechselt**:
 Beide Modi laufen auf **dem gleichen Gerät**. Der Modus wird zu Beginn
 jedes Zyklus neu ermittelt (siehe `src/modes/mode_state_machine.cpp`).
 
-> **Aktueller Status:** Alle Roadmap-Punkte 1–8 abgeschlossen.
-> Punkt 7 (SD-Screenshot) wurde bewusst gestrichen.
+> **Aktueller Status:** Release-Kandidat `v1.0.0-rc1`. Roadmap-Punkte
+> 1–5 und 8 abgeschlossen, Punkt 6 (ISS) pausiert, weil die Datenquelle
+> abgeschaltet wurde. Punkt 7 (SD-Screenshot) wurde bewusst gestrichen.
 > WEATHER-Modus und SESSION-Modus laufen vollständig.
 > Die State-Machine erkennt N.I.N.A. + laufende Sequenz und wechselt
 > automatisch zwischen den Modi.
@@ -77,7 +78,6 @@ ESP32-Boardpaket: Espressif, ≥2.0.14.
 AstroOyInk/
 ├── AstroOyInk.ino                 # setup() + loop() + doCycle() mit Modus-Switch
 ├── config.h                       # alle nutzerseitigen Einstellungen
-├── secrets.h.example              # Beispiel (echte secrets.h ist in .gitignore)
 │
 ├── src/                           # automatisch von Arduino IDE rekursiv kompiliert
 │   ├── common/                    # querschnittliche Logik, modusunabhaengig
@@ -95,7 +95,8 @@ AstroOyInk/
 │   ├── data_sources/              # External APIs / Datenquellen
 │   │   ├── weather_api.h/.cpp     # Open-Meteo HTTPS-Client
 │   │   ├── seeing_api.h/.cpp      # 7Timer! HTTP-Client, Seeing & Transparenz
-│   │   ├── iss_api.h/.cpp         # open-notify.org, ISS-Ueberflugvorhersage
+│   │   ├── iss_api.h/.cpp         # open-notify.org, ISS-Passes (ISS_ENABLED 0:
+│   │   │                          # Dienst liefert 404, Abruf aus)
 │   │   ├── nina_api.h/.cpp        # N.I.N.A. Advanced API v2 (SESSION-Modus)
 │   │   ├── nina_discovery.h/.cpp  # Auto-Discovery: /24-Scan nach Port 1888
 │   │   └── nina_sequence.h/.cpp   # sequence/state-Baum auswerten (Host-Test)
@@ -127,16 +128,13 @@ AstroOyInk/
 │       ├── preview_main.cpp       # Beispieldaten fuer alle Ansichten
 │       └── stubs/                 # Arduino/Print/SPI/GxEPD2-Ersatz
 │
-├── .github/
-│   ├── workflows/test.yml         # CI: Host-Tests
-│   ├── workflows/arduino-compile.yml   # CI: Arduino-Sketch baut
-│   └── ISSUE_TEMPLATE/
+├── docs/images/                   # README-Grafiken + Vorschau-PNGs
+│                                  # (display_*_preview.png aus tools/preview)
 │
 ├── README.md
 ├── INSTALL.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
-├── SETUP_NEW_MACHINE.md
 └── CLAUDE.md                      # diese Datei
 ```
 
@@ -190,7 +188,8 @@ Projekt-Includes sind deshalb **relativ zur einbindenden Datei**:
    detectCurrentMode()     → MODE_SESSION wenn N.I.N.A. erreichbar + Sequenz laeuft
 6+7. switch(mode):
    - MODE_WEATHER:
-       fetchWeather/Seeing/ISS() → Open-Meteo, 7Timer!, open-notify
+       fetchWeather/Seeing()     → Open-Meteo (7 Tage), 7Timer!
+                                   (ISS nur mit ISS_ENABLED=1)
        disconnectWiFi()          → WLAN aus VOR dem 30-s-Refresh (Akku)
        computeAstroSummary()     → Cloud-Score, Verdict, Warnungen
        computeMoon() x2          → "jetzt" + "Mitte der Nacht"
@@ -200,7 +199,8 @@ Projekt-Includes sind deshalb **relativ zur einbindenden Datei**:
    - MODE_SESSION:
        ninaFetchAll()            → Sequenz, Kamera, Guider, Mount
        disconnectWiFi()
-       renderSessionDashboard()
+       computeMoon(jetzt)        → Mond-Zeile (lokal, kein Netz)
+       renderSessionDashboard()  → + Sonnenaufgang aus RTC (sunriseTodS)
 7. displaySleep() + disconnectWiFi()
 8. esp_deep_sleep_start()  → WEATHER: bis zur vollen Stunde,
                               SESSION: SESSION_REFRESH_INTERVAL_S (5 min)
@@ -262,7 +262,8 @@ In dieser Reihenfolge geplant (Reihenfolge vom Nutzer gewählt):
 3. ~~📤 **OTA-Updates** (ArduinoOTA)~~ ✅
 4. ~~🌡️ **Lokaler Sensor** (BME280, I2C) — Innen-Temp/Feuchte/Druck~~ ✅
 5. ~~🪐 **7Timer! Seeing & Transparenz** — rote Kurven im Nacht-Chart~~ ✅
-6. ~~🛰️ **ISS-Überflüge** — open-notify.org, nächster Pass in FAZIT-Zeile~~ ✅
+6. 🛰️ **ISS-Überflüge** — ⏸️ pausiert: open-notify hat `iss-pass.json`
+   abgeschaltet (HTTP 404). Code bleibt, `ISS_ENABLED 0` in `iss_api.h`.
 7. ~~📷 **Screenshot-Export** auf SD-Karte~~ *(entfällt — bewusst gestrichen)*
 8. ~~🔭 **SESSION-Modus**: N.I.N.A. Advanced API~~ ✅
 

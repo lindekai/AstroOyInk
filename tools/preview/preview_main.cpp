@@ -98,6 +98,11 @@ static void buildSession(NinaData& nd) {
   strlcpy(nd.camera.filterName, "L-eXtreme", sizeof(nd.camera.filterName));
   nd.camera.exposureS = 180.0f;
   nd.camera.hfr       = 2.31f;
+  nd.camera.canCool        = true;
+  nd.camera.coolerOn       = true;
+  nd.camera.tempC          = -9.8f;
+  nd.camera.setpointC      = -10.0f;
+  nd.camera.coolerPowerPct = 42.0f;
 
   nd.guiding.connected = true;
   nd.guiding.rmsRA     = 0.42f;
@@ -174,7 +179,8 @@ int main(int argc, char** argv) {
   buildSession(nd);
   std::string ps = outDir + "/session.png";
   g_previewOut = ps.c_str();
-  renderSessionDashboard(nd, batt, LOCATION_NAME);
+  renderSessionDashboard(nd, batt, LOCATION_NAME, wd.moonNow,
+                         (int32_t)(7 * 3600 + 42 * 60));
 
   // --- Fallback + Portal ---
   std::string pf = outDir + "/fallback.png";

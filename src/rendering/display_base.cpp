@@ -200,6 +200,11 @@ static const GFXfont* fitFont(const char* text, int16_t maxW,
   return fonts[n - 1];
 }
 
+static const GFXfont* fitFont(const char* text, int16_t maxW,
+                              const GFXfont* large, const GFXfont* small) {
+  return textWidth(text, large) <= maxW ? large : small;
+}
+
 // ---------------------------------------------------------------------
 //  Hilfsfunktionen Zeichnen
 // ---------------------------------------------------------------------
@@ -1000,6 +1005,15 @@ static void drawMoonPhaseIcon(int16_t cx, int16_t cy, int16_t r, float phase) {
 //  Block: MOND
 //  Links das Mondphasen-Icon, rechts die wichtigsten Kennzahlen.
 // ---------------------------------------------------------------------
+// Himmelsaufhellung durch den Mond als Label, rot nur bei hoher Aufhellung
+static const char* moonSkyLabel(const MoonInfo& m, uint16_t& color) {
+  color = GxEPD_BLACK;
+  if (m.skyImpact < 0.10f) return "Himmel: dunkel";
+  if (m.skyImpact < 0.35f) return "Himmel: mittel";
+  color = DISPLAY_RED;
+  return "Himmel: HELL";
+}
+
 static void drawMoonBox(const WeatherData& wd) {
   display.drawRect(MOON_X, MOON_Y, MOON_W, MOON_H, GxEPD_BLACK);
   drawTextAt(MOON_X + 6, MOON_Y + 16, "MOND", &FreeSansBold9pt7b);
@@ -1036,13 +1050,8 @@ static void drawMoonBox(const WeatherData& wd) {
 
   // Sky-Impact – als Label, rot nur bei hoher Aufhellung
   ty += 20;
-  const char* impactLabel;
-  uint16_t    impactCol = GxEPD_BLACK;
-  if      (m.skyImpact < 0.10f) impactLabel = "Himmel: dunkel";
-  else if (m.skyImpact < 0.35f) impactLabel = "Himmel: mittel";
-  else                        { impactLabel = "Himmel: HELL";
-                                impactCol   = DISPLAY_RED; }
-  drawTextAt(tx, ty, impactLabel, &FreeSansBold9pt7b, impactCol);
+  uint16_t impactCol;
+  drawTextAt(tx, ty, moonSkyLabel(m, impactCol), &FreeSansBold9pt7b, impactCol);
 }
 
 // ---------------------------------------------------------------------
@@ -1079,7 +1088,7 @@ void renderFallback(const char* msg) {
     display.fillScreen(GxEPD_WHITE);
     // Header bleibt minimal (keine Daten)
     display.fillRect(0, 0, W, HDR_H, GxEPD_BLACK);
-    drawTextAt(8, 19, "Astro-Wetter-Display", &FreeSansBold12pt7b, GxEPD_WHITE);
+    drawTextAt(14, 19, "AstroOyInk", &FreeSansBold12pt7b, GxEPD_WHITE);
 
     // Zentrale Meldung
     drawTextCentered(W / 2, H / 2 - 20, "Erststart / Fehler", &FreeSansBold18pt7b);
@@ -1099,7 +1108,7 @@ void renderPortalInfo(const char* apName) {
 
     // Header
     display.fillRect(0, 0, W, HDR_H, GxEPD_BLACK);
-    drawTextAt(8, 19, "AstroOyInk  —  WiFi-Konfiguration", &FreeSansBold12pt7b, GxEPD_WHITE);
+    drawTextAt(14, 19, "AstroOyInk - WLAN-Einrichtung", &FreeSansBold12pt7b, GxEPD_WHITE);
 
     // Titelzeile
     int16_t y = 70;
@@ -1121,12 +1130,12 @@ void renderPortalInfo(const char* apName) {
 
     // Schritt 3
     y += 46;
-    drawTextAt(60, y, "3.  Formular ausfullen und speichern — Geraet startet neu.",
+    drawTextAt(60, y, "3.  Formular ausfuellen und speichern - das Geraet startet neu.",
                &FreeSans9pt7b);
 
     // Hinweis Timeout
     y += 30;
-    drawTextCentered(W / 2, y, "Portal schliesst nach 3 Minuten — danach erneuter Versuch.",
+    drawTextCentered(W / 2, y, "Das Portal schliesst nach 3 Minuten, danach neuer Versuch.",
                      &FreeSans9pt7b);
 
     // Trennlinie
@@ -1136,49 +1145,42 @@ void renderPortalInfo(const char* apName) {
 
 // =====================================================================
 //  SESSION-Dashboard
-//  Layout (800 x 480):
+//  Layout (800 x 480), gleiche Gestaltung wie WEATHER: Kaesten mit
+//  9pt-Titel, je Kasten ein grosser Leitwert.
 //
-//    x=0                   x=264              x=534            x=796
-//    +---------------------+------------------+----------------+ y=0
-//    | HEADER  Ort | Uhrzeit | Akkustand  (x=0..796)          |
-//    +---------------------+------------------+----------------+ y=26
-//    | SEQUENZ-Block  x=0..796                                 |
-//    | Zeile 1 (y=48):  Sequenzname | Target i/n | Subs i/n   |
-//    | Zeile 2 (y=72):  Status      | Alt/Az      | Restzeit   |
-//    +---------------------+------------------+----------------+ y=86
-//    | KAMERA x=4..262     | GUIDING x=264..532| MOUNT x=534..796 |
-//    | Titel (y=108)       | Titel (y=108)     | Titel (y=108) |
-//    | Kameraname (y=142)  | RMS RA  (y=142)   | Mountname     |
-//    | Filter     (y=174)  | RMS Dec (y=174)   | RA/Dec        |
-//    | Belichtung (y=206)  | RMS Tot (y=206)   | Alt/Az/Dir    |
-//    | HFR        (y=238)  | Status  (y=238)   | Pier          |
-//    |                     |                   | Flip ETA      |
-//    +---------------------+------------------+----------------+ y=480
+//    +--------------------------------------------------------+ y=0
+//    | HEADER  Ort | Datum | Akku | Stand                     |
+//    +--------------------------------------------------------+ y=30
+//    | SEQUENZ                                    Target i/n  |
+//    | <Targetname gross>                           <Status>  |
+//    | Sub i/n  [#########...............]        Noch 1h 23m |
+//    +------------------+------------------+------------------+ y=130
+//    | KAMERA           | GUIDING          | MOUNT            |
+//    |   2.31           |   0.57"          |   45 min         |
+//    |   HFR (px)       |   RMS gesamt     |   bis Flip       |
+//    |   Details ...    |   Details ...    |   Details ...    |
+//    +------------------+------------------+------------------+ y=404
+//    | NACHT  Mond | Hoehe | Himmel            Sonnenaufgang  |
+//    +--------------------------------------------------------+ y=478
 //
-//  Farb-Logik:
-//    Normaltext   → schwarz
-//    Warnungen    → DISPLAY_RED (bei BW = schwarz, bei BWR = rot)
-//    Invertierter Warnblock (nur BW, wenn DISPLAY_HAS_RED=0) für
-//    kritische Meldungen wie [Guiding WARN/LOST].
+//  Farb-Logik: Normaltext schwarz, Warnungen DISPLAY_RED (bei BW-Panel
+//  invertierter Block, siehe drawWarnLabel).
 // =====================================================================
 
 // --- SESSION-Layout-Konstanten ---
-static const int16_t SS_SEQ_Y1  = 48;    // Sequenz-Zeile 1 Baseline
-static const int16_t SS_SEQ_Y2  = 72;    // Sequenz-Zeile 2 Baseline (Status/Alt)
-static const int16_t SS_SEQ_BOT = 86;    // Unterkante Sequenz-Block
+static const int16_t SS_SEQ_X = 4,   SS_SEQ_Y = 30;
+static const int16_t SS_SEQ_W = 792, SS_SEQ_H = 96;
 
-// Spaltenstart und -breiten
-static const int16_t SS_C1_X  = 4,   SS_C1_W = 258;   // KAMERA
-static const int16_t SS_C2_X  = 264, SS_C2_W = 268;   // GUIDING
-static const int16_t SS_C3_X  = 534, SS_C3_W = 262;   // MOUNT
+static const int16_t SS_COL_Y = 130, SS_COL_H = 270;
 
-// Zeilenabstaende in den Spalten
-static const int16_t SS_R_TITLE = SS_SEQ_BOT + 22;    // = 108
-static const int16_t SS_R1      = SS_SEQ_BOT + 56;    // = 142
-static const int16_t SS_R2      = SS_SEQ_BOT + 88;    // = 174
-static const int16_t SS_R3      = SS_SEQ_BOT + 120;   // = 206
-static const int16_t SS_R4      = SS_SEQ_BOT + 152;   // = 238
-static const int16_t SS_R5      = SS_SEQ_BOT + 184;   // = 270
+static const int16_t SS_NIGHT_X = 4,   SS_NIGHT_Y = 404;
+static const int16_t SS_NIGHT_W = 792, SS_NIGHT_H = 74;
+
+// Zeilen innerhalb einer Spalte (relativ zu SS_COL_Y)
+static const int16_t SS_BIG_Y     = 72;   // Baseline Leitwert (24pt)
+static const int16_t SS_CAPTION_Y = 96;   // Beschriftung unter dem Leitwert
+static const int16_t SS_ROW0_Y    = 140;  // erste Detailzeile
+static const int16_t SS_ROW_STEP  = 26;
 
 // Zeichnet einen Warn-Text: bei BWR rot, bei BW invertierter Block
 static void drawWarnLabel(int16_t x, int16_t y, const char* text) {
@@ -1201,14 +1203,14 @@ static void formatRAStr(float raH, char* buf, size_t sz) {
   snprintf(buf, sz, "%02dh %02dm", h, m);
 }
 
-// Hilfsfunktion: Dec (Grad) → "+35° 48'"
+// Hilfsfunktion: Dec (Grad) → "+35`48'" (Backtick = Gradzeichen)
 static void formatDecStr(float decDeg, char* buf, size_t sz) {
   char sign = (decDeg >= 0) ? '+' : '-';
   float absDec = fabsf(decDeg);
   int d = (int)absDec;
   int m = (int)((absDec - d) * 60.0f + 0.5f);
   if (m >= 60) { d++; m = 0; }
-  snprintf(buf, sz, "%c%02d%c %02d'", sign, d, '\xB0', m);
+  snprintf(buf, sz, "%c%02d%c %02d'", sign, d, DEG, m);
 }
 
 // Hilfsfunktion: Restzeit in Sekunden → "1h 23m" oder "45 min"
@@ -1231,117 +1233,241 @@ static const char* azToDir(float az) {
   return "NW";
 }
 
-// ---------------------------------------------------------------------
-//  SESSION-Spalte: KAMERA
-// ---------------------------------------------------------------------
-static void drawSessionCamera(int16_t cx, int16_t cw, const NinaCameraInfo& c) {
-  drawTextAt(cx + 6, SS_R_TITLE, "KAMERA", &FreeSansBold12pt7b);
-  display.drawLine(cx + 2, SS_R_TITLE + 6, cx + cw - 2, SS_R_TITLE + 6, GxEPD_BLACK);
+// Spaltenkasten mit Titel, grossem Leitwert und Beschriftung darunter
+static void drawSessionColumnHead(int16_t x, int16_t w, const char* title,
+                                  const char* big, const char* caption,
+                                  uint16_t bigColor) {
+  display.drawRect(x, SS_COL_Y, w, SS_COL_H, GxEPD_BLACK);
+  drawTextAt(x + 6, SS_COL_Y + 18, title, &FreeSansBold9pt7b);
+  const GFXfont* f = fitFont(big, w - 16, &FreeSansBold24pt7b, &FreeSansBold18pt7b);
+  drawTextCentered(x + w / 2, SS_COL_Y + SS_BIG_Y, big, f, bigColor);
+  drawTextCentered(x + w / 2, SS_COL_Y + SS_CAPTION_Y, caption, &FreeSans9pt7b);
+  display.drawLine(x + 10, SS_COL_Y + 112, x + w - 10, SS_COL_Y + 112, GxEPD_BLACK);
+}
 
-  char buf[48];
-
-  // Kameraname (ggf. kuerzen)
-  strlcpy(buf, c.connected ? c.name : "---", sizeof(buf));
-  if (strlen(buf) > 18) buf[18] = '\0';
-  drawTextAt(cx + 6, SS_R1, buf, &FreeSans9pt7b);
-
-  snprintf(buf, sizeof(buf), "Filter: %s",
-           (c.filterName[0] != '\0') ? c.filterName : "--");
-  drawTextAt(cx + 6, SS_R2, buf, &FreeSans9pt7b);
-
-  if (c.exposureS > 0) snprintf(buf, sizeof(buf), "Exp:    %.0f s", c.exposureS);
-  else                 snprintf(buf, sizeof(buf), "Exp:    --");
-  drawTextAt(cx + 6, SS_R3, buf, &FreeSans9pt7b);
-
-  if (c.hfr > 0) snprintf(buf, sizeof(buf), "HFR:    %.1f px", c.hfr);
-  else           snprintf(buf, sizeof(buf), "HFR:    --");
-  drawTextAt(cx + 6, SS_R4, buf, &FreeSans9pt7b);
+// Detailzeile: Label links, Wert rechtsbuendig. Ohne Label (Geraetename)
+// steht der Wert fett links.
+static void drawSessionRow(int16_t x, int16_t w, uint8_t row,
+                           const char* label, const char* value,
+                           uint16_t valueColor = GxEPD_BLACK) {
+  int16_t y = SS_COL_Y + SS_ROW0_Y + row * SS_ROW_STEP;
+  if (!label || !label[0]) {
+    drawTextAt(x + 10, y, value, fitFont(value, w - 20, &FreeSansBold9pt7b, &FreeSans9pt7b),
+               valueColor);
+    return;
+  }
+  drawTextAt(x + 10, y, label, &FreeSans9pt7b);
+  const int16_t maxW = w - 20 - textWidth(label, &FreeSans9pt7b) - 8;
+  const GFXfont* f = fitFont(value, maxW, &FreeSansBold9pt7b, &FreeSans9pt7b);
+  drawTextRight(x + w - 10, y, value, f, valueColor);
 }
 
 // ---------------------------------------------------------------------
-//  SESSION-Spalte: GUIDING
+//  SESSION-Spalte: KAMERA — Leitwert HFR des letzten Bildes
 // ---------------------------------------------------------------------
-static void drawSessionGuiding(int16_t cx, int16_t cw,
-                               const NinaGuidingInfo& g) {
-  drawTextAt(cx + 6, SS_R_TITLE, "GUIDING", &FreeSansBold12pt7b);
-  display.drawLine(cx + 2, SS_R_TITLE + 6, cx + cw - 2, SS_R_TITLE + 6, GxEPD_BLACK);
+static void drawSessionCamera(int16_t x, int16_t w, const NinaCameraInfo& c) {
+  char big[16];
+  if (c.hfr > 0) snprintf(big, sizeof(big), "%.2f", c.hfr);
+  else           strlcpy(big, "--", sizeof(big));
+  drawSessionColumnHead(x, w, "KAMERA", big, "HFR (px)", GxEPD_BLACK);
 
-  char buf[40];
+  char buf[24];
+  drawSessionRow(x, w, 0, "", c.connected ? c.name : "nicht verbunden",
+                 c.connected ? GxEPD_BLACK : DISPLAY_RED);
+  drawSessionRow(x, w, 1, "Filter",
+                 (c.filterName[0] != '\0') ? c.filterName : "--");
+  if (c.exposureS > 0) snprintf(buf, sizeof(buf), "%.0f s", c.exposureS);
+  else                 strlcpy(buf, "--", sizeof(buf));
+  drawSessionRow(x, w, 2, "Belichtung", buf);
+
+  // Sensor-Temperatur ist/soll. Rot, wenn gekuehlt werden soll, der
+  // Kuehler aber aus ist oder das Soll um mehr als 1,5 K verfehlt wird.
+  if (!c.connected || isnan(c.tempC)) {
+    drawSessionRow(x, w, 3, "Sensor", "--");
+    return;
+  }
+  bool tempWarn = c.canCool && !isnan(c.setpointC) &&
+                  (!c.coolerOn || fabsf(c.tempC - c.setpointC) > 1.5f);
+  snprintf(buf, sizeof(buf), "%.1f`C", c.tempC);
+  drawSessionRow(x, w, 3, "Sensor", buf, tempWarn ? DISPLAY_RED : GxEPD_BLACK);
+  if (c.canCool && !isnan(c.setpointC)) {
+    if (c.coolerOn) snprintf(buf, sizeof(buf), "%.0f`C / %.0f %%", c.setpointC, c.coolerPowerPct);
+    else            snprintf(buf, sizeof(buf), "%.0f`C / aus", c.setpointC);
+    drawSessionRow(x, w, 4, "Soll / Kuehler", buf);
+  }
+}
+
+// ---------------------------------------------------------------------
+//  SESSION-Spalte: GUIDING — Leitwert RMS gesamt
+// ---------------------------------------------------------------------
+static void drawSessionGuiding(int16_t x, int16_t w, const NinaGuidingInfo& g) {
+  bool guidingLost = g.connected &&
+                     (strstr(g.state, "Lost") || strstr(g.state, "Stop"));
+  bool guidingWarn = g.connected && !guidingLost && g.rmsTotal > 0 &&
+                     g.rmsTotal >= GUIDING_WARN_RMS_ARCSEC;
+
+  char big[16];
+  if (g.connected && g.rmsTotal > 0) snprintf(big, sizeof(big), "%.2f\"", g.rmsTotal);
+  else                               strlcpy(big, "--", sizeof(big));
+  drawSessionColumnHead(x, w, "GUIDING", big, "RMS gesamt",
+                        (guidingLost || guidingWarn) ? DISPLAY_RED : GxEPD_BLACK);
 
   if (!g.connected) {
-    drawWarnLabel(cx + 6, SS_R1, "[Kein Guider]");
+    drawSessionRow(x, w, 0, "", "kein Guider", DISPLAY_RED);
     return;
   }
 
-  snprintf(buf, sizeof(buf), "RMS RA:  %.2f\"", g.rmsRA);
-  drawTextAt(cx + 6, SS_R1, buf, &FreeSans9pt7b);
+  char buf[24];
+  snprintf(buf, sizeof(buf), "%.2f\"", g.rmsRA);
+  drawSessionRow(x, w, 0, "RA", buf);
+  snprintf(buf, sizeof(buf), "%.2f\"", g.rmsDec);
+  drawSessionRow(x, w, 1, "Dec", buf);
+  drawSessionRow(x, w, 2, "Status", g.state[0] ? g.state : "--");
 
-  snprintf(buf, sizeof(buf), "RMS Dec: %.2f\"", g.rmsDec);
-  drawTextAt(cx + 6, SS_R2, buf, &FreeSans9pt7b);
-
-  snprintf(buf, sizeof(buf), "Total:   %.2f\"", g.rmsTotal);
-  drawTextAt(cx + 6, SS_R3, buf, &FreeSans9pt7b);
-
-  // Status-Label: OK / WARN / LOST
-  bool guidingLost = (strstr(g.state, "Lost") || strstr(g.state, "Stop"));
-  bool guidingWarn = (!guidingLost && g.rmsTotal >= GUIDING_WARN_RMS_ARCSEC
-                      && g.rmsTotal > 0);
-
-  if (guidingLost) {
-    drawWarnLabel(cx + 6, SS_R4, "[Guiding LOST]");
-  } else if (guidingWarn) {
-    drawWarnLabel(cx + 6, SS_R4, "[Guiding WARN]");
+  const char* verdict = guidingLost ? "Guiding verloren"
+                      : guidingWarn ? "Guiding unruhig"
+                      :               "Guiding OK";
+  int16_t y = SS_COL_Y + SS_ROW0_Y + 3 * SS_ROW_STEP;
+  if (guidingLost || guidingWarn) {
+    drawWarnLabel(x + 10, y, verdict);
   } else {
-    drawTextAt(cx + 6, SS_R4, "[Guiding OK]", &FreeSansBold9pt7b);
+    drawTextAt(x + 10, y, verdict, &FreeSansBold9pt7b);
   }
-
-  drawTextAt(cx + 6, SS_R5, g.state[0] ? g.state : "---", &FreeSans9pt7b);
 }
 
 // ---------------------------------------------------------------------
-//  SESSION-Spalte: MOUNT
+//  SESSION-Spalte: MOUNT — Leitwert Zeit bis zum Meridian-Flip
 // ---------------------------------------------------------------------
-static void drawSessionMount(int16_t cx, int16_t cw,
-                             const NinaMountInfo& m) {
-  drawTextAt(cx + 6, SS_R_TITLE, "MOUNT", &FreeSansBold12pt7b);
-  display.drawLine(cx + 2, SS_R_TITLE + 6, cx + cw - 2, SS_R_TITLE + 6, GxEPD_BLACK);
+static void drawSessionMount(int16_t x, int16_t w, const NinaMountInfo& m) {
+  char big[20];
+  char caption[32] = "bis Flip";
+  bool flipSoon = false;
+  if (m.connected && m.flipEtaS >= 0) {
+    formatEtaStr((uint32_t)m.flipEtaS, big, sizeof(big));
+    flipSoon = (m.flipEtaS < 600);   // Warnung wenn Flip in < 10 Minuten
+    // ungefaehre Uhrzeit des Flips, auf 5 Minuten gerundet
+    time_t now = time(nullptr);
+    if (now > 1700000000) {
+      time_t at = now + m.flipEtaS;
+      at = (at + 150) / 300 * 300;
+      char hhmm[8];
+      formatHHMM(at, hhmm, sizeof(hhmm));
+      snprintf(caption, sizeof(caption), "bis Flip ~%s", hhmm);
+    }
+  } else {
+    strlcpy(big, "--", sizeof(big));
+  }
+  drawSessionColumnHead(x, w, "MOUNT", big, caption,
+                        flipSoon ? DISPLAY_RED : GxEPD_BLACK);
+
+  if (!m.connected) {
+    drawSessionRow(x, w, 0, "", "nicht verbunden", DISPLAY_RED);
+    return;
+  }
+
+  char buf[32];
+  drawSessionRow(x, w, 0, "", m.name);
+  formatRAStr(m.raH, buf, sizeof(buf));
+  drawSessionRow(x, w, 1, "RA", buf);
+  formatDecStr(m.decDeg, buf, sizeof(buf));
+  drawSessionRow(x, w, 2, "Dec", buf);
+  snprintf(buf, sizeof(buf), "%.0f` / %.0f` %s",
+           m.altDeg, m.azDeg, azToDir(m.azDeg));
+  drawSessionRow(x, w, 3, "Alt / Az", buf, (m.altDeg < 20.0f) ? DISPLAY_RED : GxEPD_BLACK);
+  const char* pier = (m.pierSide == 0) ? "West"
+                   : (m.pierSide == 1) ? "Ost"
+                   :                     "--";
+  drawSessionRow(x, w, 4, "Pier", pier);
+}
+
+// ---------------------------------------------------------------------
+//  SESSION-Block: SEQUENZ — Target, Status, Fortschritt der Subs
+// ---------------------------------------------------------------------
+static void drawSessionSequence(const NinaSequenceInfo& seq) {
+  const int16_t x = SS_SEQ_X, y = SS_SEQ_Y, w = SS_SEQ_W;
+  display.drawRect(x, y, w, SS_SEQ_H, GxEPD_BLACK);
+  drawTextAt(x + 6, y + 18, "SEQUENZ", &FreeSansBold9pt7b);
 
   char buf[48];
+  if (seq.targetTotal > 0 && seq.targetIndex >= 0) {
+    snprintf(buf, sizeof(buf), "Target %d / %d", seq.targetIndex + 1, (int)seq.targetTotal);
+    drawTextRight(x + w - 8, y + 18, buf, &FreeSansBold9pt7b);
+  }
 
-  // Mountname (kuerzen)
-  strlcpy(buf, m.connected ? m.name : "---", sizeof(buf));
-  if (strlen(buf) > 18) buf[18] = '\0';
-  drawTextAt(cx + 6, SS_R1, buf, &FreeSans9pt7b);
+  // Status rechts in der Namenszeile, rot bei Slewing/Pausiert
+  const char* status = seq.status[0] ? seq.status : "--";
+  bool statusWarn = (strcmp(seq.status, "Slewing") == 0 ||
+                     strcmp(seq.status, "Pausiert") == 0);
+  int16_t statusW = textWidth(status, &FreeSansBold12pt7b);
+  drawTextRight(x + w - 8, y + 52, status, &FreeSansBold12pt7b,
+                statusWarn ? DISPLAY_RED : GxEPD_BLACK);
 
-  char ra[16];
-  formatRAStr(m.raH, ra, sizeof(ra));
-  snprintf(buf, sizeof(buf), "RA:  %s", ra);
-  drawTextAt(cx + 6, SS_R2, buf, &FreeSans9pt7b);
+  // Targetname gross, notfalls kleiner
+  const char* name = seq.targetName[0]   ? seq.targetName
+                   : seq.sequenceName[0] ? seq.sequenceName
+                   :                       "--";
+  const int16_t nameMax = w - 16 - statusW - 24;
+  const GFXfont* nf = fitFont(name, nameMax, &FreeSansBold18pt7b, &FreeSansBold12pt7b);
+  drawTextAt(x + 8, y + 54, name, nf);
 
-  char dec[16];
-  formatDecStr(m.decDeg, dec, sizeof(dec));
-  snprintf(buf, sizeof(buf), "Dec: %s", dec);
-  drawTextAt(cx + 6, SS_R3, buf, &FreeSans9pt7b);
-
-  const char* pier = (m.pierSide == 0) ? "West"
-                   : (m.pierSide == 1) ? "East"
-                   :                     "--";
-  snprintf(buf, sizeof(buf), "Pier: %s", pier);
-  drawTextAt(cx + 6, SS_R4, buf, &FreeSans9pt7b);
-
-  // Meridian-Flip-Countdown
-  if (m.flipEtaS < 0) {
-    drawTextAt(cx + 6, SS_R5, "Flip: --", &FreeSans9pt7b);
+  // Fortschritt: "Sub i/n" | Balken | Restzeit
+  const int16_t rowY = y + 84;
+  if (seq.subsTotal > 0) {
+    snprintf(buf, sizeof(buf), "Sub %d / %d", (int)seq.subsDone, (int)seq.subsTotal);
+  } else if (seq.subsDone > 0) {
+    snprintf(buf, sizeof(buf), "Sub %d", (int)seq.subsDone);  // zeitbasierte Schleife
   } else {
-    char eta[20];
-    formatEtaStr((uint32_t)m.flipEtaS, eta, sizeof(eta));
-    snprintf(buf, sizeof(buf), "Flip: %s", eta);
-    // Warnung wenn Flip in < 10 Minuten
-    if (m.flipEtaS < 600) {
-      drawWarnLabel(cx + 6, SS_R5, buf);
-    } else {
-      drawTextAt(cx + 6, SS_R5, buf, &FreeSans9pt7b);
-    }
+    strlcpy(buf, "Sub --", sizeof(buf));
+  }
+  drawTextAt(x + 8, rowY, buf, &FreeSansBold9pt7b);
+
+  char eta[24] = "";
+  if (seq.etaS > 0) {
+    char e[16];
+    formatEtaStr(seq.etaS, e, sizeof(e));
+    snprintf(eta, sizeof(eta), "noch %s", e);
+    drawTextRight(x + w - 8, rowY, eta, &FreeSans9pt7b);
+  }
+
+  if (seq.subsTotal > 0) {
+    const int16_t bx = x + 120;
+    const int16_t bw = (x + w - 8) - (eta[0] ? textWidth(eta, &FreeSans9pt7b) + 16 : 0) - bx;
+    const int16_t bh = 12, by = rowY - bh + 1;
+    display.drawRect(bx, by, bw, bh, GxEPD_BLACK);
+    int32_t done = seq.subsDone < 0 ? 0 : seq.subsDone;
+    if (done > seq.subsTotal) done = seq.subsTotal;
+    int16_t fw = (int16_t)((int32_t)(bw - 4) * done / seq.subsTotal);
+    if (fw > 0) display.fillRect(bx + 2, by + 2, fw, bh - 4, GxEPD_BLACK);
+  }
+}
+
+// ---------------------------------------------------------------------
+//  SESSION-Block: NACHT — Mond (lokal berechnet) und Sonnenaufgang
+// ---------------------------------------------------------------------
+static void drawSessionNight(const MoonInfo& moon, int32_t sunriseTodS) {
+  const int16_t x = SS_NIGHT_X, y = SS_NIGHT_Y, w = SS_NIGHT_W;
+  display.drawRect(x, y, w, SS_NIGHT_H, GxEPD_BLACK);
+  drawTextAt(x + 6, y + 18, "NACHT", &FreeSansBold9pt7b);
+
+  drawMoonPhaseIcon(x + 120, y + SS_NIGHT_H / 2, 24, moon.phase);
+
+  char buf[48];
+  snprintf(buf, sizeof(buf), "%s, %.0f %% beleuchtet",
+           moon.phaseName, moon.illumination * 100.0f);
+  drawTextAt(x + 156, y + 30, buf, &FreeSansBold9pt7b);
+
+  if (moon.altitudeDeg > 0.0f) snprintf(buf, sizeof(buf), "Hoehe %.0f`", moon.altitudeDeg);
+  else                         strlcpy(buf, "unter Horizont", sizeof(buf));
+  drawTextAt(x + 156, y + 54, buf, &FreeSans9pt7b);
+  uint16_t skyCol;
+  drawTextAt(x + 156 + textWidth(buf, &FreeSans9pt7b) + 24, y + 54,
+             moonSkyLabel(moon, skyCol), &FreeSansBold9pt7b, skyCol);
+
+  if (sunriseTodS >= 0) {
+    snprintf(buf, sizeof(buf), "%02ld:%02ld",
+             (long)(sunriseTodS / 3600), (long)((sunriseTodS % 3600) / 60));
+    drawTextRight(x + w - 10, y + 30, "Sonnenaufgang", &FreeSans9pt7b);
+    drawTextRight(x + w - 10, y + 58, buf, &FreeSansBold12pt7b);
   }
 }
 
@@ -1349,13 +1475,13 @@ static void drawSessionMount(int16_t cx, int16_t cw,
 //  renderSessionDashboard — public
 // ---------------------------------------------------------------------
 void renderSessionDashboard(const NinaData& data, const BatteryInfo& batt,
-                            const char* locationName) {
+                            const char* locationName,
+                            const MoonInfo& moon, int32_t sunriseTodS) {
   display.setFullWindow();
   display.firstPage();
   do {
     display.fillScreen(GxEPD_WHITE);
 
-    // --- Header ---
     drawHeaderImpl(locationName ? locationName : LOCATION_NAME,
                    time(nullptr), batt);
 
@@ -1365,81 +1491,15 @@ void renderSessionDashboard(const NinaData& data, const BatteryInfo& batt,
       continue;
     }
 
-    const NinaSequenceInfo& seq = data.sequence;
+    drawSessionSequence(data.sequence);
 
-    // --- Sequenz-Block ---
-    // Zeile 1: SEQUENZ + Target-Name | Target i/n | Sub i/n
-    char line1[128];
-    {
-      char seqLabel[72];
-      if (seq.targetName[0] != '\0') {
-        snprintf(seqLabel, sizeof(seqLabel), "SEQUENZ: %s", seq.targetName);
-      } else if (seq.sequenceName[0] != '\0') {
-        snprintf(seqLabel, sizeof(seqLabel), "SEQUENZ: %s", seq.sequenceName);
-      } else {
-        snprintf(seqLabel, sizeof(seqLabel), "SEQUENZ: ---");
-      }
+    // 3 gleich breite Spalten mit 4 px Abstand, die letzte buendig am Rand
+    const int16_t cw = (SS_SEQ_W + 4) / 3;
+    drawSessionCamera (SS_SEQ_X,          cw - 4, data.camera);
+    drawSessionGuiding(SS_SEQ_X + cw,     cw - 4, data.guiding);
+    drawSessionMount  (SS_SEQ_X + 2 * cw, SS_SEQ_X + SS_SEQ_W - (SS_SEQ_X + 2 * cw),
+                       data.mount);
 
-      char targets[24] = "";
-      if (seq.targetTotal > 0 && seq.targetIndex >= 0) {
-        snprintf(targets, sizeof(targets), "  Target %d/%d",
-                 seq.targetIndex + 1, (int)seq.targetTotal);
-      }
-
-      char subs[24] = "";
-      if (seq.subsTotal > 0) {
-        snprintf(subs, sizeof(subs), "  Sub %d/%d",
-                 (int)seq.subsDone, (int)seq.subsTotal);
-      } else if (seq.subsDone > 0) {
-        // Zeitbasierte Schleife: keine Gesamtzahl bekannt
-        snprintf(subs, sizeof(subs), "  Sub %d", (int)seq.subsDone);
-      }
-
-      char eta[20] = "";
-      if (seq.etaS > 0) {
-        char etaBuf[16];
-        formatEtaStr(seq.etaS, etaBuf, sizeof(etaBuf));
-        snprintf(eta, sizeof(eta), "  Noch %s", etaBuf);
-      }
-
-      snprintf(line1, sizeof(line1), "%s%s%s%s", seqLabel, targets, subs, eta);
-    }
-    drawTextAt(6, SS_SEQ_Y1, line1, &FreeSansBold9pt7b);
-
-    // Zeile 2: Status links | Alt/Az rechts
-    char statusBuf[32];
-    snprintf(statusBuf, sizeof(statusBuf), "Status: %s",
-             seq.status[0] ? seq.status : "---");
-
-    bool statusWarn = (strcmp(seq.status, "Slewing") == 0 ||
-                       strcmp(seq.status, "Pausiert") == 0);
-    if (statusWarn) {
-      drawWarnLabel(6, SS_SEQ_Y2, statusBuf);
-    } else {
-      drawTextAt(6, SS_SEQ_Y2, statusBuf, &FreeSans9pt7b);
-    }
-
-    // Alt/Az rechts in Zeile 2
-    if (data.mount.connected && data.mount.altDeg > -90.0f) {
-      char altaz[40];
-      snprintf(altaz, sizeof(altaz), "Alt: %.0f%c  Az: %.0f%c %s",
-               data.mount.altDeg, '\xB0',
-               data.mount.azDeg,  '\xB0',
-               azToDir(data.mount.azDeg));
-      drawTextRight(W - 6, SS_SEQ_Y2, altaz, &FreeSans9pt7b);
-    }
-
-    // Trennlinie unter Sequenz-Block
-    display.drawLine(4, SS_SEQ_BOT, W - 4, SS_SEQ_BOT, GxEPD_BLACK);
-
-    // --- Spalten-Trennlinien ---
-    display.drawLine(SS_C2_X - 2, SS_SEQ_BOT + 2, SS_C2_X - 2, H - 2, GxEPD_BLACK);
-    display.drawLine(SS_C3_X - 2, SS_SEQ_BOT + 2, SS_C3_X - 2, H - 2, GxEPD_BLACK);
-
-    // --- Die drei Spalten ---
-    drawSessionCamera(SS_C1_X, SS_C1_W, data.camera);
-    drawSessionGuiding(SS_C2_X, SS_C2_W, data.guiding);
-    drawSessionMount(SS_C3_X, SS_C3_W, data.mount);
-
+    drawSessionNight(moon, sunriseTodS);
   } while (display.nextPage());
 }

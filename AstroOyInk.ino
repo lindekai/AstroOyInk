@@ -212,8 +212,10 @@ static void runWeatherMode(bool wifiOk, bool timeOk) {
     Serial.println("[STEP 4b] Fetch 7Timer! Seeing ...");
     fetchSeeing(g_cfg.lat, g_cfg.lon, seeing);
 
+#if ISS_ENABLED
     Serial.println("[STEP 4c] Fetch ISS-Passes ...");
     fetchISSPasses(g_cfg.lat, g_cfg.lon, iss);
+#endif
   }
   // Alle Daten da — WLAN vor dem 30-s-Refresh abschalten (spart Akku)
   disconnectWiFi();
@@ -317,7 +319,8 @@ static void runSessionMode(bool wifiOk, bool /*timeOk*/) {
     Serial.println("[STEP 6] Render Session-Dashboard ...");
     Serial.flush();
     uint32_t t0 = millis();
-    renderSessionDashboard(nd, batt, g_cfg.locationName);
+    MoonInfo moon = computeMoon(time(nullptr), g_cfg.lat, g_cfg.lon);
+    renderSessionDashboard(nd, batt, g_cfg.locationName, moon, sunriseTodS);
     hasEverRendered = true;
     Serial.printf("[STEP 6] Render ok (%lu ms)\n", (unsigned long)(millis() - t0));
   } else {

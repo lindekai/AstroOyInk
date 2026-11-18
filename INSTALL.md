@@ -423,28 +423,28 @@ Im Serial Monitor erscheint die Suche als `[NINA] Suche N.I.N.A. in …` bzw.
 
 ### Was das Display im SESSION-Modus zeigt
 
-```
-┌─── Saarmund ─── 01:18 ─── [████░] 72% ─── Update 01:18 ───┐
-│ SEQUENZ: M42 Ha   Target 2/3   Sub 47/120   Noch 1h 23m    │
-│ Status: Imaging                     Alt: 68°  Az: 215° SW  │
-├───────────────────┬──────────────────────┬──────────────────┤
-│ KAMERA            │ GUIDING              │ MOUNT            │
-│ ZWO ASI294MC Pro  │ RMS RA:   0.45"      │ iOptron CEM60    │
-│ Filter: Ha        │ RMS Dec:  0.38"      │ RA  05h 34m      │
-│ Exp:    300 s     │ Total:    0.59"      │ Dec +35° 48'     │
-│ HFR:    2.3 px    │ [Guiding OK]         │ Pier: West       │
-│                   │                      │ Flip in: 1h 23m  │
-└───────────────────┴──────────────────────┴──────────────────┘
-```
+![SESSION-Modus, pixelgenaue Vorschau](docs/images/display_session_preview.png)
+
+- **SEQUENZ:** aktuelles Target groß, Target i/n, Status und ein
+  Fortschrittsbalken der Subs im aktuellen Target.
+- **KAMERA / GUIDING / MOUNT:** je ein Leitwert groß — HFR des letzten
+  Bildes, RMS gesamt, Zeit bis zum Meridian-Flip mit ungefährer Uhrzeit
+  („bis Flip ~23:15“, auf 5 min gerundet) — darunter die Details (Filter,
+  Belichtung, Sensor-Temperatur ist/soll und Kühlerleistung; RA/Dec-RMS,
+  Status; RA/Dec, Alt/Az, Pier-Seite).
+- **NACHT:** Mondphase, Mondhöhe und Himmelsaufhellung (lokal berechnet,
+  kein Netz nötig) sowie der Sonnenaufgang aus dem letzten Wetterabruf.
 
 ### Warnungen im SESSION-Modus
 
 | Zustand | Anzeige BWR | Anzeige B/W |
 |---|---|---|
-| Guiding RMS ≥ 1,0″ | `[Guiding WARN]` **rot** | `[Guiding WARN]` invertiert |
-| Guiding verloren | `[Guiding LOST]` **rot** | `[Guiding LOST]` invertiert |
-| Flip in < 10 min | Flip-Countdown **rot** | Flip-Countdown invertiert |
-| Slewing / Pausiert | Status-Text **rot** | Status-Text invertiert |
+| Guiding RMS ≥ 1,0″ | RMS-Wert **rot**, „Guiding unruhig“ **rot** | „Guiding unruhig“ invertiert |
+| Guiding verloren | RMS-Wert **rot**, „Guiding verloren“ **rot** | „Guiding verloren“ invertiert |
+| Flip in < 10 min | Flip-Countdown **rot** | Flip-Countdown schwarz |
+| Objekthöhe < 20° | Alt/Az **rot** | Alt/Az schwarz |
+| Sensor > 1,5 K vom Soll oder Kühler aus | Sensor-Temperatur **rot** | Sensor-Temperatur schwarz |
+| Slewing / Pausiert | Status-Text **rot** | Status-Text schwarz |
 
 Den Guiding-Schwellwert anpassen:
 
@@ -534,7 +534,7 @@ Direkt nach dem Hochladen passiert Folgendes:
 | Fehler `Der Sketch ist zu groß` / `Textbereich überschreitet den verfügbaren Platz` | Partition Scheme auf `Minimal SPIFFS (1.9MB APP with OTA)` stellen (siehe [Abschnitt 8](#8-board-und-port-auswählen)). |
 | Display sieht aus wie gewünscht, aber **Werte sehen falsch aus** | Koordinaten geprüft? Lat/Lon vertauscht? Der erste Test: `LOCATION_LAT=52.52` und `LOCATION_LON=13.405` sollte „Berlin" plausibles Wetter geben. |
 | **SESSION-Modus erscheint nie**, obwohl N.I.N.A. läuft | Advanced API Plugin in N.I.N.A. installiert und gestartet? Port 1888 in der Windows-Firewall freigegeben? Host-Eintrag im Portal/`config.h` korrekt? Bei Auto-Discovery: N.I.N.A.-PC im gleichen /24-Netz und tagsüber gestartet? Dann bis zum Abend warten oder ESP32 per Reset neu starten (Kaltstart sucht immer). Mit `http://HOST:1888/v2/api/version` im Browser testen. |
-| SESSION-Modus zeigt **„N.I.N.A. nicht erreichbar"** | Sequenz wirklich gestartet? `ninaIsSequenceRunning` antwortet nur `true` wenn eine Sequenz aktiv läuft (nicht nur geöffnet). |
+| SESSION-Modus zeigt **„N.I.N.A. nicht erreichbar"** oder bleibt bei WEATHER | Sequenz wirklich gestartet? Umgeschaltet wird nur, wenn ein Knoten in `sequence/state` den Status `RUNNING` hat (nur geöffnet reicht nicht). Das serielle Log unterscheidet „N.I.N.A. nicht erreichbar“ und „Erreichbar, aber keine Sequenz mit Status RUNNING“. |
 | **Guiding-Werte immer 0** | N.I.N.A. Guider (PHD2 / DirectGuider) muss mit N.I.N.A. verbunden und aktiv sein. Wert bleibt 0 solange kein Guider angebunden ist. |
 | **Meridian-Flip-Countdown fehlt** | Einige Mount-Treiber liefern `TimeToMeridianFlip` nicht. Bekanntes API-Limit — Wert zeigt dann „--". |
 

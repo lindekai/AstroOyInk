@@ -8,12 +8,12 @@
     <text x="112" y="126" font-size="26" font-weight="800" fill="#111522">☁  WEATHER</text>
     <text x="112" y="164" font-size="18" fill="#4E586F">Open-Meteo + 7Timer! Seeing</text>
     <text x="112" y="194" font-size="18" fill="#4E586F">Mond nach Meeus, Nacht-Bewertung</text>
-    <text x="112" y="224" font-size="18" fill="#4E586F">5-Tage-Vorschau, ISS-Überflüge</text>
+    <text x="112" y="224" font-size="18" fill="#4E586F">6-Tage-Vorschau, Mondhöhe je Stunde</text>
     <text x="112" y="276" font-size="14" font-weight="700" letter-spacing="1.6" fill="#111522">STANDARD · DEEP-SLEEP · 1×/STUNDE</text>
     <rect x="760" y="60" width="440" height="240" rx="18" fill="#FFFFFF" stroke="#D3D8E4" stroke-width="1.5"/>
     <rect x="792" y="84" width="56" height="5" rx="2.5" fill="#C8102E"/>
     <text x="792" y="126" font-size="26" font-weight="800" fill="#111522">🔭  SESSION</text>
-    <text x="792" y="164" font-size="18" fill="#4E586F">Target, Subs, Restzeit, Status</text>
+    <text x="792" y="164" font-size="18" fill="#4E586F">Target, Sub-Fortschritt, Status</text>
     <text x="792" y="194" font-size="18" fill="#4E586F">Kamera, HFR, Guiding-RMS</text>
     <text x="792" y="224" font-size="18" fill="#4E586F">Mount, Pier-Seite, Meridian-Flip</text>
     <text x="792" y="276" font-size="14" font-weight="700" letter-spacing="1.6" fill="#C8102E">N.I.N.A. AKTIV · DEEP-SLEEP · 5 MIN</text>
