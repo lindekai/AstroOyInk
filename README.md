@@ -184,13 +184,13 @@ Ersteinrichtung stehen in `config.h`:
 <summary><b>WEATHER-Modus</b> (800 × 480)</summary>
 
 ```
-┌─ Saarmund ────────────── 22:41 ───────── [███ ] 72 %  Update 22:41 ─┐
+┌─ Saarmund ────────────── 22:41 ────────── [### ] 72 %  Update 22:41 ─┐
 │ AKTUELL            │ NACHT-BEWERTUNG       │ MOND                    │
-│  3.7 °C   6 km/h   │  ( 8% )  GUT          │  ◐  Zun. Sichel         │
-│           78 %     │          ★★★★★        │     25 % beleuchtet     │
-│  IN: 21 °C 45 %    │  Nacht 22:17–03:54    │     Himmel: dunkel      │
+│  3.7 C    6 km/h   │  ( 8% )  GUT          │  (  Zun. Sichel         │
+│           78 %     │          *****        │     25 % beleuchtet     │
+│  IN: 21 C  45 %    │  Nacht 22:17-03:54    │     Himmel: dunkel      │
 ├────────────────────┴───────────────────────┴─────────────────────────┤
-│ NACHT – WOLKEN-VERLAUF (%)      Gesamt / Low / Mid / High + Seeing   │
+│ NACHT - WOLKEN-VERLAUF (%)      Gesamt / Low / Mid / High + Seeing   │
 ├──────────────────────────────────────────────────────────────────────┤
 │ STUNDENWERTE NACHT   Std / Wolk% / ISS                               │
 ├──────────────────────────────────────────────────────────────────────┤
@@ -206,14 +206,14 @@ Ersteinrichtung stehen in `config.h`:
 <summary><b>SESSION-Modus</b> (800 × 480)</summary>
 
 ```
-┌─ Saarmund ────────────── 23:12 ───────────────────── [███ ] 72 % ─┐
+┌─ Saarmund ────────────── 23:12 ───────────────────── [### ] 72 % ─┐
 │ SEQUENZ  M31-LRGB   Target 1/3   Sub 42/120   Restzeit 2:35       │
-│ Status: Imaging     Alt 58° / Az 112°                             │
+│ Status: Imaging     Alt 58 / Az 112                               │
 ├──────────────────────┬──────────────────────┬─────────────────────┤
 │ KAMERA               │ GUIDING              │ MOUNT               │
-│ ZWO ASI2600MM        │ RA   0.42″           │ EQ6-R Pro           │
-│ Filter: L            │ Dec  0.38″           │ RA/Dec              │
-│ 180 s                │ Tot  0.57″           │ Alt/Az              │
+│ ZWO ASI2600MM        │ RA   0.42"           │ EQ6-R Pro           │
+│ Filter: L            │ Dec  0.38"           │ RA/Dec              │
+│ 180 s                │ Tot  0.57"           │ Alt/Az              │
 │ HFR 2.1              │ [Guiding OK]         │ Pier: East          │
 │                      │                      │ Flip in 1:12        │
 └──────────────────────┴──────────────────────┴─────────────────────┘
