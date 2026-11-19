@@ -149,7 +149,7 @@ SCL 25) – Details in [INSTALL.md](INSTALL.md#2-verkabelung).
   <a href="docs/images/schaltplan.svg"><img src="docs/images/schaltplan.svg" alt="Kommentierter Schaltplan: ESP32, Waveshare-Display, TC4056-Lademodul, TPS62827-Buck, Akku-Spannungsteiler, BME280" width="100%"></a>
 </p>
 <p align="center">
-  <a href="docs/images/breadboard.svg"><img src="docs/images/breadboard.svg" alt="Steckbrett-Aufbau mit ESP32-DevKitC auf zwei Steckbrettern und allen Verbindungen" width="100%"></a>
+  <a href="docs/images/breadboard.svg"><img src="docs/images/breadboard.svg" alt="Steckbrett-Aufbau mit ESP32-DevKitC auf einem Steckbrett und allen Verbindungen" width="100%"></a>
 </p>
 
 Erzeugt mit `python3 tools/make_wiring_svgs.py docs/images`.

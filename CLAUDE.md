@@ -55,6 +55,13 @@ zu AstroOyInk nachvollziehen will, findet die Iterationen in `CHANGELOG.md`.
 BUSY=25  RST=26  DC=27  CS=15  SCK=13  MOSI=14
 ```
 
+Das sind die Defaults (passen zum Waveshare ESP32 e-Paper Driver Board).
+Fuer den Aufbau auf **einem** Steckbrett (`docs/images/breadboard.svg`)
+liegen alle Signale auf einer DevKitC-Stiftleiste, dort gilt abweichend:
+`CS=33  BUSY=39  SDA=32  SCL=25` (in `config.h` eintragen). Schaltplan und
+Steckbrett-Bild erzeugt `tools/make_wiring_svgs.py` — bei Pinaenderungen
+dort nachziehen und neu erzeugen.
+
 ## Build-System
 
 **Arduino IDE 2.x — kein PlatformIO.**
