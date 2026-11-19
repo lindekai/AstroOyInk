@@ -128,17 +128,17 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 | *optional* | BME280 (I²C) | Innenklima im AKTUELL-Block |
 | *optional* | Bilderrahmen 7×5″ | für die Wand |
 
-<details>
-<summary><b>Pinbelegung Display</b></summary>
+> [!TIP]
+> Ein voller Drei-Farben-Refresh dauert auf dem V3-Panel **25–30 Sekunden**.
+> Das Flackern dabei ist normal.
+
+### Pinbelegung Display
 
 | Signal | BUSY | RST | DC | CS | SCK | MOSI |
 |---|---|---|---|---|---|---|
 | GPIO | 25 | 26 | 27 | 15 | 13 | 14 |
 
-</details>
-
-<details>
-<summary><b>Schaltplan und Steckbrett-Aufbau</b></summary>
+### Schaltplan und Steckbrett-Aufbau
 
 Vollständig kommentiert, inklusive Akkubetrieb, Akkuanzeige, USB-Erkennung
 und BME280 (optionale Teile gestrichelt). Der Steckbrett-Aufbau passt auf
@@ -153,12 +153,6 @@ SCL 25) – Details in [INSTALL.md](INSTALL.md#2-verkabelung).
 </p>
 
 Erzeugt mit `python3 tools/make_wiring_svgs.py docs/images`.
-
-</details>
-
-> [!TIP]
-> Ein voller Drei-Farben-Refresh dauert auf dem V3-Panel **25–30 Sekunden**.
-> Das Flackern dabei ist normal.
 
 ## 🔋 Stromversorgung
 
@@ -195,8 +189,7 @@ USB-C ──> TC4056 ──> LiPo 3,7 V ──┬──> TPS62827 Buck ──> 3
 > Ruhestrom zieht. Am Waveshare-Board muss dafür nichts ausgelötet werden: Der
 > LDO ist umgangen, und der USB-Chip hängt an USB-5 V, die im Akkubetrieb fehlt.
 
-<details>
-<summary><b>Ersatzteile, Grenzen und USB-Erkennung</b></summary>
+#### Ersatzteile, Grenzen und USB-Erkennung
 
 **Ersatz für den TPS62827:** entscheidend ist der Ruhestrom (Iq) im
 einstelligen µA-Bereich, 3,3 V direkt am Ausgang und ein LiPo-tauglicher
@@ -221,8 +214,6 @@ abzuklemmen – oder per OTA zu flashen.
 
 **Brownout:** `Brownout detector was triggered` im Serial Monitor heißt, die
 Versorgung schafft die WLAN-Spitzen nicht – Pufferelko prüfen.
-
-</details>
 
 ### Laufzeit
 
@@ -308,8 +299,7 @@ Der Netz-Scan läuft nur von **1 h vor Sonnenuntergang bis 1 h nach Sonnenaufgan
 
 ## 🖼️ Display-Layout
 
-<details>
-<summary><b>WEATHER-Modus</b> (800 × 480)</summary>
+### WEATHER-Modus (800 × 480)
 
 ```
 ┌─ Saarmund ────────────── 22:41 ────────── [### ] 72 %  Update 22:41 ─┐
@@ -328,10 +318,7 @@ Der Netz-Scan läuft nur von **1 h vor Sonnenuntergang bis 1 h nach Sonnenaufgan
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-</details>
-
-<details>
-<summary><b>SESSION-Modus</b> (800 × 480)</summary>
+### SESSION-Modus (800 × 480)
 
 ```
 ┌─ Saarmund ─────────────── So 22.11. ─────── [### ] 72 %  Stand 23:12 ─┐
@@ -352,8 +339,6 @@ Der Netz-Scan läuft nur von **1 h vor Sonnenuntergang bis 1 h nach Sonnenaufgan
 │            Hoehe 12°   Himmel: mittel                                 │
 └───────────────────────────────────────────────────────────────────────┘
 ```
-
-</details>
 
 ## 🗂️ Projektstruktur
 
@@ -413,14 +398,11 @@ und leichtem Wahnsinn, die Astrofotografie ausmacht. Oder kürzer:
 **ein kleines E-Paper-Astrodisplay für Menschen, die „klarer Himmel“ eher für
 ein theoretisches Konzept halten.**
 
-<details>
-<summary><b>Vorgeschichte: AstroWeatherEPD</b></summary>
+### Vorgeschichte: AstroWeatherEPD
 
 AstroOyInk ist aus dem unveröffentlichten Vorgänger **AstroWeatherEPD v1.0**
 hervorgegangen, in dem der WEATHER-Modus entstanden ist. Den Weg dorthin
 dokumentiert das [CHANGELOG.md](CHANGELOG.md). AstroOyInk ist die offizielle Linie.
-
-</details>
 
 ## 🙏 Credits
 

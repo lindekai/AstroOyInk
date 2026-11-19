@@ -5,6 +5,9 @@ Alle relevanten Änderungen am Projekt.
 ## [Unreleased]
 
 ### Hinzugefügt
+- 📖 README ohne aufklappbare Bereiche: Pinbelegung, Schaltplan,
+  Ersatzteile, Display-Layout und Vorgeschichte sind jetzt normale
+  Abschnitte.
 - 🔌 **Schaltplan und Steckbrett-Bild** (`docs/images/schaltplan.svg`,
   `docs/images/breadboard.svg`), vollständig kommentiert: Display,
   TC4056 + LiPo, TPS62827-Buck, Pufferelko, Akkuteiler an GPIO34, optionale
