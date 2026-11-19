@@ -123,12 +123,15 @@ AstroOyInk/
 │
 ├── tools/
 │   ├── make_readme_svgs.py        # README-Grafiken (stilisiert, NICHT pixelgenau)
+│   ├── make_wiring_svgs.py        # Schaltplan + Steckbrett-Bild (Pins aus config.h
+│   │                              # von Hand gespiegelt – bei Pinaenderung neu erzeugen)
 │   └── preview/                   # Pixelgenaue Host-Vorschau des Displays
 │       ├── build_preview.sh       # → tools/preview/out/*.png
 │       ├── preview_main.cpp       # Beispieldaten fuer alle Ansichten
 │       └── stubs/                 # Arduino/Print/SPI/GxEPD2-Ersatz
 │
-├── docs/images/                   # README-Grafiken + Vorschau-PNGs
+├── docs/images/                   # README-Grafiken + Vorschau-PNGs,
+│                                  # schaltplan.svg, breadboard.svg
 │                                  # (display_*_preview.png aus tools/preview)
 │
 ├── README.md

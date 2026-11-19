@@ -5,6 +5,13 @@ Alle relevanten Änderungen am Projekt.
 ## [Unreleased]
 
 ### Hinzugefügt
+- 🔌 **Schaltplan und Steckbrett-Bild** (`docs/images/schaltplan.svg`,
+  `docs/images/breadboard.svg`), vollständig kommentiert: Display,
+  TC4056 + LiPo, TPS62827-Buck, Pufferelko, Akkuteiler an GPIO34, optionale
+  USB-Erkennung an GPIO35 und BME280. Der Steckbrett-Aufbau passt auf ein
+  Brett, alle Signale auf einer Stiftleiste (CS 33, BUSY 39, SDA 32, SCL 25
+  in `config.h`; die Defaults bleiben fürs Waveshare Driver Board). Erzeugt
+  mit `tools/make_wiring_svgs.py`, eingebunden in README und INSTALL.
 - 🌙 **Mondhöhe über die Nacht** — neue Zeile „Mond“ in der Stundentabelle
   (Grad je Nachtstunde, ab 30° rot, unter dem Horizont „-“),
   berechnet mit `computeMoonTrack()`.

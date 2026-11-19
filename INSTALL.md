@@ -56,6 +56,26 @@ auch wenn du **noch nie etwas mit Arduino oder ESP32 gemacht hast**.
 das Display wird einfach mit dem 24-Pin-Flachbandkabel angesteckt.
 Spring direkt zu Schritt 3.
 
+Den kompletten Aufbau gibt es als kommentierten **Schaltplan** und als
+**Steckbrett-Bild** – mit Akkubetrieb, Akkuanzeige, USB-Erkennung und BME280
+(optionale Teile gestrichelt):
+
+[![Schaltplan](docs/images/schaltplan.svg)](docs/images/schaltplan.svg)
+
+[![Steckbrett-Aufbau](docs/images/breadboard.svg)](docs/images/breadboard.svg)
+
+> **Aufbau auf einem Steckbrett:** Das 38-Pin-DevKitC ist so breit, dass auf
+> einem Brett nur auf einer Seite ein Loch je Pin frei bleibt. Deshalb liegen
+> dort alle Signale auf einer Stiftleiste – mit vier anderen Pins als in der
+> Tabelle unten. In `config.h` eintragen:
+>
+> ```cpp
+> #define EPD_PIN_CS        33   // statt 15
+> #define EPD_PIN_BUSY      39   // statt 25 (VN, nur Eingang – reicht für BUSY)
+> #define LOCAL_SENSOR_SDA  32   // statt 21
+> #define LOCAL_SENSOR_SCL  25   // statt 22
+> ```
+
 **Bei einem Standard-ESP32-DevKit** verbindest du wie folgt:
 
 | E-Paper Pin | ESP32 GPIO | Bemerkung |

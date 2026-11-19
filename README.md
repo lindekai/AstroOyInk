@@ -137,6 +137,25 @@ N.I.N.A. Advanced API erreichbar ist **und** eine Sequenz läuft.
 
 </details>
 
+<details>
+<summary><b>Schaltplan und Steckbrett-Aufbau</b></summary>
+
+Vollständig kommentiert, inklusive Akkubetrieb, Akkuanzeige, USB-Erkennung
+und BME280 (optionale Teile gestrichelt). Der Steckbrett-Aufbau passt auf
+**ein** Brett und nutzt dafür vier andere Pins (CS 33, BUSY 39, SDA 32,
+SCL 25) – Details in [INSTALL.md](INSTALL.md#2-verkabelung).
+
+<p align="center">
+  <a href="docs/images/schaltplan.svg"><img src="docs/images/schaltplan.svg" alt="Kommentierter Schaltplan: ESP32, Waveshare-Display, TC4056-Lademodul, TPS62827-Buck, Akku-Spannungsteiler, BME280" width="100%"></a>
+</p>
+<p align="center">
+  <a href="docs/images/breadboard.svg"><img src="docs/images/breadboard.svg" alt="Steckbrett-Aufbau mit ESP32-DevKitC auf zwei Steckbrettern und allen Verbindungen" width="100%"></a>
+</p>
+
+Erzeugt mit `python3 tools/make_wiring_svgs.py docs/images`.
+
+</details>
+
 > [!TIP]
 > Ein voller Drei-Farben-Refresh dauert auf dem V3-Panel **25–30 Sekunden**.
 > Das Flackern dabei ist normal.
@@ -349,8 +368,8 @@ AstroOyInk/
 │   ├── modes/                # mode_state_machine: WEATHER ↔ SESSION
 │   └── rendering/            # GxEPD2, Wetter- und Session-Dashboard
 ├── tests/                    # Host-Tests mit g++, ohne ESP32
-├── tools/                    # Generator für die README-Grafiken
-└── docs/images/              # Hero, Modus-Grafik, Display-Vorschau
+├── tools/                    # Generatoren für README-Grafiken, Schaltplan, Vorschau
+└── docs/images/              # Hero, Modus-Grafik, Display-Vorschau, Schaltplan
 ```
 
 ## 🧪 Tests
