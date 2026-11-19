@@ -5,6 +5,15 @@ Alle relevanten Änderungen am Projekt.
 ## [Unreleased]
 
 ### Hinzugefügt
+- 🏠 **3D-Druck-Gehäuse** in `hardware/gehaeuse/` (OpenSCAD, parametrisch,
+  STLs in `stl/`): **Tischgehäuse** – Display steht frei im 15°-Schlitz, nur
+  der inaktive Rand steckt im Sockel, Elektronik und Akku im 26 mm flachen
+  Sockel – und **Wandgehäuse** – flacher Rahmen mit 2-mm-Blende,
+  Schlüssellöcher, Elektronik auf dem Rückdeckel. Beide ohne Kleber
+  (Rastnasen, Niederhalter, Presspassung), je ein USB-C-Anschluss zum Laden,
+  belüftete BME280-Kammer. Maße der Elektronik nachgemessen.
+- 🖼️ Gehäuse-Mockups (`tools/make_gehaeuse_mockups.py`): Hero-Bilder mit
+  echter Display-Vorschau und Schnittzeichnungen aus echten Modellschnitten.
 - 📖 README ohne aufklappbare Bereiche: Pinbelegung, Schaltplan,
   Ersatzteile, Display-Layout und Vorgeschichte sind jetzt normale
   Abschnitte.

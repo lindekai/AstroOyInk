@@ -1,0 +1,468 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1330" width="1600" height="1330" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<rect width="1600" height="1330" fill="#FFFFFF"/>
+<defs>
+<pattern id="hatchA" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+  <rect width="6" height="6" fill="#E3E1DA"/><line x1="0" y1="0" x2="0" y2="6" stroke="#8C8778" stroke-width="1.1"/></pattern>
+<pattern id="hatchB" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+  <rect width="6" height="6" fill="#EEECE6"/><line x1="0" y1="0" x2="0" y2="6" stroke="#A29C8C" stroke-width="1"/></pattern>
+<marker id="pfeil" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+  <path d="M0,0 L10,5 L0,10 z" fill="#2F6FDE"/></marker>
+<marker id="pfeilR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+  <path d="M0,0 L10,5 L0,10 z" fill="#C8102E"/></marker>
+<marker id="mass" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+  <path d="M0,1 L10,5 L0,9" fill="none" stroke="#5B6472" stroke-width="1.6"/></marker>
+</defs>
+<text x="40.0" y="52.0" font-size="26" text-anchor="start" fill="#1B1B1B" font-weight="800">AstroOyInk – Tischgehäuse · Schnittzeichnung</text>
+<text x="40.0" y="78.0" font-size="13" text-anchor="start" fill="#5B6472" font-weight="400">Einbaulage der Elektronik nach gemessenen Teilen · Schnitte 2,6 : 1, Draufsicht 3 : 1 · alle Maße in mm · ohne Kleber montiert</text>
+<text x="1560.0" y="52.0" font-size="13" text-anchor="end" fill="#C8102E" font-weight="800">Mockup</text>
+<text x="50.0" y="120.0" font-size="15" text-anchor="start" fill="#1B1B1B" font-weight="800">Schnitt A–A</text>
+<text x="50.0" y="138.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">Mitte: Display, Flexkabel, FPC-Adapter (x = 100)</text>
+<g><g transform="translate(70.0,560.0) scale(2.6)"><path d="
+M 0,2.4 L 84,2.4 L 84,-0 L 81.3,-0 L 81.3,-2 L 80.1,-2
+ L 80.1,-0 L 3.9,-0 L 3.9,-2 L 2.7,-2 L 2.7,-0 L 0,-0
+ z
+" fill="url(#hatchB)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 30,-3 L 48,-3 L 48,-4.6 L 45,-4.6 L 45,-7 L 33,-7
+ L 33,-4.6 L 30,-4.6 z
+" fill="#1F4FA0" stroke="#123468" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 0,-0 L 2.4,-0 L 2.4,-17 L 6.4,-21 L 20.7115,-21 L 18.6458,-13.2909
+ L 20.9641,-12.6697 L 23.7412,-23.0341 L 23.626,-24 L 4,-24 L 0,-20 z
+M 23.5721,-11.9709 L 24.9243,-11.6085 L 27.4408,-21 L 77.6,-21 L 81.6,-17 L 81.6,-0
+ L 84,-0 L 84,-20 L 80,-24 L 26.4351,-24 L 25.3833,-22.5941 L 25.0364,-21.2997
+ L 25.9927,-21.0435 L 24.4424,-15.2576 L 24.452,-15.255 z
+" fill="url(#hatchA)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 21.8267,-14.9232 L 22.9858,-14.6126 L 51.7665,-122.024 L 50.6074,-122.334 z
+" fill="#1E1E22" stroke="#1E1E22" stroke-width="0.2" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<path d="M132.7,514.7 L128.6,529.8 L139.0,540.5 L154.5,543.9" fill="none" stroke="#D9822B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M132.4,497.6 L132.4,336.4" fill="none" stroke="#8A8F99" stroke-width="1" stroke-dasharray="4 3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M132.4,388.4 L134.3,388.4 L136.2,388.5 L138.1,388.5 L140.0,388.7 L141.9,388.8 L143.8,389.0 L145.7,389.2 L147.6,389.5 L149.5,389.7 L151.4,390.1 L153.2,390.4 L155.1,390.8 L157.0,391.2 L158.8,391.6 L160.7,392.1" fill="none" stroke="#C8102E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="145.4" y="375.4" font-size="14" text-anchor="start" fill="#C8102E" font-weight="800">15°</text>
+<line x1="70.0" y1="590.2" x2="288.4" y2="590.2" stroke="#5B6472" stroke-width="1" marker-start="url(#mass)" marker-end="url(#mass)"/>
+<text x="179.2" y="584.2" font-size="11" text-anchor="middle" fill="#5B6472" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">84</text>
+<line x1="308.4" y1="566.2" x2="308.4" y2="497.6" stroke="#5B6472" stroke-width="1" marker-start="url(#mass)" marker-end="url(#mass)"/>
+<text x="314.4" y="535.4" font-size="11" text-anchor="middle" fill="#5B6472" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">26.4</text>
+<circle cx="175.6" cy="342.3" r="2.6" fill="#1B1B1B"/>
+<line x1="175.6" y1="342.3" x2="80.6" y2="332.3" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="80.6" cy="332.3" r="11" fill="#C8102E"/>
+<text x="80.6" y="336.8" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">1</text>
+<circle cx="128.6" cy="520.3" r="2.6" fill="#1B1B1B"/>
+<line x1="128.6" y1="520.3" x2="198.6" y2="450.3" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="198.6" cy="450.3" r="11" fill="#C8102E"/>
+<text x="198.6" y="454.8" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">2</text>
+<circle cx="130.7" cy="499.8" r="2.6" fill="#1B1B1B"/>
+<line x1="130.7" y1="499.8" x2="70.7" y2="463.8" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="70.7" cy="463.8" r="11" fill="#C8102E"/>
+<text x="70.7" y="468.3" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">3</text>
+<circle cx="128.6" cy="529.8" r="2.6" fill="#1B1B1B"/>
+<line x1="128.6" y1="529.8" x2="78.6" y2="573.8" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="78.6" cy="573.8" r="11" fill="#C8102E"/>
+<text x="78.6" y="578.3" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">4</text>
+<circle cx="171.4" cy="545.7" r="2.6" fill="#1B1B1B"/>
+<line x1="171.4" y1="545.7" x2="221.4" y2="485.7" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="221.4" cy="485.7" r="11" fill="#C8102E"/>
+<text x="221.4" y="490.2" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">16</text>
+<circle cx="226.0" cy="563.1" r="2.6" fill="#1B1B1B"/>
+<line x1="226.0" y1="563.1" x2="236.0" y2="605.1" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="236.0" cy="605.1" r="11" fill="#C8102E"/>
+<text x="236.0" y="609.6" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">6</text>
+<text x="330.0" y="120.0" font-size="15" text-anchor="start" fill="#1B1B1B" font-weight="800">Schnitt B–B</text>
+<text x="330.0" y="138.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">links: Akku und Niederhalter (x = 47)</text>
+<g><g transform="translate(350.0,560.0) scale(2.6)"><path d="
+M 0,2.4 L 84,2.4 L 84,-0 L 81.3,-0 L 81.3,-2 L 81.1,-2
+ L 81.1,-5 L 79.5,-5 L 79.5,-0 L 32.5,-0 L 32.5,-5 L 30.9,-5
+ L 30.9,-0 L 3.9,-0 L 3.9,-2 L 2.7,-2 L 2.7,-0 L 0,-0
+ z
+" fill="url(#hatchB)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 33,-0 L 79,-0 L 79,-10 L 33,-10 z
+" fill="#B8BEC8" stroke="#6E7686" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 0,-0 L 2.4,-0 L 2.4,-17 L 6.4,-21 L 20.7115,-21 L 18.6458,-13.2909
+ L 24.9243,-11.6085 L 27.4408,-21 L 42,-21 L 42,-10.6 L 44,-10.6 L 44,-21
+ L 68,-21 L 68,-10.6 L 70,-10.6 L 70,-21 L 77.6,-21 L 81.6,-17
+ L 81.6,-0 L 84,-0 L 84,-20 L 80,-24 L 26.4351,-24 L 25.3833,-22.5941
+ L 23.2273,-14.5479 L 21.5852,-14.9879 L 23.7412,-23.0341 L 23.626,-24 L 4,-24 L 0,-20
+ z
+" fill="url(#hatchA)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 21.8267,-14.9232 L 22.9858,-14.6126 L 51.7665,-122.024 L 50.6074,-122.334 z
+" fill="#1E1E22" stroke="#1E1E22" stroke-width="0.2" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<circle cx="495.6" cy="547.0" r="2.6" fill="#1B1B1B"/>
+<line x1="495.6" y1="547.0" x2="535.6" y2="477.0" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="535.6" cy="477.0" r="11" fill="#C8102E"/>
+<text x="535.6" y="481.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">7</text>
+<circle cx="431.6" cy="552.2" r="2.6" fill="#1B1B1B"/>
+<line x1="431.6" y1="552.2" x2="391.6" y2="602.2" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="391.6" cy="602.2" r="11" fill="#C8102E"/>
+<text x="391.6" y="606.7" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">8</text>
+<circle cx="461.8" cy="518.4" r="2.6" fill="#1B1B1B"/>
+<line x1="461.8" y1="518.4" x2="451.8" y2="408.4" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="451.8" cy="408.4" r="11" fill="#C8102E"/>
+<text x="451.8" y="412.9" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">9</text>
+<text x="610.0" y="120.0" font-size="15" text-anchor="start" fill="#1B1B1B" font-weight="800">Schnitt E–E</text>
+<text x="610.0" y="138.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">rechts: Driver Board (x = 157)</text>
+<g><g transform="translate(630.0,560.0) scale(2.6)"><path d="
+M 0,2.4 L 84,2.4 L 84,-0 L 81.3,-0 L 81.3,-2 L 80.1,-2
+ L 80.1,-0 L 3.9,-0 L 3.9,-2 L 2.7,-2 L 2.7,-0 L 0,-0
+ z
+" fill="url(#hatchB)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 40,-12 L 41.3,-12 L 41.3,-3 L 43.8,-3 L 43.8,-12 L 65.7,-12
+ L 65.7,-3 L 68.2,-3 L 68.2,-12 L 69.5,-12 L 69.5,-13.6 L 67.5,-13.6
+ L 67.5,-17 L 42,-17 L 42,-13.6 L 40,-13.6 z
+" fill="#2C6E49" stroke="#1C4A30" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 0,-0 L 2.4,-0 L 2.4,-17 L 6.4,-21 L 20.7115,-21 L 18.6458,-13.2909
+ L 24.9243,-11.6085 L 27.4408,-21 L 77.6,-21 L 81.6,-17 L 81.6,-0 L 84,-0
+ L 84,-20 L 80,-24 L 26.4351,-24 L 25.3833,-22.5941 L 23.2273,-14.5479 L 21.5852,-14.9879
+ L 23.7412,-23.0341 L 23.626,-24 L 4,-24 L 0,-20 z
+" fill="url(#hatchA)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 21.8267,-14.9232 L 22.9858,-14.6126 L 51.7665,-122.024 L 50.6074,-122.334 z
+" fill="#1E1E22" stroke="#1E1E22" stroke-width="0.2" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<circle cx="786.0" cy="526.7" r="2.6" fill="#1B1B1B"/>
+<line x1="786.0" y1="526.7" x2="826.0" y2="446.7" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="826.0" cy="446.7" r="11" fill="#C8102E"/>
+<text x="826.0" y="451.2" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">5</text>
+<circle cx="737.9" cy="544.4" r="2.6" fill="#1B1B1B"/>
+<line x1="737.9" y1="544.4" x2="697.9" y2="600.4" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="697.9" cy="600.4" r="11" fill="#C8102E"/>
+<text x="697.9" y="604.9" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">17</text>
+<circle cx="773.0" cy="509.3" r="2.6" fill="#1B1B1B"/>
+<line x1="773.0" y1="509.3" x2="803.0" y2="379.3" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="803.0" cy="379.3" r="11" fill="#C8102E"/>
+<text x="803.0" y="383.8" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">18</text>
+<text x="915.0" y="120.0" font-size="15" text-anchor="start" fill="#1B1B1B" font-weight="800">Detail C – BME280-Kammer</text>
+<text x="915.0" y="138.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">Querschnitt durch die Kammer (y = 9), 5 : 1</text>
+<clipPath id="clip72"><rect x="920.0" y="270.0" width="235.0" height="150.0"/></clipPath>
+<g clip-path="url(#clip72)"><g transform="translate(935.0,400.0) scale(5.0)"><path d="
+M 0.0655433,2.4 L 14.4,2.4 L 14.4,-0 L 10.9,-0 L 10.9,-6 L 9.2,-6
+ L 9.2,-1 L 7.5,-1 L 7.5,-6 L 5.9,-6 L 5.9,-0 L 4.04717,-0
+ L 4.04717,-2 L 2.82628,-2 L 2.82628,-0 L 0.0655433,-0 z
+M 16.4,2.4 L 18.9,2.4 L 18.9,-0 L 16.4,-0 z
+M 20.9,1.41 L 23.4,1.41 L 23.4,-0 L 20.9,-0 z
+M 25.4,1.41 L 27.9,1.41 L 27.9,-0 L 25.4,-0 z
+M 29.9,2.4 L 171.644,2.4 L 171.644,1.41 L 180.356,1.41 L 180.356,2.4 L 199.934,2.4
+ L 199.934,-0 L 197.174,-0 L 197.174,-2 L 195.953,-2 L 195.953,-0 L 29.9,-0
+ z
+" fill="url(#hatchB)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 7.5,-1 L 9.1,-1 L 9.1,-12 L 7.5,-12 z
+" fill="#6B2C8F" stroke="#4A1E63" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/><path d="
+M 0.0655433,-0 L 2.46661,-0 L 2.46661,-5 L 0.0655433,-5 z
+M 0.0655433,-6.8 L 2.46661,-6.8 L 2.46661,-9 L 0.0655433,-9 z
+M 0.0655433,-10.8 L 2.46661,-10.8 L 2.46661,-13 L 0.0655433,-13 z
+M 0.0655433,-14.8 L 2.46661,-14.8 L 2.46661,-17 L 6.26795,-20.7363 L 6.40029,-20.8619 L 6.54583,-21
+ L 32.4,-21 L 32.4,-4 L 34,-4 L 34,-21 L 193.454,-21 L 193.732,-20.7363
+ L 194.905,-19.5837 L 197.533,-17 L 197.533,-0 L 199.934,-0 L 199.934,-20 L 198.999,-20.9355
+ L 197.596,-22.3387 L 196.394,-23.5195 L 195.906,-24 L 4.09446,-24 L 3.60557,-23.5195 L 2.40425,-22.3387
+ L 0.0655433,-20 z
+" fill="url(#hatchA)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<path d="M980.0,370.5 L912.5,370.5" fill="none" stroke="#2F6FDE" stroke-width="1.6" marker-end="url(#pfeil)" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M980.0,350.5 L912.5,350.5" fill="none" stroke="#2F6FDE" stroke-width="1.6" marker-end="url(#pfeil)" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M980.0,330.5 L912.5,330.5" fill="none" stroke="#2F6FDE" stroke-width="1.6" marker-end="url(#pfeil)" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M1012.0,445.0 L1012.0,407.5" fill="none" stroke="#2F6FDE" stroke-width="1.6" marker-end="url(#pfeil)" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M1034.5,445.0 L1034.5,407.5" fill="none" stroke="#2F6FDE" stroke-width="1.6" marker-end="url(#pfeil)" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M1057.0,445.0 L1057.0,407.5" fill="none" stroke="#2F6FDE" stroke-width="1.6" marker-end="url(#pfeil)" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M1079.5,445.0 L1079.5,407.5" fill="none" stroke="#2F6FDE" stroke-width="1.6" marker-end="url(#pfeil)" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M1035.0,390.0 L1005.0,355.0 L982.5,345.0" fill="none" stroke="#2F6FDE" stroke-width="1.2" stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="976.0" cy="355.0" r="2.6" fill="#1B1B1B"/>
+<line x1="976.0" y1="355.0" x2="1046.0" y2="260.0" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="1046.0" cy="260.0" r="11" fill="#C8102E"/>
+<text x="1046.0" y="264.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">10</text>
+<circle cx="941.0" cy="330.0" r="2.6" fill="#1B1B1B"/>
+<line x1="941.0" y1="330.0" x2="911.0" y2="260.0" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="911.0" cy="260.0" r="11" fill="#C8102E"/>
+<text x="911.0" y="264.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">11</text>
+<circle cx="1045.0" cy="406.0" r="2.6" fill="#1B1B1B"/>
+<line x1="1045.0" y1="406.0" x2="1165.0" y2="446.0" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="1165.0" cy="446.0" r="11" fill="#C8102E"/>
+<text x="1165.0" y="450.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">12</text>
+<circle cx="1101.0" cy="325.0" r="2.6" fill="#1B1B1B"/>
+<line x1="1101.0" y1="325.0" x2="1191.0" y2="245.0" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
+<circle cx="1191.0" cy="245.0" r="11" fill="#C8102E"/>
+<text x="1191.0" y="249.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">13</text>
+<text x="935.0" y="520.0" font-size="12" text-anchor="start" fill="#5B6472" font-weight="400" font-style="italic">Frischluft strömt von unten und von der Seite ein, die Trennwand hält</text>
+<text x="935.0" y="537.0" font-size="12" text-anchor="start" fill="#5B6472" font-weight="400" font-style="italic">die Abwärme von ESP32, Laderegler und Akku vom Sensor fern.</text>
+<text x="60.0" y="640.0" font-size="15" text-anchor="start" fill="#1B1B1B" font-weight="800">Draufsicht</text>
+<text x="60.0" y="658.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">Sockel waagerecht geschnitten (z = 8), Display-Lage gestrichelt · 3 : 1</text>
+<g><g transform="translate(80.0,957.0) scale(3.0)"><path d="
+M 2.7,-10.3 L 2.76502,-9.308 L 2.95896,-8.33297 L 3.27851,-7.39161 L 3.71821,-6.5 L 4.27051,-5.67341
+ L 4.92599,-4.92599 L 5.67341,-4.27051 L 5.9,-4.11911 L 5.9,-2.9 L 8.6294,-2.9 L 9.308,-2.76502
+ L 10.3,-2.7 L 189.7,-2.7 L 190.692,-2.76502 L 191.667,-2.95896 L 192.608,-3.27851 L 193.5,-3.71821
+ L 194.327,-4.27051 L 195.074,-4.92599 L 195.729,-5.67341 L 196.282,-6.5 L 196.721,-7.39161 L 197.041,-8.33297
+ L 197.235,-9.308 L 197.3,-10.3 L 197.3,-26.6978 L 197.157,-26.2779 L 196.897,-25.75 L 196.57,-25.2606
+ L 196.182,-24.818 L 196.1,-24.7461 L 196.1,-10.3 L 196.045,-9.46463 L 195.882,-8.64356 L 195.613,-7.85083
+ L 195.243,-7.1 L 194.777,-6.40393 L 194.225,-5.77452 L 193.596,-5.22254 L 192.9,-4.75744 L 192.149,-4.38717
+ L 191.356,-4.11807 L 190.535,-3.95475 L 189.7,-3.9 L 10.9,-3.9 L 10.9,-17.9 L 5.9,-17.9
+ L 5.9,-5.66447 L 5.77452,-5.77452 L 5.22254,-6.40393 L 4.75744,-7.1 L 4.38717,-7.85083 L 4.11807,-8.64356
+ L 3.95475,-9.46463 L 3.9,-10.3 L 3.9,-24.7461 L 3.81802,-24.818 L 3.42991,-25.2606 L 3.10289,-25.75
+ L 2.84254,-26.2779 L 2.7,-26.6978 z
+M 7.5,-4.56018 L 7.5,-17.1 L 9.2,-17.1 L 9.2,-4.00739 L 8.64356,-4.11807 L 7.85083,-4.38717
+ z
+M 2.7,-29.3022 L 2.84254,-29.7221 L 3.10289,-30.25 L 3.42991,-30.7394 L 3.81802,-31.182 L 3.9,-31.2539
+ L 3.9,-73.7 L 3.90286,-73.7436 L 3.81802,-73.818 L 3.42991,-74.2606 L 3.10289,-74.75 L 2.87035,-75.2215
+ L 2.76502,-74.692 L 2.7,-73.7 z
+M 8.77846,-81.1296 L 9.25,-80.8971 L 9.73943,-80.5701 L 10.182,-80.182 L 10.2564,-80.0971 L 10.3,-80.1
+ L 10.9,-80.1 L 10.9,-30.9 L 86.0039,-30.9 L 86.3519,-30.7284 L 86.7235,-30.6022 L 87.1084,-30.5257
+ L 87.5,-30.5 L 87.8916,-30.5257 L 88.2765,-30.6022 L 88.648,-30.7284 L 89,-30.9019 L 89.3263,-31.1199
+ L 89.6213,-31.3787 L 89.8801,-31.6737 L 90.0981,-32 L 90.2716,-32.3519 L 90.3978,-32.7235 L 90.4743,-33.1084
+ L 90.5,-33.5 L 90.4743,-33.8916 L 90.3978,-34.2765 L 90.2716,-34.648 L 90.0981,-35 L 89.8801,-35.3263
+ L 89.6213,-35.6213 L 89.3263,-35.8801 L 89,-36.0981 L 88.648,-36.2716 L 88.2765,-36.3978 L 87.8916,-36.4743
+ L 87.5,-36.5 L 87.1084,-36.4743 L 86.7235,-36.3978 L 86.6,-36.3558 L 86.6,-41.6442 L 86.7235,-41.6022
+ L 87.1084,-41.5257 L 87.5,-41.5 L 87.8916,-41.5257 L 88.2765,-41.6022 L 88.648,-41.7284 L 89,-41.9019
+ L 89.3263,-42.1199 L 89.6213,-42.3787 L 89.8801,-42.6737 L 90.0981,-43 L 90.2716,-43.3519 L 90.3978,-43.7235
+ L 90.4743,-44.1084 L 90.5,-44.5 L 90.4743,-44.8916 L 90.3978,-45.2765 L 90.2716,-45.648 L 90.0981,-46
+ L 89.8801,-46.3263 L 89.6213,-46.6213 L 89.3263,-46.8801 L 89,-47.0981 L 88.648,-47.2716 L 88.2765,-47.3978
+ L 87.8916,-47.4743 L 87.5,-47.5 L 87.1084,-47.4743 L 86.7235,-47.3978 L 86.6,-47.3558 L 86.6,-67
+ L 85,-67 L 85,-46.1468 L 84.9019,-46 L 84.7284,-45.648 L 84.6022,-45.2765 L 84.5257,-44.8916
+ L 84.5,-44.5 L 84.5257,-44.1084 L 84.6022,-43.7235 L 84.7284,-43.3519 L 84.9019,-43 L 85,-42.8532
+ L 85,-35.1468 L 84.9019,-35 L 84.7284,-34.648 L 84.6022,-34.2765 L 84.5257,-33.8916 L 84.5,-33.5
+ L 84.5257,-33.1084 L 84.6022,-32.7235 L 84.6781,-32.5 L 12.5,-32.5 L 12.5,-79.5 L 85,-79.5
+ L 85,-77 L 86.6,-77 L 86.6,-80.1 L 189.7,-80.1 L 189.744,-80.0971 L 189.818,-80.182
+ L 190.261,-80.5701 L 190.75,-80.8971 L 191.222,-81.1296 L 190.692,-81.235 L 189.7,-81.3 L 10.3,-81.3
+ L 9.308,-81.235 z
+M 86.4,-33.5 L 86.4094,-33.6436 L 86.4375,-33.7847 L 86.4837,-33.921 L 86.5474,-34.05 L 86.6273,-34.1696
+ L 86.7222,-34.2778 L 86.8304,-34.3727 L 86.95,-34.4526 L 87.079,-34.5163 L 87.2153,-34.5625 L 87.3564,-34.5906
+ L 87.5,-34.6 L 87.6436,-34.5906 L 87.7847,-34.5625 L 87.921,-34.5163 L 88.05,-34.4526 L 88.1696,-34.3727
+ L 88.2778,-34.2778 L 88.3727,-34.1696 L 88.4526,-34.05 L 88.5163,-33.921 L 88.5625,-33.7847 L 88.5906,-33.6436
+ L 88.6,-33.5 L 88.5906,-33.3564 L 88.5625,-33.2153 L 88.5163,-33.079 L 88.4526,-32.95 L 88.3727,-32.8304
+ L 88.2778,-32.7222 L 88.1696,-32.6273 L 88.05,-32.5474 L 87.921,-32.4837 L 87.7847,-32.4375 L 87.6436,-32.4094
+ L 87.5,-32.4 L 87.3564,-32.4094 L 87.2153,-32.4375 L 87.079,-32.4837 L 86.95,-32.5474 L 86.8304,-32.6273
+ L 86.7222,-32.7222 L 86.6273,-32.8304 L 86.5474,-32.95 L 86.4837,-33.079 L 86.4375,-33.2153 L 86.4094,-33.3564
+ z
+M 86.4,-44.5 L 86.4094,-44.6436 L 86.4375,-44.7847 L 86.4837,-44.921 L 86.5474,-45.05 L 86.6273,-45.1696
+ L 86.7222,-45.2778 L 86.8304,-45.3727 L 86.95,-45.4526 L 87.079,-45.5163 L 87.2153,-45.5625 L 87.3564,-45.5906
+ L 87.5,-45.6 L 87.6436,-45.5906 L 87.7847,-45.5625 L 87.921,-45.5163 L 88.05,-45.4526 L 88.1696,-45.3727
+ L 88.2778,-45.2778 L 88.3727,-45.1696 L 88.4526,-45.05 L 88.5163,-44.921 L 88.5625,-44.7847 L 88.5906,-44.6436
+ L 88.6,-44.5 L 88.5906,-44.3564 L 88.5625,-44.2153 L 88.5163,-44.079 L 88.4526,-43.95 L 88.3727,-43.8304
+ L 88.2778,-43.7222 L 88.1696,-43.6273 L 88.05,-43.5474 L 87.921,-43.4837 L 87.7847,-43.4375 L 87.6436,-43.4094
+ L 87.5,-43.4 L 87.3564,-43.4094 L 87.2153,-43.4375 L 87.079,-43.4837 L 86.95,-43.5474 L 86.8304,-43.6273
+ L 86.7222,-43.7222 L 86.6273,-43.8304 L 86.5474,-43.95 L 86.4837,-44.079 L 86.4375,-44.2153 L 86.4094,-44.3564
+ z
+M 109.5,-33.5 L 109.526,-33.1084 L 109.602,-32.7235 L 109.728,-32.3519 L 109.902,-32 L 110.12,-31.6737
+ L 110.379,-31.3787 L 110.674,-31.1199 L 111,-30.9019 L 111.352,-30.7284 L 111.724,-30.6022 L 112.108,-30.5257
+ L 112.5,-30.5 L 112.892,-30.5257 L 113.276,-30.6022 L 113.648,-30.7284 L 114,-30.9019 L 114.326,-31.1199
+ L 114.621,-31.3787 L 114.88,-31.6737 L 115.098,-32 L 115.272,-32.3519 L 115.398,-32.7235 L 115.474,-33.1084
+ L 115.5,-33.5 L 115.474,-33.8916 L 115.398,-34.2765 L 115.272,-34.648 L 115.098,-35 L 114.88,-35.3263
+ L 114.621,-35.6213 L 114.326,-35.8801 L 114,-36.0981 L 113.648,-36.2716 L 113.276,-36.3978 L 112.892,-36.4743
+ L 112.5,-36.5 L 112.108,-36.4743 L 111.724,-36.3978 L 111.352,-36.2716 L 111,-36.0981 L 110.674,-35.8801
+ L 110.379,-35.6213 L 110.12,-35.3263 L 109.902,-35 L 109.728,-34.648 L 109.602,-34.2765 L 109.526,-33.8916
+ z
+M 111.4,-33.5 L 111.409,-33.6436 L 111.437,-33.7847 L 111.484,-33.921 L 111.547,-34.05 L 111.627,-34.1696
+ L 111.722,-34.2778 L 111.83,-34.3727 L 111.95,-34.4526 L 112.079,-34.5163 L 112.215,-34.5625 L 112.356,-34.5906
+ L 112.5,-34.6 L 112.644,-34.5906 L 112.785,-34.5625 L 112.921,-34.5163 L 113.05,-34.4526 L 113.17,-34.3727
+ L 113.278,-34.2778 L 113.373,-34.1696 L 113.453,-34.05 L 113.516,-33.921 L 113.563,-33.7847 L 113.591,-33.6436
+ L 113.6,-33.5 L 113.591,-33.3564 L 113.563,-33.2153 L 113.516,-33.079 L 113.453,-32.95 L 113.373,-32.8304
+ L 113.278,-32.7222 L 113.17,-32.6273 L 113.05,-32.5474 L 112.921,-32.4837 L 112.785,-32.4375 L 112.644,-32.4094
+ L 112.5,-32.4 L 112.356,-32.4094 L 112.215,-32.4375 L 112.079,-32.4837 L 111.95,-32.5474 L 111.83,-32.6273
+ L 111.722,-32.7222 L 111.627,-32.8304 L 111.547,-32.95 L 111.484,-33.079 L 111.437,-33.2153 L 111.409,-33.3564
+ z
+M 109.5,-44.5 L 109.526,-44.1084 L 109.602,-43.7235 L 109.728,-43.3519 L 109.902,-43 L 110.12,-42.6737
+ L 110.379,-42.3787 L 110.674,-42.1199 L 111,-41.9019 L 111.352,-41.7284 L 111.724,-41.6022 L 112.108,-41.5257
+ L 112.5,-41.5 L 112.892,-41.5257 L 113.276,-41.6022 L 113.648,-41.7284 L 114,-41.9019 L 114.326,-42.1199
+ L 114.621,-42.3787 L 114.88,-42.6737 L 115.098,-43 L 115.272,-43.3519 L 115.398,-43.7235 L 115.474,-44.1084
+ L 115.5,-44.5 L 115.474,-44.8916 L 115.398,-45.2765 L 115.272,-45.648 L 115.098,-46 L 114.88,-46.3263
+ L 114.621,-46.6213 L 114.326,-46.8801 L 114,-47.0981 L 113.648,-47.2716 L 113.276,-47.3978 L 112.892,-47.4743
+ L 112.5,-47.5 L 112.108,-47.4743 L 111.724,-47.3978 L 111.352,-47.2716 L 111,-47.0981 L 110.674,-46.8801
+ L 110.379,-46.6213 L 110.12,-46.3263 L 109.902,-46 L 109.728,-45.648 L 109.602,-45.2765 L 109.526,-44.8916
+ z
+M 111.4,-44.5 L 111.409,-44.6436 L 111.437,-44.7847 L 111.484,-44.921 L 111.547,-45.05 L 111.627,-45.1696
+ L 111.722,-45.2778 L 111.83,-45.3727 L 111.95,-45.4526 L 112.079,-45.5163 L 112.215,-45.5625 L 112.356,-45.5906
+ L 112.5,-45.6 L 112.644,-45.5906 L 112.785,-45.5625 L 112.921,-45.5163 L 113.05,-45.4526 L 113.17,-45.3727
+ L 113.278,-45.2778 L 113.373,-45.1696 L 113.453,-45.05 L 113.516,-44.921 L 113.563,-44.7847 L 113.591,-44.6436
+ L 113.6,-44.5 L 113.591,-44.3564 L 113.563,-44.2153 L 113.516,-44.079 L 113.453,-43.95 L 113.373,-43.8304
+ L 113.278,-43.7222 L 113.17,-43.6273 L 113.05,-43.5474 L 112.921,-43.4837 L 112.785,-43.4375 L 112.644,-43.4094
+ L 112.5,-43.4 L 112.356,-43.4094 L 112.215,-43.4375 L 112.079,-43.4837 L 111.95,-43.5474 L 111.83,-43.6273
+ L 111.722,-43.7222 L 111.627,-43.8304 L 111.547,-43.95 L 111.484,-44.079 L 111.437,-44.2153 L 111.409,-44.3564
+ z
+M 118.3,-63.1 L 119.7,-63.1 L 119.7,-69.1 L 118.3,-69.1 z
+M 132.3,-63.1 L 133.7,-63.1 L 133.7,-69.1 L 132.3,-69.1 z
+M 134.5,-62 L 135.7,-62 L 135.7,-70 L 134.5,-70 z
+M 138,-58.3 L 144,-58.3 L 144,-59.7 L 138,-59.7 z
+M 138,-72.3 L 144,-72.3 L 144,-73.7 L 138,-73.7 z
+M 144.8,-45 L 146,-45 L 146,-64.5 L 144.8,-64.5 z
+M 146.3,-45 L 149.3,-45 L 149.3,-64.5 L 147.5,-64.5 L 147.5,-70 L 146.3,-70
+ z
+M 191.6,-45 L 194.6,-45 L 194.6,-64.5 L 191.6,-64.5 z
+M 196.097,-73.7436 L 196.1,-73.7 L 196.1,-31.2539 L 196.182,-31.182 L 196.57,-30.7394 L 196.897,-30.25
+ L 197.157,-29.7221 L 197.3,-29.3022 L 197.3,-73.7 L 197.235,-74.692 L 197.13,-75.2215 L 196.897,-74.75
+ L 196.57,-74.2606 L 196.182,-73.818 z
+" fill="url(#hatchB)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<g><g transform="translate(80.0,957.0) scale(3.0)"><path d="
+M 13,-33 L 81,-33 L 81,-79 L 13,-79 z
+" fill="#B8BEC8" stroke="#6E7686" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<g><g transform="translate(80.0,957.0) scale(3.0)"><path d="
+M 84,-30 L 116,-30 L 116,-48 L 84,-48 z
+" fill="#1F4FA0" stroke="#123468" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<g><g transform="translate(80.0,957.0) scale(3.0)"><path d="
+M 120,-51.1 L 132,-51.1 L 132,-81.1 L 120,-81.1 z
+" fill="#2252A8" stroke="#173A78" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<g><g transform="translate(80.0,957.0) scale(3.0)"><path d="
+M 136,-60 L 146,-60 L 146,-72 L 136,-72 z
+" fill="#1D4E9A" stroke="#123468" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<g><g transform="translate(80.0,957.0) scale(3.0)"><path d="
+M 146.3,-40 L 194.6,-40 L 194.6,-69.5 L 146.3,-69.5 z
+" fill="#2C6E49" stroke="#1C4A30" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<g><g transform="translate(80.0,957.0) scale(3.0)"><path d="
+M 7.5,-4 L 9.1,-4 L 9.1,-17 L 7.5,-17 z
+" fill="#6B2C8F" stroke="#4A1E63" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<g><g transform="translate(80.0,957.0) scale(3.0)"><path d="
+M 0,-10 L 0.0855513,-8.69474 L 0.340741,-7.41181 L 0.761204,-6.17317 L 1.33975,-5 L 2.06647,-3.91238
+ L 2.92893,-2.92893 L 3.91238,-2.06647 L 5,-1.33975 L 6.17317,-0.761204 L 7.41181,-0.340741 L 8.69474,-0.0855513
+ L 10,-0 L 190,-0 L 191.305,-0.0855513 L 192.588,-0.340741 L 193.827,-0.761204 L 195,-1.33975
+ L 196.088,-2.06647 L 197.071,-2.92893 L 197.934,-3.91238 L 198.66,-5 L 199.239,-6.17317 L 199.659,-7.41181
+ L 199.914,-8.69474 L 200,-10 L 200,-74 L 199.914,-75.3053 L 199.659,-76.5882 L 199.239,-77.8268
+ L 198.66,-79 L 197.934,-80.0876 L 197.071,-81.0711 L 196.088,-81.9335 L 195,-82.6603 L 193.827,-83.2388
+ L 192.588,-83.6593 L 191.305,-83.9144 L 190,-84 L 10,-84 L 8.69474,-83.9144 L 7.41181,-83.6593
+ L 6.17317,-83.2388 L 5,-82.6603 L 3.91238,-81.9335 L 2.92893,-81.0711 L 2.06647,-80.0876 L 1.33975,-79
+ L 0.761204,-77.8268 L 0.340741,-76.5882 L 0.0855513,-75.3053 L 0,-74 z
+M 2.4,-10 L 2.4,-16.4 L 32.4,-16.4 L 32.4,-2.4 L 10,-2.4 L 9.008,-2.46502
+ L 8.03297,-2.65896 L 7.09161,-2.97851 L 6.2,-3.41821 L 5.37341,-3.97051 L 4.62599,-4.62599 L 3.97051,-5.37341
+ L 3.41821,-6.2 L 2.97851,-7.09161 L 2.65896,-8.03297 L 2.46502,-9.008 z
+M 2.4,-18 L 2.4,-74 L 2.46502,-74.992 L 2.65896,-75.967 L 2.97851,-76.9084 L 3.00278,-76.9576
+ L 3.03422,-76.4779 L 3.1363,-75.9647 L 3.30448,-75.4693 L 3.5359,-75 L 3.82659,-74.565 L 4.17157,-74.1716
+ L 4.56495,-73.8266 L 5,-73.5359 L 5.46927,-73.3045 L 5.96472,-73.1363 L 6.47789,-73.0342 L 7,-73
+ L 7.5221,-73.0342 L 8.03528,-73.1363 L 8.53073,-73.3045 L 9,-73.5359 L 9.43505,-73.8266 L 9.82843,-74.1716
+ L 10.1734,-74.565 L 10.4641,-75 L 10.6955,-75.4693 L 10.8637,-75.9647 L 10.9658,-76.4779 L 11,-77
+ L 10.9658,-77.5221 L 10.8637,-78.0353 L 10.6955,-78.5307 L 10.4641,-79 L 10.1734,-79.435 L 9.82843,-79.8284
+ L 9.43505,-80.1734 L 9,-80.4641 L 8.53073,-80.6955 L 8.03528,-80.8637 L 7.5221,-80.9658 L 7.04241,-80.9972
+ L 7.09161,-81.0215 L 8.03297,-81.341 L 9.008,-81.535 L 10,-81.6 L 190,-81.6 L 190.992,-81.535
+ L 191.967,-81.341 L 192.908,-81.0215 L 192.958,-80.9972 L 192.478,-80.9658 L 191.965,-80.8637 L 191.469,-80.6955
+ L 191,-80.4641 L 190.565,-80.1734 L 190.172,-79.8284 L 189.827,-79.435 L 189.536,-79 L 189.304,-78.5307
+ L 189.136,-78.0353 L 189.034,-77.5221 L 189,-77 L 189.034,-76.4779 L 189.136,-75.9647 L 189.304,-75.4693
+ L 189.536,-75 L 189.827,-74.565 L 190.172,-74.1716 L 190.565,-73.8266 L 191,-73.5359 L 191.469,-73.3045
+ L 191.965,-73.1363 L 192.478,-73.0342 L 193,-73 L 193.522,-73.0342 L 194.035,-73.1363 L 194.531,-73.3045
+ L 195,-73.5359 L 195.435,-73.8266 L 195.828,-74.1716 L 196.173,-74.565 L 196.464,-75 L 196.696,-75.4693
+ L 196.864,-75.9647 L 196.966,-76.4779 L 196.997,-76.9576 L 197.021,-76.9084 L 197.341,-75.967 L 197.535,-74.992
+ L 197.6,-74 L 197.6,-10 L 197.535,-9.008 L 197.341,-8.03297 L 197.021,-7.09161 L 196.582,-6.2
+ L 196.029,-5.37341 L 195.374,-4.62599 L 194.627,-3.97051 L 193.8,-3.41821 L 192.908,-2.97851 L 191.967,-2.65896
+ L 190.992,-2.46502 L 190,-2.4 L 34,-2.4 L 34,-18 z
+M 5.7,-77 L 5.71112,-77.1697 L 5.7443,-77.3365 L 5.79896,-77.4975 L 5.87417,-77.65 L 5.96864,-77.7914
+ L 6.08076,-77.9192 L 6.20861,-78.0314 L 6.35,-78.1258 L 6.50251,-78.201 L 6.66354,-78.2557 L 6.83032,-78.2889
+ L 7,-78.3 L 7.16968,-78.2889 L 7.33646,-78.2557 L 7.49749,-78.201 L 7.65,-78.1258 L 7.79139,-78.0314
+ L 7.91924,-77.9192 L 8.03136,-77.7914 L 8.12583,-77.65 L 8.20104,-77.4975 L 8.2557,-77.3365 L 8.28888,-77.1697
+ L 8.3,-77 L 8.28888,-76.8303 L 8.2557,-76.6635 L 8.20104,-76.5025 L 8.12583,-76.35 L 8.03136,-76.2086
+ L 7.91924,-76.0808 L 7.79139,-75.9686 L 7.65,-75.8742 L 7.49749,-75.799 L 7.33646,-75.7443 L 7.16968,-75.7111
+ L 7,-75.7 L 6.83032,-75.7111 L 6.66354,-75.7443 L 6.50251,-75.799 L 6.35,-75.8742 L 6.20861,-75.9686
+ L 6.08076,-76.0808 L 5.96864,-76.2086 L 5.87417,-76.35 L 5.79896,-76.5025 L 5.7443,-76.6635 L 5.71112,-76.8303
+ z
+M 191.7,-77 L 191.711,-77.1697 L 191.744,-77.3365 L 191.799,-77.4975 L 191.874,-77.65 L 191.969,-77.7914
+ L 192.081,-77.9192 L 192.209,-78.0314 L 192.35,-78.1258 L 192.503,-78.201 L 192.664,-78.2557 L 192.83,-78.2889
+ L 193,-78.3 L 193.17,-78.2889 L 193.336,-78.2557 L 193.497,-78.201 L 193.65,-78.1258 L 193.791,-78.0314
+ L 193.919,-77.9192 L 194.031,-77.7914 L 194.126,-77.65 L 194.201,-77.4975 L 194.256,-77.3365 L 194.289,-77.1697
+ L 194.3,-77 L 194.289,-76.8303 L 194.256,-76.6635 L 194.201,-76.5025 L 194.126,-76.35 L 194.031,-76.2086
+ L 193.919,-76.0808 L 193.791,-75.9686 L 193.65,-75.8742 L 193.497,-75.799 L 193.336,-75.7443 L 193.17,-75.7111
+ L 193,-75.7 L 192.83,-75.7111 L 192.664,-75.7443 L 192.503,-75.799 L 192.35,-75.8742 L 192.209,-75.9686
+ L 192.081,-76.0808 L 191.969,-76.2086 L 191.874,-76.35 L 191.799,-76.5025 L 191.744,-76.6635 L 191.711,-76.8303
+ z
+M 3,-28 L 3.03422,-27.4779 L 3.1363,-26.9647 L 3.30448,-26.4693 L 3.5359,-26 L 3.82659,-25.565
+ L 4.17157,-25.1716 L 4.56495,-24.8266 L 5,-24.5359 L 5.46927,-24.3045 L 5.96472,-24.1363 L 6.47789,-24.0342
+ L 7,-24 L 7.5221,-24.0342 L 8.03528,-24.1363 L 8.53073,-24.3045 L 9,-24.5359 L 9.43505,-24.8266
+ L 9.82843,-25.1716 L 10.1734,-25.565 L 10.4641,-26 L 10.6955,-26.4693 L 10.8637,-26.9647 L 10.9658,-27.4779
+ L 11,-28 L 10.9658,-28.5221 L 10.8637,-29.0353 L 10.6955,-29.5307 L 10.4641,-30 L 10.1734,-30.435
+ L 9.82843,-30.8284 L 9.43505,-31.1734 L 9,-31.4641 L 8.53073,-31.6955 L 8.03528,-31.8637 L 7.5221,-31.9658
+ L 7,-32 L 6.47789,-31.9658 L 5.96472,-31.8637 L 5.46927,-31.6955 L 5,-31.4641 L 4.56495,-31.1734
+ L 4.17157,-30.8284 L 3.82659,-30.435 L 3.5359,-30 L 3.30448,-29.5307 L 3.1363,-29.0353 L 3.03422,-28.5221
+ z
+M 5.7,-28 L 5.71112,-28.1697 L 5.7443,-28.3365 L 5.79896,-28.4975 L 5.87417,-28.65 L 5.96864,-28.7914
+ L 6.08076,-28.9192 L 6.20861,-29.0314 L 6.35,-29.1258 L 6.50251,-29.201 L 6.66354,-29.2557 L 6.83032,-29.2889
+ L 7,-29.3 L 7.16968,-29.2889 L 7.33646,-29.2557 L 7.49749,-29.201 L 7.65,-29.1258 L 7.79139,-29.0314
+ L 7.91924,-28.9192 L 8.03136,-28.7914 L 8.12583,-28.65 L 8.20104,-28.4975 L 8.2557,-28.3365 L 8.28888,-28.1697
+ L 8.3,-28 L 8.28888,-27.8303 L 8.2557,-27.6635 L 8.20104,-27.5025 L 8.12583,-27.35 L 8.03136,-27.2086
+ L 7.91924,-27.0808 L 7.79139,-26.9686 L 7.65,-26.8742 L 7.49749,-26.799 L 7.33646,-26.7443 L 7.16968,-26.7111
+ L 7,-26.7 L 6.83032,-26.7111 L 6.66354,-26.7443 L 6.50251,-26.799 L 6.35,-26.8742 L 6.20861,-26.9686
+ L 6.08076,-27.0808 L 5.96864,-27.2086 L 5.87417,-27.35 L 5.79896,-27.5025 L 5.7443,-27.6635 L 5.71112,-27.8303
+ z
+M 189,-28 L 189.034,-27.4779 L 189.136,-26.9647 L 189.304,-26.4693 L 189.536,-26 L 189.827,-25.565
+ L 190.172,-25.1716 L 190.565,-24.8266 L 191,-24.5359 L 191.469,-24.3045 L 191.965,-24.1363 L 192.478,-24.0342
+ L 193,-24 L 193.522,-24.0342 L 194.035,-24.1363 L 194.531,-24.3045 L 195,-24.5359 L 195.435,-24.8266
+ L 195.828,-25.1716 L 196.173,-25.565 L 196.464,-26 L 196.696,-26.4693 L 196.864,-26.9647 L 196.966,-27.4779
+ L 197,-28 L 196.966,-28.5221 L 196.864,-29.0353 L 196.696,-29.5307 L 196.464,-30 L 196.173,-30.435
+ L 195.828,-30.8284 L 195.435,-31.1734 L 195,-31.4641 L 194.531,-31.6955 L 194.035,-31.8637 L 193.522,-31.9658
+ L 193,-32 L 192.478,-31.9658 L 191.965,-31.8637 L 191.469,-31.6955 L 191,-31.4641 L 190.565,-31.1734
+ L 190.172,-30.8284 L 189.827,-30.435 L 189.536,-30 L 189.304,-29.5307 L 189.136,-29.0353 L 189.034,-28.5221
+ z
+M 191.7,-28 L 191.711,-28.1697 L 191.744,-28.3365 L 191.799,-28.4975 L 191.874,-28.65 L 191.969,-28.7914
+ L 192.081,-28.9192 L 192.209,-29.0314 L 192.35,-29.1258 L 192.503,-29.201 L 192.664,-29.2557 L 192.83,-29.2889
+ L 193,-29.3 L 193.17,-29.2889 L 193.336,-29.2557 L 193.497,-29.201 L 193.65,-29.1258 L 193.791,-29.0314
+ L 193.919,-28.9192 L 194.031,-28.7914 L 194.126,-28.65 L 194.201,-28.4975 L 194.256,-28.3365 L 194.289,-28.1697
+ L 194.3,-28 L 194.289,-27.8303 L 194.256,-27.6635 L 194.201,-27.5025 L 194.126,-27.35 L 194.031,-27.2086
+ L 193.919,-27.0808 L 193.791,-26.9686 L 193.65,-26.8742 L 193.497,-26.799 L 193.336,-26.7443 L 193.17,-26.7111
+ L 193,-26.7 L 192.83,-26.7111 L 192.664,-26.7443 L 192.503,-26.799 L 192.35,-26.8742 L 192.209,-26.9686
+ L 192.081,-27.0808 L 191.969,-27.2086 L 191.874,-27.35 L 191.799,-27.5025 L 191.744,-27.6635 L 191.711,-27.8303
+ z
+" fill="url(#hatchA)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
+<path d="M125.0,883.5 L635.0,883.5" fill="none" stroke="#1B1B1B" stroke-width="1.2" stroke-dasharray="6 4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M380.0,883.5 L380.0,867.0" fill="none" stroke="#D9822B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M428.0,840.0 L500.0,840.0 L530.0,807.0" fill="none" stroke="#B9BEC8" stroke-width="3.4" stroke-dasharray="2 2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M458.0,702.0 L458.0,678.0" fill="none" stroke="#C8102E" stroke-width="1.6" marker-end="url(#pfeilR)" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="466.0" y="687.0" font-size="11" text-anchor="start" fill="#C8102E" font-weight="700">USB-C Laden</text>
+<circle cx="221.0" cy="789.0" r="11" fill="#C8102E"/>
+<text x="221.0" y="793.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">7</text>
+<circle cx="380.0" cy="840.0" r="11" fill="#C8102E"/>
+<text x="380.0" y="844.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">16</text>
+<circle cx="458.0" cy="759.0" r="11" fill="#C8102E"/>
+<text x="458.0" y="763.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">14</text>
+<circle cx="503.0" cy="759.0" r="11" fill="#C8102E"/>
+<text x="503.0" y="763.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">15</text>
+<circle cx="593.0" cy="792.0" r="11" fill="#C8102E"/>
+<text x="593.0" y="796.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">5</text>
+<circle cx="104.6" cy="930.0" r="11" fill="#C8102E"/>
+<text x="104.6" y="934.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">10</text>
+<line x1="80.0" y1="983.0" x2="680.0" y2="983.0" stroke="#5B6472" stroke-width="1" marker-start="url(#mass)" marker-end="url(#mass)"/>
+<text x="380.0" y="977.0" font-size="11" text-anchor="middle" fill="#5B6472" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">200</text>
+<line x1="58.0" y1="957.0" x2="58.0" y2="705.0" stroke="#5B6472" stroke-width="1" marker-start="url(#mass)" marker-end="url(#mass)"/>
+<text x="44.0" y="831.0" font-size="11" text-anchor="middle" fill="#5B6472" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">84</text>
+<text x="80.0" y="1027.0" font-size="12" text-anchor="start" fill="#5B6472" font-weight="400" font-style="italic">Graues gestricheltes Band: 200-mm-Flachbandkabel vom Adapter zum Board, Rest flach gefaltet über dem Akku.</text>
+<rect x="760" y="622" width="800" height="648" rx="10" fill="#F7F8FA" stroke="#C9CED8"/>
+<text x="780.0" y="650.0" font-size="13" text-anchor="start" fill="#5B6472" font-weight="700">LEGENDE &amp; EINBAUHINWEISE</text>
+<circle cx="794.0" cy="676.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="680.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">1</text>
+<text x="816.0" y="680.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Display (Rohpanel 170,2 × 111,2 × 1,2) – der inaktive untere Rand (~9,6 mm) verschwindet im Schlitz.</text>
+<circle cx="794.0" cy="707.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="711.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">2</text>
+<text x="816.0" y="711.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Glas steht direkt im Schlitz auf zwei Auflagen links/rechts vom Flexkabel – keine Rückenplatte.</text>
+<circle cx="794.0" cy="738.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="742.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">3</text>
+<text x="816.0" y="742.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Schlitz 15° geneigt, 9,3 mm tief, 1,7 mm breit, mit Einführfase – oben bleibt alles frei.</text>
+<circle cx="794.0" cy="769.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="773.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">4</text>
+<text x="816.0" y="773.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Durchlass für das Flexkabel (15 × 25 mm), Mulde hinter der Klebestelle – das Kabel trägt nichts.</text>
+<circle cx="794.0" cy="800.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="804.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">5</text>
+<text x="816.0" y="804.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Driver Board Rev 3 auf zwei Stegen, USB-C innen (Flashen: Bodenplatte ab oder OTA).</text>
+<circle cx="794.0" cy="831.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="835.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">6</text>
+<text x="816.0" y="835.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Bodenplatte, 4 × M3-Senkkopf von unten, Mulden für Gummifüße – oben keine Schraube sichtbar.</text>
+<circle cx="794.0" cy="862.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="866.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">7</text>
+<text x="816.0" y="866.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">LiPo 68 × 46 × 10, JST-Kabel zur Mitte.</text>
+<circle cx="794.0" cy="893.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="897.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">8</text>
+<text x="816.0" y="897.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Akku-Mulde mit 0,5 mm Luft rundum – die Zelle wird nicht geklemmt.</text>
+<circle cx="794.0" cy="924.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="928.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">9</text>
+<text x="816.0" y="928.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Niederhalter-Rippen in der Decke, 0,6 mm über dem Akku.</text>
+<circle cx="794.0" cy="955.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="959.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">10</text>
+<text x="816.0" y="959.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">BME280 (13 × 11) steht senkrecht im Schlitzhalter (Presspassung).</text>
+<circle cx="794.0" cy="986.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="990.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">11</text>
+<text x="816.0" y="990.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Lüftungsschlitze in der linken Seitenwand, 3 × waagerecht.</text>
+<circle cx="794.0" cy="1017.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="1021.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">12</text>
+<text x="816.0" y="1021.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Lüftungsschlitze in der Bodenplatte, 4 ×.</text>
+<circle cx="794.0" cy="1048.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="1052.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">13</text>
+<text x="816.0" y="1052.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Trennwand zur Elektronik, unten Durchlass für die 4 Sensorleitungen.</text>
+<circle cx="794.0" cy="1079.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="1083.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">14</text>
+<text x="816.0" y="1083.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">TC4056 im Rastrahmen (einklicken), USB-C hinten – der einzige Anschluss.</text>
+<circle cx="794.0" cy="1110.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="1114.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">15</text>
+<text x="816.0" y="1114.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">TPS62827-Buck im Rastrahmen, direkt verdrahtet.</text>
+<circle cx="794.0" cy="1141.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="1145.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">16</text>
+<text x="816.0" y="1145.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">FPC-Adapter auf 4 Domen (M2,5), 200-mm-Flachbandkabel gefaltet zum Board.</text>
+<circle cx="794.0" cy="1172.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="1176.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">17</text>
+<text x="816.0" y="1176.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Stiftleisten bleiben dran: 12 mm Luft darunter für Lötstellen und Kabel.</text>
+<circle cx="794.0" cy="1203.0" r="11" fill="#C8102E"/>
+<text x="794.0" y="1207.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">18</text>
+<text x="816.0" y="1207.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Niederhalter-Rippe auf dem Blech des ESP32-Moduls.</text>
+<text x="780.0" y="1250.0" font-size="12" text-anchor="start" fill="#5B6472" font-weight="400" font-style="italic">Druck: Sockel mit der Oberseite aufs Bett, Bodenplatte flach · PETG oder PLA, 0,2 mm · nur 2 Druckteile.</text>
+</svg>

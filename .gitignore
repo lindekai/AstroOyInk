@@ -16,6 +16,9 @@ tests/build/
 # Geheime Zugangsdaten (nie committen!)
 secrets.h
 
+# Python-Cache
+__pycache__/
+
 # Host-Vorschau (tools/preview/build_preview.sh)
 tools/preview/build/
 tools/preview/out/

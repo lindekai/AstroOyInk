@@ -240,6 +240,36 @@ Was die Firmware dafür tut:
 - **WLAN aus vor dem Refresh** – die Daten sind dann schon geholt, der 30-s-Refresh läuft ohne Funk
 - **OTA-Fenster nur beim Kaltstart** – für ein Update kurz RST drücken
 
+## 🏠 Gehäuse (3D-Druck)
+
+Zwei Gehäuse für dieselbe Elektronik, parametrisch in OpenSCAD und ohne Kleber
+montiert. Fertige STLs, Teileliste, Druck- und Montagehinweise stehen in
+[hardware/gehaeuse](hardware/gehaeuse/README.md).
+
+### Tischgehäuse
+
+<p align="center">
+  <img src="docs/images/gehaeuse_tisch_hero.png" alt="Tischgehäuse: das Display steht frei, nur unten in einem 15° geneigten Schlitz eingefasst, die Elektronik steckt im flachen Sockel" width="85%">
+</p>
+
+Das Glas steckt nur unten in einem um 15° geneigten Schlitz, oben ist alles
+frei. Akku, Driver Board, Laderegler und BME280 verschwinden im 26 mm flachen
+Sockel, einziger Anschluss ist die USB-C-Ladebuchse hinten.
+[Schnittzeichnung](docs/images/gehaeuse_tisch_schnitt.svg)
+
+### Wandgehäuse
+
+<p align="center">
+  <img src="docs/images/gehaeuse_wand_hero.png" alt="Wandgehäuse: flacher Rahmen mit schmaler Blende, zeigt die SESSION-Ansicht" width="85%">
+</p>
+
+Flach wie ein Bilderrahmen (181 × 134 × 24 mm), aufgehängt an zwei
+Schlüssellöchern. Die Elektronik sitzt auf dem Rückdeckel, die USB-C-Ladebuchse
+an der Unterkante. [Schnittzeichnung](docs/images/gehaeuse_wand_schnitt.svg)
+
+Beide Gehäuse haben eine abgetrennte, belüftete Kammer für den BME280, damit die
+Abwärme der Elektronik die Innentemperatur nicht verfälscht.
+
 ## 🚀 Schnellstart
 
 Die ausführliche Anleitung steht in **[INSTALL.md](INSTALL.md)**. Kurzfassung:
@@ -353,8 +383,9 @@ AstroOyInk/
 │   ├── modes/                # mode_state_machine: WEATHER ↔ SESSION
 │   └── rendering/            # GxEPD2, Wetter- und Session-Dashboard
 ├── tests/                    # Host-Tests mit g++, ohne ESP32
-├── tools/                    # Generatoren für README-Grafiken, Schaltplan, Vorschau
-└── docs/images/              # Hero, Modus-Grafik, Display-Vorschau, Schaltplan
+├── hardware/gehaeuse/        # 3D-Druck-Gehäuse (OpenSCAD + STL), Tisch und Wand
+├── tools/                    # Generatoren für Grafiken, Schaltplan, Gehäuse-Mockups, Vorschau
+└── docs/images/              # Hero, Modus-Grafik, Display-Vorschau, Schaltplan, Gehäuse
 ```
 
 ## 🧪 Tests

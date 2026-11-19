@@ -130,12 +130,20 @@ AstroOyInk/
 │
 ├── tools/
 │   ├── make_readme_svgs.py        # README-Grafiken (stilisiert, NICHT pixelgenau)
+│   ├── make_gehaeuse_mockups.py   # Gehaeuse-Hero + Schnittzeichnungen (OpenSCAD)
 │   ├── make_wiring_svgs.py        # Schaltplan + Steckbrett-Bild (Pins aus config.h
 │   │                              # von Hand gespiegelt – bei Pinaenderung neu erzeugen)
 │   └── preview/                   # Pixelgenaue Host-Vorschau des Displays
 │       ├── build_preview.sh       # → tools/preview/out/*.png
 │       ├── preview_main.cpp       # Beispieldaten fuer alle Ansichten
 │       └── stubs/                 # Arduino/Print/SPI/GxEPD2-Ersatz
+│
+├── hardware/gehaeuse/             # 3D-Druck-Gehaeuse (OpenSCAD, ohne Kleber)
+│   ├── common.scad                # Bauteilmasse (nachgemessen), Helfer, Rastnasen
+│   ├── gehaeuse_tisch.scad        # Sockel + Bodenplatte, Display im 15°-Schlitz
+│   ├── gehaeuse_wand.scad         # Frontrahmen + Rueckdeckel, Schluesselloecher
+│   ├── export_stl.sh              # → stl/*.stl
+│   └── README.md                  # Teileliste, Druck, Montage
 │
 ├── docs/images/                   # README-Grafiken + Vorschau-PNGs,
 │                                  # schaltplan.svg, breadboard.svg
