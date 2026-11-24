@@ -253,7 +253,7 @@ montiert. Fertige STLs, Teileliste, Druck- und Montagehinweise stehen in
 </p>
 
 Das Glas steckt nur unten in einem um 15° geneigten Schlitz, oben ist alles
-frei. Akku, Driver Board, Laderegler und BME280 verschwinden im 26 mm flachen
+frei. Akku, Driver Board, Laderegler und BME280 verschwinden im 21 mm flachen
 Sockel, einziger Anschluss ist die USB-C-Ladebuchse hinten.
 [Schnittzeichnung](docs/images/gehaeuse_tisch_schnitt.svg)
 

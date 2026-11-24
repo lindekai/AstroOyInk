@@ -4,9 +4,12 @@ Zwei Gehäuse für dieselbe Elektronik – parametrisch in OpenSCAD, fertige STL
 liegen in [`stl/`](stl/). Beide kommen **ohne Kleber** aus: Rastnasen,
 Niederhalter-Rippen, Presspassung und Schrauben.
 
-> **Status: Mockup.** Die Elektronik ist nachgemessen, das Display nach
-> Datenblatt. Der erste Probedruck steht noch aus – Passungen ggf. über `tol`
-> in `common.scad` anpassen.
+> **Status:** Das Tischgehäuse ist einmal probegedruckt worden. Der Display-Schlitz
+> passte, die BME-Kammer stieß auf den Zentrierrand der Bodenplatte. Das ist
+> in der aktuellen, kompakteren Version behoben (siehe
+> [Kollisionsprüfung](#kollisionsprüfung)), ein zweiter Probedruck steht aus.
+> Das Wandgehäuse ist noch nicht gedruckt. Passungen ggf. über `tol` in
+> `common.scad` anpassen.
 
 ## Tischgehäuse
 
@@ -21,10 +24,10 @@ die aktive Fläche.
 
 | | |
 |---|---|
-| Außenmaß | 200 × 84 × 26,4 mm (ohne Display) |
+| Außenmaß | 184 × 68 × 21,4 mm (ohne Display) |
 | Druckteile | `tisch_sockel.stl` (Oberseite aufs Bett), `tisch_boden.stl` (flach) |
 | Anschluss | 1 × USB-C (Laden) hinten |
-| BME280 | eigene Kammer vorne links, Schlitze in Seitenwand und Boden |
+| BME280 | eigene Kammer hinten rechts, Schlitze in Rückwand, rechter Seitenwand und Boden |
 
 ## Wandgehäuse
 
@@ -79,10 +82,12 @@ TC4056 USB-C, TPS62827-Buck, BME280.
 ## Zusammenbau
 
 **Tisch**
-1. Elektronik auf der Bodenplatte einsetzen: Akku in die Mulde, TC4056 und Buck
-   in die Rastrahmen klicken, Driver Board auf die Stege, FPC-Adapter mit
-   4 × M2,5 verschrauben, BME280 in den Schlitzhalter stecken.
-2. Flachbandkabel vom Adapter zum Board stecken, Rest flach über den Akku legen.
+1. Elektronik auf der Bodenplatte einsetzen: Akku links in die Mulde, TC4056
+   und Buck in die Rastrahmen klicken, Driver Board rechts vorne auf die Stege,
+   FPC-Adapter mittig mit 4 × M2,5 verschrauben, BME280 in den Halter in der
+   Kammer hinten rechts stecken (die Kammerwände sind Teil der Bodenplatte,
+   die Sensorleitungen laufen unten durch die linke Kammerwand).
+2. Flachbandkabel vom Adapter zum Board stecken, Rest flach zwischen Adapter und Board falten.
 3. Sockel aufsetzen, Panel-Flexkabel durch den Schlitzdurchlass zum Adapter
    führen und einstecken, Bodenplatte mit 4 × M3 von unten verschrauben.
 4. Glas in den Schlitz stellen – es liegt auf den beiden Auflagen neben dem Kabel.
@@ -93,6 +98,18 @@ TC4056 USB-C, TPS62827-Buck, BME280.
 3. Deckel aufsetzen – die Rippen drücken das Glas an die Blende – und mit 4 × M3 verschrauben.
 
 Zum Flashen per Kabel die Bodenplatte bzw. den Deckel abnehmen; im Alltag reicht OTA.
+
+## Kollisionsprüfung
+
+```bash
+hardware/gehaeuse/pruefe_kollision.sh
+```
+
+Schneidet beim Tischgehäuse jedes Paar aus Sockel, Bodenplatte, Display und
+Elektronik miteinander (`teil="kollision"` in `gehaeuse_tisch.scad`). Reine
+Flächenkontakte (Platine liegt auf Steg) sind erlaubt, jedes echte Volumen wird
+mit Lage gemeldet. Nach jeder Änderung an Maßen oder Bauteillage laufen lassen,
+bevor gedruckt wird.
 
 ## Anpassen und neu erzeugen
 

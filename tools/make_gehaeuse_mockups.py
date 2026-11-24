@@ -276,9 +276,9 @@ def title_block(s, x, y, label, sub):
 #  Tischgehaeuse
 # =====================================================================
 
-T = dict(neigung=15, b_w=200, b_d=84, b_h=24, boden_t=2.4, schlitz_y=24, schlitz_tiefe=111.2 - 97.92 - 3.65 - 0.3,
+T = dict(neigung=15, b_w=184, b_d=68, b_h=19, boden_t=2.4, schlitz_y=12, schlitz_tiefe=111.2 - 97.92 - 3.65 - 0.3,
          wand=2.4, pnl_t=1.2, tape_t=0.3, rueck_t=2.0, aa_bot=111.2 - 97.92 - 3.65, pnl_h=111.2,
-         ada_y=30, drv_x=148.9, drv_y=40, drv_b=29.5)
+         ada_y=18, drv_x=130.3, drv_y=16, drv_b=29.5)
 
 
 def slot_world(yl, zl):
@@ -295,17 +295,17 @@ TISCH_LEGENDE = [
     "Durchlass für das Flexkabel (15 × 25 mm), Mulde hinter der Klebestelle – das Kabel trägt nichts.",
     "Driver Board Rev 3 auf zwei Stegen, USB-C innen (Flashen: Bodenplatte ab oder OTA).",
     "Bodenplatte, 4 × M3-Senkkopf von unten, Mulden für Gummifüße – oben keine Schraube sichtbar.",
-    "LiPo 68 × 46 × 10, JST-Kabel zur Mitte.",
+    "LiPo 68 × 46 × 10 links, JST-Kabel nach rechts zum Laderegler.",
     "Akku-Mulde mit 0,5 mm Luft rundum – die Zelle wird nicht geklemmt.",
     "Niederhalter-Rippen in der Decke, 0,6 mm über dem Akku.",
-    "BME280 (13 × 11) steht senkrecht im Schlitzhalter (Presspassung).",
-    "Lüftungsschlitze in der linken Seitenwand, 3 × waagerecht.",
+    "BME280 (13 × 11) steht senkrecht im Halter vor der Rückwand (Presspassung).",
+    "Lüftungsschlitze in Rückwand und rechter Seitenwand, je 3 × waagerecht.",
     "Lüftungsschlitze in der Bodenplatte, 4 ×.",
-    "Trennwand zur Elektronik, unten Durchlass für die 4 Sensorleitungen.",
-    "TC4056 im Rastrahmen (einklicken), USB-C hinten – der einzige Anschluss.",
+    "Trennwände stehen auf der Bodenplatte, unten Durchlass für die 4 Sensorleitungen.",
+    "TC4056 im Rastrahmen mit Anschlag, USB-C hinten – Wand außen auf 1 mm ausgespart.",
     "TPS62827-Buck im Rastrahmen, direkt verdrahtet.",
-    "FPC-Adapter auf 4 Domen (M2,5), 200-mm-Flachbandkabel gefaltet zum Board.",
-    "Stiftleisten bleiben dran: 12 mm Luft darunter für Lötstellen und Kabel.",
+    "FPC-Adapter auf 4 Domen (M2,5), 100-mm-Flachbandkabel gefaltet zum Board.",
+    "Stiftleisten bleiben dran: Platine 10 mm über dem Boden, 1 mm Luft unter den Stiften.",
     "Niederhalter-Rippe auf dem Blech des ESP32-Moduls.",
 ]
 
@@ -324,8 +324,8 @@ def tisch_schnitt(out):
 
     # --- A-A: Schlitz, Flexkabel, FPC-Adapter ------------------------
     A = View(s, 70, base_y, k)
-    title_block(s, 50, 120, "Schnitt A–A", "Mitte: Display, Flexkabel, FPC-Adapter (x = 100)")
-    A.draw(f, ["boden", "ada", "sockel", "panel"], cut_x=100)
+    title_block(s, 50, 120, "Schnitt A–A", "Mitte: Display, Flexkabel, FPC-Adapter (x = 92)")
+    A.draw(f, ["boden", "ada", "sockel", "panel"], cut_x=92)
     p0 = slot_world(T["pnl_t"] + 0.6, -T["schlitz_tiefe"] + 3)
     p1 = slot_world(T["pnl_t"] + 0.6, -T["schlitz_tiefe"] - 3)
     A.path([p0, p1, (p1[0] + 4, 7.5), (T["ada_y"] + 2.5, 6.2)], "#D9822B", 2.2)
@@ -343,38 +343,38 @@ def tisch_schnitt(out):
     A.callout(2, *slot_world(0.85, -T["schlitz_tiefe"] + 0.5), 70, -70)
     A.callout(3, *slot_world(-0.4, -1), -60, -36)
     A.callout(4, *p1, -50, 44)
-    A.callout(16, 39, 5.5, 50, -60)
-    A.callout(6, 60, -1.2, 10, 42)
+    A.callout(16, 30, 5.5, 50, -60)
+    A.callout(6, 50, -1.2, 10, 42)
 
     # --- B-B: Akku ------------------------------------------------------
     B = View(s, 350, base_y, k)
-    title_block(s, 330, 120, "Schnitt B–B", "links: Akku und Niederhalter (x = 47)")
-    B.draw(f, ["boden", "lipo", "sockel", "panel"], cut_x=47)
-    B.callout(7, 56, 5, 40, -70)
-    B.callout(8, 31.4, 3, -40, 50)
-    B.callout(9, 43, 16, -10, -110)
+    title_block(s, 330, 120, "Schnitt B–B", "links: Akku und Niederhalter (x = 40)")
+    B.draw(f, ["boden", "lipo", "sockel", "panel"], cut_x=40)
+    B.callout(7, 40, 5, 40, -70)
+    B.callout(8, 62.3, 2, 30, 50)
+    B.callout(9, 51, 14, 10, -110)
 
     # --- E-E: Driver Board ---------------------------------------------
     E = View(s, 630, base_y, k)
-    title_block(s, 610, 120, "Schnitt E–E", "rechts: Driver Board (x = 157)")
-    E.draw(f, ["boden", "drv", "sockel", "panel"], cut_x=157)
-    E.callout(5, 60, 12.8, 40, -80)
-    E.callout(17, 41.5, 6, -40, 56)
-    E.callout(18, 55, 19.5, 30, -130)
+    title_block(s, 610, 120, "Schnitt E–E", "rechts: Driver Board (x = 141)")
+    E.draw(f, ["boden", "drv", "sockel", "panel"], cut_x=141)
+    E.callout(5, 40, 10.8, 40, -80)
+    E.callout(17, 43, 5, 30, 56)
+    E.callout(18, 30, 16, 30, -130)
 
     # --- Detail C: BME-Kammer ------------------------------------------
-    C = View(s, 935, 400, 5.0, clip=(-3, -4, 44, 26))
-    title_block(s, 915, 120, "Detail C – BME280-Kammer", "Querschnitt durch die Kammer (y = 9), 5 : 1")
-    C.draw(f, ["boden", "bme", "sockel"], cut_y=9)
-    for z in (6, 10, 14):
-        C.path([(9, z - 0.1), (-4.5, z - 0.1)], "#2F6FDE", 1.6, marker="pfeil")
-    for x in (15.4, 19.9, 24.4, 28.9):
-        C.path([(x, -9), (x, -1.5)], "#2F6FDE", 1.6, marker="pfeil")
-    C.path([(20, 2), (14, 9), (9.5, 11)], "#2F6FDE", 1.2, dash="3 3")
-    C.callout(10, 8.2, 9, 70, -95)
-    C.callout(11, 1.2, 14, -30, -70)
-    C.callout(12, 22, -1.2, 120, 40)
-    C.callout(13, 33.2, 15, 90, -80)
+    C = View(s, 935 - 44 * 7.0, 400, 7.0, clip=(44, -4, 70, 19))
+    title_block(s, 915, 120, "Detail C – BME280-Kammer", "Seitenschnitt durch die Kammer (x = 160), 7 : 1")
+    C.draw(f, ["boden", "bme", "sockel"], cut_x=160)
+    for z in (4.9, 8.9, 12.9):
+        C.path([(74, z), (67, z)], "#2F6FDE", 1.6, marker="pfeil")
+    for y in (52, 56):
+        C.path([(y, -8), (y, -1.5)], "#2F6FDE", 1.6, marker="pfeil")
+    C.path([(54, 1), (58, 4), (60.6, 6)], "#2F6FDE", 1.2, dash="3 3")
+    C.callout(10, 62, 9, -60, -95)
+    C.callout(11, 66.8, 12.9, 40, -70)
+    C.callout(12, 54, -1.2, -90, 40)
+    C.callout(13, 47.3, 13, -50, -60)
     s.text(935, 520, "Frischluft strömt von unten und von der Seite ein, die Trennwand hält", 12, fill=MUTED,
            italic=True)
     s.text(935, 537, "die Abwärme von ESP32, Laderegler und Akku vom Sensor fern.", 12, fill=MUTED, italic=True)
@@ -387,19 +387,19 @@ def tisch_schnitt(out):
     for g, z in (("lipo", 5), ("ada", 3.8), ("tc", 2), ("buck", 1.5), ("drv", 12.8), ("bme", 6)):
         D.draw(f, [g], cut_z=z)
     D.draw(f, ["sockel"], cut_z=8)
-    D.path([(15, 24.5), (185, 24.5)], INK, 1.2, dash="6 4")
-    D.path([(100, 24.5), (100, 30)], "#D9822B", 2.2)
-    D.path([(116, 39), (140, 39), (150, 50)], "#B9BEC8", 3.4, dash="2 2")
-    x = 126
+    D.path([(7, 12.5), (177, 12.5)], INK, 1.2, dash="6 4")
+    D.path([(92, 12.5), (92, 18)], "#D9822B", 2.2)
+    D.path([(108, 30), (124, 30), (132, 34)], "#B9BEC8", 3.4, dash="2 2")
+    x = 116
     D.path([(x, T["b_d"] + 1), (x, T["b_d"] + 9)], RED, 1.6, marker="pfeilR")
     tx, ty = D.P(x, T["b_d"] + 6)
     s.text(tx + 8, ty, "USB-C Laden", 11, "start", RED, 700)
-    for (u, v, n) in ((47, 56, 7), (100, 39, 16), (126, 66, 14), (141, 66, 15), (171, 55, 5), (8.2, 9, 10)):
+    for (u, v, n) in ((40, 38, 7), (92, 27, 16), (116, 50, 14), (134, 55, 15), (160, 30, 5), (160, 62, 10)):
         marker(s, *D.P(u, v), n)
     D.dim(0, 0, T["b_w"], 0, f"{T['b_w']}", off=(0, 26))
-    D.dim(0, 0, 0, T["b_d"], f"{T['b_d']}", off=(-22, 0), tpos=(D.P(0, 42)[0] - 36, D.P(0, 42)[1]))
-    s.text(80, D.oy + 70, "Graues gestricheltes Band: 200-mm-Flachbandkabel vom Adapter zum Board, Rest flach "
-                          "gefaltet über dem Akku.", 12, fill=MUTED, italic=True)
+    D.dim(0, 0, 0, T["b_d"], f"{T['b_d']}", off=(-22, 0), tpos=(D.P(0, T["b_d"] / 2)[0] - 36, D.P(0, T["b_d"] / 2)[1]))
+    s.text(80, D.oy + 70, "Graues gestricheltes Band: Flachbandkabel vom Adapter zum Board, Rest flach "
+                          "gefaltet zwischen Adapter und Board.", 12, fill=MUTED, italic=True)
 
     # --- Legende ----------------------------------------------------------
     lx, ly = 760, 650
@@ -418,12 +418,12 @@ def tisch_schnitt(out):
 
 
 def tisch():
-    hero("gehaeuse_tisch.scad", "100,30,52,68,0,24,430",
+    hero("gehaeuse_tisch.scad", "92,25,50,68,0,24,410",
          os.path.join(IMG, "display_weather_preview.png"),
          os.path.join(IMG, "gehaeuse_tisch_hero.png"),
          "Tischgehäuse",
          ["Das Display steht frei und ist nur", "unten eingefasst – die Elektronik", "verschwindet im Sockel."],
-         ["15° Neigung", "Akku im Sockel", "BME280-Lüftungskammer", "ohne Kleber montiert", "200 × 84 × 26 mm"])
+         ["15° Neigung", "Akku im Sockel", "BME280-Lüftungskammer", "ohne Kleber montiert", "184 × 68 × 21 mm"])
     tisch_schnitt(os.path.join(IMG, "gehaeuse_tisch_schnitt.svg"))
 
 

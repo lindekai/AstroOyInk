@@ -11,6 +11,7 @@
 //    "boden"   – Bodenplatte mit Aufnahmen, Druck flach
 //    "ansicht" – Zusammenbau fuer die Vorschau
 //    "schnitt" – Ansicht mit offenem Sockel (Elektronik sichtbar)
+//    "kollision" – Schnittmenge von gruppe und gruppe2 (leer = passt)
 //
 //  Export:  openscad -D 'teil="sockel"' -o sockel.stl gehaeuse_tisch.scad
 // =====================================================================
@@ -19,7 +20,8 @@ include <common.scad>
 
 teil = "ansicht";
 // Fuer tools/make_gehaeuse_mockups.py
-gruppe   = "sockel";    // Bauteilgruppe fuer teil = "cut"
+gruppe   = "sockel";    // Bauteilgruppe fuer teil = "cut" und "kollision"
+gruppe2  = "boden";     // zweite Gruppe fuer teil = "kollision"
 cut_x    = -1;          // Schnitt senkrecht bei x (Seitenansicht) ...
 cut_y    = -1;          // ... quer bei y (Vorderansicht) ...
 cut_z    = -1;          // ... oder waagerecht bei z (Draufsicht)
@@ -27,35 +29,39 @@ aa_maske = false;       // aktive Flaeche magenta (Bildeinpassung)
 
 // --- Parameter ---------------------------------------------------------
 neigung       = 15;     // Display nach hinten geneigt (Grad aus der Senkrechten)
-b_w           = 200;    // Sockel Breite
-b_d           = 84;     // Sockel Tiefe
-b_h           = 24;     // Hoehe Sockelschale (ohne Bodenplatte)
+b_w           = 184;    // Sockel Breite (Glas 170,2 + Schlitzwaende)
+b_d           = 68;     // Sockel Tiefe
+b_h           = 19;     // Hoehe Sockelschale (ohne Bodenplatte)
 b_r           = 10;     // Eckradius
-fase          = 4;      // Fase an der Oberkante
+fase          = 3;      // Fase an der Oberkante
 wand          = 2.4;
-decke         = 3;
+decke         = 2.4;
 boden_t       = 2.4;
-schlitz_y     = 24;     // Abstand Vorderkante -> Schlitz (Oberseite)
+schlitz_y     = 12;     // Abstand Vorderkante -> Schlitz (Oberseite)
 schlitz_tiefe = aa_bot - 0.3;   // genau der inaktive Rand (9,3 mm)
 schlitz_t     = pnl_t + 0.5;    // Glas + Spiel, lehnt durch die Neigung an
 schlitz_l     = pnl_w + 0.8;
 schraube_d    = 2.6;    // M3 selbstschneidend in die Dome
 dom_d         = 8;
 ada_schraube  = 2.2;    // M2,5 selbstschneidend fuer den FPC-Adapter
+rand_h        = 2;      // Zentrierrand der Bodenplatte
+rand_w        = 1.2;
 
 innen_h = b_h - decke;  // lichte Hoehe ueber der Bodenplatte
 
-// Dome fuer die Bodenschrauben
-dome = [[7, 28], [b_w - 7, 28], [7, b_d - 7], [b_w - 7, b_d - 7]];
-
 // Lage der Elektronik (z = 0 = Oberseite Bodenplatte)
-lipo_pos = [13, 33];                          // Kabel an der rechten Kurzseite
-ada_pos  = [b_w / 2 - ada_l / 2, 30];          // direkt hinter dem Schlitz
-tc_pos   = [120, b_d - wand - 0.5 - tc_l];     // USB-C nach hinten
-buck_pos = [136, 60];
-drv_pos  = [b_w - wand - 3 - drv_l, 40];       // USB-C innen, nicht herausgefuehrt
-drv_z    = drv_stift + 3;                      // Platinenunterseite
-bme_kam  = [wand, wand, 30, 14];               // x, y, Breite, Tiefe der Kammer
+lipo_pos = [6, schlitz_y + 3];                 // links, Kabel an der rechten Kurzseite
+ada_pos  = [b_w / 2 - ada_l / 2, schlitz_y + 6];   // mittig direkt hinter dem Schlitz
+tc_pos   = [110, b_d - wand - 0.5 - tc_l];     // USB-C nach hinten, Buchse buendig mit der Wand
+drv_pos  = [b_w - wand - 3 - drv_l, schlitz_y + 4];   // rechts vorne, USB-C innen
+drv_z    = drv_stift + 1;                      // Platinenunterseite
+buck_pos = [129, b_d - wand - 4.5 - buck_b];   // hinter dem Driver Board
+// BME-Kammer hinten rechts: Innenraum von (x, y) bis zu den Aussenwaenden
+bme_kam  = [150, drv_pos[1] + drv_b + 2.6];
+bme_pos  = [bme_kam[0] + 3, b_d - wand - 6];   // Halter (Sensor steht parallel zur Rueckwand)
+
+// Dome fuer die Bodenschrauben (hinten links neben dem Akku)
+dome = [[6, 6], [b_w - 6, 6], [lipo_pos[0] + lipo_l + 7, b_d - 6], [b_w - 6, b_d - 6]];
 
 // --- Grundform ----------------------------------------------------------
 module aussen(h) {
@@ -65,11 +71,12 @@ module aussen(h) {
   }
 }
 
-module innen() {
+// Innenraum des Sockels, o = zusaetzlicher Abstand zu den Waenden
+module innen(o = 0) {
   hull() {
-    translate([wand, wand, -1]) rrect(b_w - 2 * wand, b_d - 2 * wand, innen_h - fase + 1, b_r - wand);
-    translate([wand + fase, wand + fase, -1])
-      rrect(b_w - 2 * (wand + fase), b_d - 2 * (wand + fase), innen_h + 1, b_r - wand - fase);
+    translate([wand + o, wand + o, -1]) rrect(b_w - 2 * (wand + o), b_d - 2 * (wand + o), innen_h - fase + 1, b_r - wand - o);
+    translate([wand + fase + o, wand + fase + o, -1])
+      rrect(b_w - 2 * (wand + fase + o), b_d - 2 * (wand + fase + o), innen_h + 1, b_r - wand - fase - o);
   }
 }
 
@@ -98,31 +105,44 @@ module schlitz_aussparung() {
 }
 
 // --- BME-Kammer ---------------------------------------------------------
+// Die Trennwaende stehen auf der Bodenplatte (flach gedruckt) und enden
+// 0,3 mm unter der Decke; der Zentrierrand ist im Kammerbereich offen.
 module bme_waende() {
-  x = bme_kam[0]; y = bme_kam[1]; w = bme_kam[2]; d = bme_kam[3];
-  difference() {
-    union() {
-      translate([x + w, y, 0]) cube([1.6, d + 1.6, innen_h]);
-      translate([x, y + d, 0]) cube([w + 1.6, 1.6, innen_h]);
+  x = bme_kam[0]; y = bme_kam[1];
+  intersection() {
+    difference() {
+      union() {
+        translate([x - 1.6, y - 1.6, 0]) cube([1.6, b_d - y + 1.6, innen_h - 0.3]);   // links
+        translate([x - 1.6, y - 1.6, 0]) cube([b_w - x + 1.6, 1.6, innen_h - 0.3]);   // vorne
+      }
+      translate([x - 3, y + 4, -1]) cube([4, 5, 5]);    // Kabeldurchlass unten
     }
-    translate([x + w - 1, y + 3, -1]) cube([4, 5, 5]);   // Kabeldurchlass unten
+    innen(tol);
   }
 }
 
-module bme_schlitze_seite() {
-  for (z = [5, 9, 13]) translate([-1, bme_kam[1] + 2.5, z]) cube([wand + 2, bme_kam[3] - 5, 1.8]);
+// Lueftung: Rueckwand (vor dem Sensor) und rechte Seitenwand
+module bme_schlitze() {
+  for (z = [4, 8, 12]) {
+    translate([bme_pos[0] + 1, b_d - wand - 1, z]) cube([bme_l, wand + 2, 1.8]);
+    translate([b_w - wand - 1, bme_kam[1] + 2, z]) cube([wand + 2, 6, 1.8]);
+  }
 }
 
 // --- Oeffnungen ---------------------------------------------------------
-module usb_c_loch(l = wand + 2) {
-  hull() for (dx = [-(usbc_w + 1) / 2 + 2.4, (usbc_w + 1) / 2 - 2.4]) translate([dx, 0, 0])
-    cylinder(r = 2.4, h = l);
+module langloch_y(w, h, l) {   // abgerundetes Loch in y-Richtung, Mitte (0, 0)
+  r = h / 2;
+  hull() for (dx = [-(w / 2 - r), w / 2 - r]) translate([dx, 0, 0]) rotate([90, 0, 0]) cylinder(r = r, h = l);
 }
 
-// Einziger Anschluss: USB-C des TC4056 hinten. Zum Flashen per Kabel
-// die Bodenplatte abnehmen (oder OTA).
+// Einziger Anschluss: USB-C des TC4056 hinten. Die Wand ist um die Buchse
+// von aussen auf 1 mm ausgespart, damit auch dicke Stecker ganz einrasten.
+// Zum Flashen per Kabel die Bodenplatte abnehmen (oder OTA).
+usb_x = tc_pos[0] + tc_b / 2;
+usb_z = 1 + tc_t + usbc_h / 2;
 module oeffnungen() {
-  translate([tc_pos[0] + tc_b / 2, b_d + 1, 1 + tc_t + usbc_h / 2]) rotate([90, 0, 0]) usb_c_loch();
+  translate([usb_x, b_d + 1, usb_z]) langloch_y(usbc_w + 1, 4.8, wand + 2);
+  translate([usb_x, b_d + 1, usb_z]) langloch_y(13, 7.5, 1 + wand - 1.0);
 }
 
 // --- Niederhalter-Rippen an der Decke ----------------------------------
@@ -141,13 +161,24 @@ module sockel() {
       difference() { aussen(b_h); innen(); }
       intersection() { aussen(b_h); schlitz_trafo() schlitz_koerper(); }
       for (p = dome) translate([p[0], p[1], 0]) cylinder(d = dom_d, h = innen_h + 0.1);
-      bme_waende();
       niederhalter();
     }
     schlitz_trafo() schlitz_aussparung();
     for (p = dome) translate([p[0], p[1], -1]) cylinder(d = schraube_d, h = innen_h - 2);
     oeffnungen();
-    bme_schlitze_seite();
+    bme_schlitze();
+  }
+}
+
+// Zentrierrand: greift in den Sockel, an Domen, USB und BME-Kammer offen
+module zentrierrand() {
+  difference() {
+    translate([wand + tol, wand + tol, 0]) rrect(b_w - 2 * (wand + tol), b_d - 2 * (wand + tol), rand_h, b_r - wand - tol);
+    translate([wand + tol + rand_w, wand + tol + rand_w, -1])
+      rrect(b_w - 2 * (wand + tol + rand_w), b_d - 2 * (wand + tol + rand_w), rand_h + 2, b_r - wand - tol - rand_w);
+    for (p = dome) translate([p[0], p[1], -1]) cylinder(d = dom_d + 1, h = rand_h + 2);
+    translate([tc_pos[0] - 2, b_d - wand - 3, -1]) cube([tc_b + 4, wand + 4, rand_h + 2]);
+    translate([bme_kam[0] - 1.6, bme_kam[1] - 1.6, -1]) cube([b_w, b_d, rand_h + 2]);
   }
 }
 
@@ -155,37 +186,39 @@ module boden() {
   difference() {
     union() {
       translate([0, 0, -boden_t]) rrect(b_w, b_d, boden_t, b_r);
-      // Zentrierrand
-      difference() {
-        translate([wand + tol, wand + tol, 0]) rrect(b_w - 2 * (wand + tol), b_d - 2 * (wand + tol), 2, b_r - wand);
-        translate([wand + tol + 1.2, wand + tol + 1.2, -1])
-          rrect(b_w - 2 * (wand + tol + 1.2), b_d - 2 * (wand + tol + 1.2), 4, b_r - wand - 1.2);
-        for (p = dome) translate([p[0], p[1], -1]) cylinder(d = dom_d + 1, h = 4);
-        bme_schlitze_seite();
-        oeffnungen();
-      }
-      // Akku-Mulde: 0,5 mm Luft rundum, 4 mm Luft an der Kabelseite
-      translate([lipo_pos[0], lipo_pos[1], 0]) difference() {
-        translate([-0.5 - 1.6, -0.5 - 1.6, 0]) cube([lipo_l + 4.5 + 3.2, lipo_b + 1 + 3.2, 5]);
-        translate([-0.5, -0.5, -1]) cube([lipo_l + 4.5, lipo_b + 1, 7]);
-        translate([lipo_l + 1, lipo_b - 12, 1]) cube([10, 10, 6]);     // Kabelausgang
+      zentrierrand();
+      // Akku-Mulde: 0,5 mm Luft rundum; rechts nur hinter dem FPC-Adapter,
+      // links nur bis vor die Gehaeuseecke
+      translate([lipo_pos[0], lipo_pos[1], 0]) {
+        mh = 4;
+        translate([-0.5, -2.1, 0]) cube([lipo_l + 1, 1.6, mh]);                 // vorne
+        translate([-0.5, lipo_b + 0.5, 0]) cube([lipo_l + 1, 1.6, mh]);         // hinten
+        translate([-2.1, -2.1, 0]) cube([1.6, lipo_b - 4, mh]);                 // links
+        difference() {                                                           // rechts
+          translate([lipo_l + 0.5, ada_pos[1] + ada_b + 0.5 - lipo_pos[1], 0])
+            cube([1.6, lipo_b + 2.1 - (ada_pos[1] + ada_b + 0.5 - lipo_pos[1]), mh]);
+          translate([lipo_l, lipo_b - 12, 1]) cube([4, 10, mh]);                // Kabelausgang
+        }
       }
       // FPC-Adapter auf 4 Domen
       for (dx = [-1, 1], dy = [-1, 1])
         translate([ada_pos[0] + ada_l / 2 + dx * ada_loch[0] / 2, ada_pos[1] + ada_b / 2 + dy * ada_loch[1] / 2, 0])
           cylinder(d = 6, h = 3);
-      // TC4056 (laengs in y) und Buck: Rastrahmen
+      // TC4056 (laengs in y) im Rastrahmen, Anschlag vorne gegen den Steckdruck
       translate([tc_pos[0] + tc_b, tc_pos[1], 0]) rotate([0, 0, 90]) rastrahmen(tc_l, tc_b, 1, stirn = false);
+      translate([tc_pos[0] + 1, tc_pos[1] - 1.2 - tol, 0]) cube([tc_b - 2, 1.2, 1 + tc_t - 0.2]);
+      // Buck im Rastrahmen
       translate([buck_pos[0], buck_pos[1], 0]) rastrahmen(buck_l, buck_b, 0.01, buck_h - 0.6);
       // Driver Board: Stege unter den Stirnseiten (zwischen den Stiftreihen)
       for (x = [drv_pos[0], drv_pos[0] + drv_l - 3])
         translate([x, drv_pos[1] + 5, 0]) cube([3, drv_b - 10, drv_z]);
       // Anschlag auf der Antennenseite
       translate([drv_pos[0] - 1.2 - tol, drv_pos[1] + 5, 0]) cube([1.2, drv_b - 10, drv_z + drv_t + 0.8]);
-      // BME280 steht senkrecht in einem Schlitz (Presspassung) an den Seitenschlitzen
-      translate([wand + 3.5, bme_kam[1] + 0.5, 0]) difference() {
-        cube([5, bme_l + 2, 6]);
-        translate([1.6, 1, 1]) cube([1.7, bme_l + 0.2, 6]);
+      // BME-Kammer und Sensorhalter (Sensor steht senkrecht, Presspassung)
+      bme_waende();
+      translate([bme_pos[0], bme_pos[1], 0]) difference() {
+        cube([bme_l + 2, 5, 6]);
+        translate([1, 1.6, 1]) cube([bme_l + 0.2, 1.7, 6]);
       }
     }
     for (p = dome) translate([p[0], p[1], -boden_t]) senkung_m3(boden_t + 1);
@@ -193,13 +226,13 @@ module boden() {
       translate([ada_pos[0] + ada_l / 2 + dx * ada_loch[0] / 2, ada_pos[1] + ada_b / 2 + dy * ada_loch[1] / 2, -1])
         cylinder(d = ada_schraube, h = 5);
     // Lueftung unter der BME-Kammer
-    for (i = [0 : 3]) translate([bme_kam[0] + 12 + i * 4.5, bme_kam[1] + 3, -boden_t - 1])
-      cube([2, bme_kam[3] - 6, boden_t + 2]);
+    for (i = [0 : 3]) translate([bme_kam[0] + 1.5 + i * 3.6, bme_kam[1] + 2, -boden_t - 1])
+      cube([1.8, bme_pos[1] - bme_kam[1] - 3, boden_t + 2]);
     // Mulden fuer Gummifuesse 10 mm
-    for (p = [[24, 12], [b_w - 24, 12], [24, b_d - 12], [b_w - 24, b_d - 12]])
-      translate([p[0], p[1], -boden_t - 0.01]) cylinder(d = 10.6, h = 1);
+    for (p = fuesse) translate([p[0], p[1], -boden_t - 0.01]) cylinder(d = 10.6, h = 1);
   }
 }
+fuesse = [[14, 12], [b_w - 14, 12], [14, b_d - 12], [b_w - 14, b_d - 12]];
 
 // --- Vorschau ----------------------------------------------------------
 module panel() {
@@ -228,14 +261,18 @@ module tc_koerper() {
   translate([0, 0, 1]) cube([tc_b, tc_l, tc_t]);
   translate([tc_b / 2 - 4.5, tc_l - 7, 1 + tc_t]) cube([9, 7.5, usbc_h - 0.5]);
 }
-module bme_koerper() { translate([wand + 5.1, bme_kam[1] + 1.6, 1]) cube([1.6, bme_l, bme_b]); }
+module buck_koerper() {   // liegt auf 0,01-mm-Pads, Rastkante bei buck_h - 0,6
+  translate([0, 0, 0.01]) cube([buck_l, buck_b, buck_h - 0.6]);
+  translate([1, 1, 0.01]) cube([buck_l - 2, buck_b - 2, buck_h]);
+}
+module bme_koerper() { translate([bme_pos[0] + 1.1, bme_pos[1] + 1.6, 1]) cube([bme_l, 1.6, bme_b]); }
 
 module elektronik() {
   translate([drv_pos[0], drv_pos[1], 0]) color("#2C6E49") drv_koerper();
   translate([lipo_pos[0], lipo_pos[1], 0]) dummy(lipo_l, lipo_b, lipo_t, "#C9CDD3");
   translate([ada_pos[0], ada_pos[1], 0]) color("#1F4FA0") ada_koerper();
   translate([tc_pos[0], tc_pos[1], 0]) color("#2252A8") tc_koerper();
-  translate([buck_pos[0], buck_pos[1], 0]) dummy(buck_l, buck_b, buck_h, "#1D4E9A");
+  translate([buck_pos[0], buck_pos[1], 0]) color("#1D4E9A") buck_koerper();
   color("#6B2C8F") bme_koerper();
 }
 
@@ -248,7 +285,7 @@ module gruppe_3d(g) {
   if (g == "lipo") translate([lipo_pos[0], lipo_pos[1], 0]) cube([lipo_l, lipo_b, lipo_t]);
   if (g == "ada") translate([ada_pos[0], ada_pos[1], 0]) ada_koerper();
   if (g == "tc") translate([tc_pos[0], tc_pos[1], 0]) tc_koerper();
-  if (g == "buck") translate([buck_pos[0], buck_pos[1], 0]) cube([buck_l, buck_b, buck_h]);
+  if (g == "buck") translate([buck_pos[0], buck_pos[1], 0]) buck_koerper();
   if (g == "bme") bme_koerper();
 }
 
@@ -267,6 +304,7 @@ else if (teil == "schnitt") {
   color("#BDB9B0") boden();
   elektronik();
 }
+else if (teil == "kollision") intersection() { gruppe_3d(gruppe); gruppe_3d(gruppe2); }
 else {
   color("#2B2D31") sockel();
   color("#2B2D31") boden();

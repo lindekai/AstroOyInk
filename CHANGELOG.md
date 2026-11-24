@@ -7,7 +7,7 @@ Alle relevanten Änderungen am Projekt.
 ### Hinzugefügt
 - 🏠 **3D-Druck-Gehäuse** in `hardware/gehaeuse/` (OpenSCAD, parametrisch,
   STLs in `stl/`): **Tischgehäuse** – Display steht frei im 15°-Schlitz, nur
-  der inaktive Rand steckt im Sockel, Elektronik und Akku im 26 mm flachen
+  der inaktive Rand steckt im Sockel, Elektronik und Akku im 21 mm flachen
   Sockel – und **Wandgehäuse** – flacher Rahmen mit 2-mm-Blende,
   Schlüssellöcher, Elektronik auf dem Rückdeckel. Beide ohne Kleber
   (Rastnasen, Niederhalter, Presspassung), je ein USB-C-Anschluss zum Laden,
@@ -32,6 +32,17 @@ Alle relevanten Änderungen am Projekt.
   feste Zeitpunkte. README-Bild ist vorerst diese Vorschau.
 - 🔭 **N.I.N.A.-Auto-Discovery** (leerer Host = automatisch, Scan nur
   abends/nachts) und Sequenz-Auswertung über `sequence/state`.
+
+### Geändert (Gehäuse)
+- 🏠 **Tischgehäuse nach dem ersten Probedruck überarbeitet:** kleiner
+  (184 × 68 × 21,4 statt 200 × 84 × 26,4 mm), Schlitz weiter vorn, Akku links,
+  Driver Board rechts vorn, BME280-Kammer hinten rechts. Die Kammerwände
+  stehen jetzt auf der Bodenplatte, und der Zentrierrand ist dort offen. Vorher
+  stießen sie auf den Rand, der Sockel ließ sich nicht aufsetzen. Ebenfalls
+  behoben: FPC-Adapter lag auf der Akku-Mulde, TC4056 lag auf dem Zentrierrand.
+  Die USB-C-Wand ist von außen auf 1 mm ausgespart, damit Stecker ganz
+  einrasten. Neu: `hardware/gehaeuse/pruefe_kollision.sh` prüft alle Teile
+  paarweise auf Überschneidungen.
 
 ### Geändert (Layout)
 - 🔭 **SESSION-Ansicht neu geordnet** wie WEATHER: Sequenz-Kasten mit
