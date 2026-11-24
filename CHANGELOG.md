@@ -43,6 +43,8 @@ Alle relevanten Änderungen am Projekt.
   Die USB-C-Wand ist von außen auf 1 mm ausgespart, damit Stecker ganz
   einrasten. Neu: `hardware/gehaeuse/pruefe_kollision.sh` prüft alle Teile
   paarweise auf Überschneidungen.
+- 🔤 Bodenplatte des Tischgehäuses mit vertiefter Beschriftung auf der
+  Unterseite: AstroOyInk, Version, Autor, Community und Lizenz.
 
 ### Geändert (Layout)
 - 🔭 **SESSION-Ansicht neu geordnet** wie WEATHER: Sequenz-Kasten mit

@@ -28,6 +28,7 @@ die aktive Fläche.
 | Druckteile | `tisch_sockel.stl` (Oberseite aufs Bett), `tisch_boden.stl` (flach) |
 | Anschluss | 1 × USB-C (Laden) hinten |
 | BME280 | eigene Kammer hinten rechts, Schlitze in Rückwand, rechter Seitenwand und Boden |
+| Beschriftung | Unterseite der Bodenplatte, 0,6 mm vertieft: Projektname, Version (`version` in `gehaeuse_tisch.scad`), Autor, Community, Lizenz |
 
 ## Wandgehäuse
 

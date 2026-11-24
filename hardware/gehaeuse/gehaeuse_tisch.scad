@@ -230,9 +230,27 @@ module boden() {
       cube([1.8, bme_pos[1] - bme_kam[1] - 3, boden_t + 2]);
     // Mulden fuer Gummifuesse 10 mm
     for (p = fuesse) translate([p[0], p[1], -boden_t - 0.01]) cylinder(d = 10.6, h = 1);
+    beschriftung();
   }
 }
 fuesse = [[14, 12], [b_w - 14, 12], [14, b_d - 12], [b_w - 14, b_d - 12]];
+
+// Beschriftung auf der Unterseite der Bodenplatte, 0,6 mm vertieft.
+// Gespiegelt, damit sie lesbar ist, wenn man den Sockel seitlich umdreht.
+version   = "v1.0.0-rc1";
+schrift   = "Liberation Sans:style=Bold";
+text_tief = 0.6;
+module beschriftung() {
+  zeilen = [   // [Text, Groesse, y]
+    ["AstroOyInk",                                        7.0, 46],
+    [str(version, " · Tischgehäuse"),                      3.6, 39.5],
+    ["Autor: Kai Linde · github.com/lindekai/AstroOyInk",  3.2, 12.5],
+    ["Community: Dark Matters Discord · MIT-Lizenz",       3.2, 6]
+  ];
+  translate([b_w / 2, 0, -boden_t - 0.01]) mirror([1, 0, 0])
+    for (z = zeilen) translate([0, z[2], 0]) linear_extrude(text_tief + 0.01)
+      text(z[0], size = z[1], font = schrift, halign = "center", valign = "baseline");
+}
 
 // --- Vorschau ----------------------------------------------------------
 module panel() {
