@@ -22,3 +22,6 @@ __pycache__/
 # Host-Vorschau (tools/preview/build_preview.sh)
 tools/preview/build/
 tools/preview/out/
+
+# Slicer-Projekte (lokal, nicht ins Repo)
+*.3mf
