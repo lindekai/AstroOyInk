@@ -4,12 +4,11 @@ Zwei Gehäuse für dieselbe Elektronik – parametrisch in OpenSCAD, fertige STL
 liegen in [`stl/`](stl/). Beide kommen **ohne Kleber** aus: Rastnasen,
 Niederhalter-Rippen, Presspassung und Schrauben.
 
-> **Status:** Das Tischgehäuse ist einmal probegedruckt worden. Der Display-Schlitz
-> passte, die BME-Kammer stieß auf den Zentrierrand der Bodenplatte. Das ist
-> in der aktuellen, kompakteren Version behoben (siehe
-> [Kollisionsprüfung](#kollisionsprüfung)), ein zweiter Probedruck steht aus.
-> Das Wandgehäuse ist noch nicht gedruckt. Passungen ggf. über `tol` in
-> `common.scad` anpassen.
+> **Status:** Das Tischgehäuse ist in der aktuellen, kompakten Version gedruckt
+> und im Einsatz getestet – es funktioniert. (Beim ersten Probedruck stieß die
+> BME-Kammer noch auf den Zentrierrand der Bodenplatte, siehe
+> [Kollisionsprüfung](#kollisionsprüfung).) Das Wandgehäuse ist im Druck.
+> Passungen ggf. über `tol` in `common.scad` anpassen.
 
 ## Tischgehäuse
 
@@ -45,7 +44,8 @@ komplett auf dem Deckel.
 | Außenmaß | 180,8 × 133,8 × 23,5 mm |
 | Druckteile | `wand_rahmen.stl` (Sichtseite aufs Bett), `wand_deckel.stl` (Außenseite aufs Bett) |
 | Anschluss | 1 × USB-C (Laden) an der Unterkante |
-| Aufhängung | 2 Schlüssellöcher, Abstand 100 mm (Schraube mit Kopf ≤ 9 mm) |
+| Aufhängung | 2 Schlüssellöcher, Abstand 100 mm, 15 mm unter der Oberkante (Schraube mit Kopf ≤ 9 mm) |
+| Bohrschablone | [`bohrschablone_wand.pdf`](bohrschablone_wand.pdf) – A4, mit 100 % drucken, Kontrollstrecke nachmessen |
 | BME280 | eigene Kammer unten links, 5 Schlitze unten, 3 an der linken Seite |
 
 ## Teileliste
@@ -97,6 +97,11 @@ TC4056 USB-C, TPS62827-Buck, BME280.
 1. Glas mit der Sichtseite nach unten in den Rahmen legen, Flexkabel nach unten.
 2. Elektronik auf dem Deckel einsetzen (wie oben), Panel-Flexkabel am Adapter einstecken.
 3. Deckel aufsetzen – die Rippen drücken das Glas an die Blende – und mit 4 × M3 verschrauben.
+4. [Bohrschablone](bohrschablone_wand.pdf) in Originalgröße drucken, mit der
+   Wasserwaage ausrichten und die zwei Punkte bohren. Rund- oder Linsenkopfschrauben
+   (Schaft 3,5–4 mm) so eindrehen, dass der Kopf ca. 3 mm vor der Wand steht,
+   Gerät mit den runden Öffnungen über die Köpfe hängen und nach unten rutschen lassen.
+   Neu erzeugen: `python3 tools/make_bohrschablone.py`.
 
 Zum Flashen per Kabel die Bodenplatte bzw. den Deckel abnehmen; im Alltag reicht OTA.
 

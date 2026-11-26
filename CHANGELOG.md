@@ -5,6 +5,10 @@ Alle relevanten Änderungen am Projekt.
 ## [Unreleased]
 
 ### Hinzugefügt
+- 📐 **Bohrschablone fürs Wandgehäuse** (`hardware/gehaeuse/bohrschablone_wand.pdf`,
+  A4, 1:1): Gehäuseumriss, beide Bohrpunkte (100 mm Abstand, 15 mm unter der
+  Oberkante), Wasserwaagen-Linie, Kontrollstrecke für den Druckmaßstab und
+  Schraubenempfehlung. Erzeugt mit `tools/make_bohrschablone.py`.
 - 🏠 **3D-Druck-Gehäuse** in `hardware/gehaeuse/` (OpenSCAD, parametrisch,
   STLs in `stl/`): **Tischgehäuse** – Display steht frei im 15°-Schlitz, nur
   der inaktive Rand steckt im Sockel, Elektronik und Akku im 21 mm flachen
@@ -34,6 +38,9 @@ Alle relevanten Änderungen am Projekt.
   abends/nachts) und Sequenz-Auswertung über `sequence/state`.
 
 ### Geändert (Gehäuse)
+- 🔩 **Wanddeckel: Senkungen auf die Außenseite** – die M3-Senkungen saßen
+  innen, verschraubt wird aber von außen. Jetzt wie bei der Tisch-Bodenplatte
+  (Ø 6,6 mm an der Außenfläche). `wand_deckel.stl` neu exportiert.
 - 🏠 **Tischgehäuse nach dem ersten Probedruck überarbeitet:** kleiner
   (184 × 68 × 21,4 statt 200 × 84 × 26,4 mm), Schlitz weiter vorn, Akku links,
   Driver Board rechts vorn, BME280-Kammer hinten rechts. Die Kammerwände

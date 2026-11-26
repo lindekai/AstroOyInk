@@ -185,7 +185,8 @@ module deckel_lokal() {
       translate([0, 0, -deckel_t]) rrect(W, H, deckel_t, r_aussen);
       deckel_inhalt();
     }
-    for (p = dome) translate([p[0], p[1], 0]) rotate([180, 0, 0]) senkung_m3(deckel_t + 1);
+    // Senkung an der Aussenseite (z' = -deckel_t), verschraubt wird von aussen
+    for (p = dome) translate([p[0], p[1], -deckel_t]) senkung_m3(deckel_t + 1);
     schluesselloch_schnitt();
   }
 }

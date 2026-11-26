@@ -265,7 +265,8 @@ Sockel, einziger Anschluss ist die USB-C-Ladebuchse hinten.
 
 Flach wie ein Bilderrahmen (181 × 134 × 24 mm), aufgehängt an zwei
 Schlüssellöchern. Die Elektronik sitzt auf dem Rückdeckel, die USB-C-Ladebuchse
-an der Unterkante. [Schnittzeichnung](docs/images/gehaeuse_wand_schnitt.svg)
+an der Unterkante. [Schnittzeichnung](docs/images/gehaeuse_wand_schnitt.svg) ·
+[Bohrschablone (A4-PDF, 1:1)](hardware/gehaeuse/bohrschablone_wand.pdf)
 
 Beide Gehäuse haben eine abgetrennte, belüftete Kammer für den BME280, damit die
 Abwärme der Elektronik die Innentemperatur nicht verfälscht.

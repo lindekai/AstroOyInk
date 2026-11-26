@@ -133,6 +133,8 @@ AstroOyInk/
 │   ├── make_gehaeuse_mockups.py   # Gehaeuse-Hero + Schnittzeichnungen (OpenSCAD)
 │   ├── make_wiring_svgs.py        # Schaltplan + Steckbrett-Bild (Pins aus config.h
 │   │                              # von Hand gespiegelt – bei Pinaenderung neu erzeugen)
+│   ├── make_bohrschablone.py      # A4-PDF 1:1 fuers Wandgehaeuse (Masse von Hand aus
+│   │                              # gehaeuse_wand.scad gespiegelt – bei Aenderung neu erzeugen)
 │   └── preview/                   # Pixelgenaue Host-Vorschau des Displays
 │       ├── build_preview.sh       # → tools/preview/out/*.png
 │       ├── preview_main.cpp       # Beispieldaten fuer alle Ansichten
