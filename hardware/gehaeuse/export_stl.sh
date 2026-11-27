@@ -15,4 +15,6 @@ teil gehaeuse_tisch.scad sockel tisch_sockel
 teil gehaeuse_tisch.scad boden  tisch_boden
 teil gehaeuse_wand.scad  rahmen wand_rahmen
 teil gehaeuse_wand.scad  deckel wand_deckel
+teil gehaeuse_wand.scad  probe_rahmen probe_wand_rahmen
+teil gehaeuse_wand.scad  probe_deckel probe_wand_deckel
 echo "[STL] fertig: $(ls stl/*.stl | wc -l | tr -d ' ') Dateien"

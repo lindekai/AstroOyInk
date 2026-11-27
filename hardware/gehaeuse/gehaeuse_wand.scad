@@ -14,6 +14,8 @@
 //    "ansicht" – Zusammenbau fuer die Vorschau (haengend)
 //    "schnitt" – Deckel mit Elektronik (Vorschau)
 //    "kollision" – Schnittmenge von gruppe und gruppe2 (leer = passt)
+//    "probe_rahmen", "probe_deckel" – Probestuecke der Ecke unten links
+//              (BME-Kammer, TC4056-Tasche, Buck, USB-C), gleiche Druckorientierung
 //
 //  Export:  openscad -D 'teil="rahmen"' -o rahmen.stl gehaeuse_wand.scad
 // =====================================================================
@@ -30,6 +32,7 @@ cut_z    = -1;
 aa_maske = false;
 
 // --- Parameter ---------------------------------------------------------
+probe = [75, 45];      // Probestueck: Ausschnitt x 0..75, y 0..45 (Ecke unten links)
 rand     = 5;          // Wandstaerke seitlich und unten/oben
 kinn     = 6;          // Freiraum unter dem Glas (Flexkabel)
 oben     = 6;          // Freiraum ueber dem Glas (Schraubdome)
@@ -275,6 +278,8 @@ if (teil == "cut") {
     projection(cut = true) translate([0, 0, -cut_z]) gruppe_3d(gruppe);
 }
 else if (teil == "kollision") intersection() { gruppe_3d(gruppe); gruppe_3d(gruppe2); }
+else if (teil == "probe_rahmen") intersection() { rahmen(); translate([-1, -1, -1]) cube([probe[0] + 1, probe[1] + 1, D + 2]); }
+else if (teil == "probe_deckel") intersection() { translate([0, 0, deckel_t]) deckel_lokal(); translate([-1, -1, -1]) cube([probe[0] + 1, probe[1] + 1, D + 5]); }
 else if (teil == "rahmen") rahmen();
 else if (teil == "deckel") translate([0, 0, deckel_t]) deckel_lokal();
 else if (teil == "schnitt") {

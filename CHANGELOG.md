@@ -47,6 +47,9 @@ Alle relevanten Änderungen am Projekt.
   dem Glas, Kabeldurchlass Richtung ESP32, Sensorhalter weg vom Schraubdom.
   **Rahmen und Deckel neu drucken.**
 - 🧪 `pruefe_kollision.sh wand` prüft jetzt auch das Wandgehäuse.
+- 🧩 **Probestücke** fürs Wandgehäuse (`teil="probe_rahmen"` / `"probe_deckel"`,
+  `stl/probe_wand_*.stl`): nur die Ecke unten links mit BME-Kammer,
+  TC4056-Tasche, Buck und USB-C – Passung testen, bevor die 8-h-Teile laufen.
 - 🔩 **Wanddeckel: Senkungen auf die Außenseite** – die M3-Senkungen saßen
   innen, verschraubt wird aber von außen. Jetzt wie bei der Tisch-Bodenplatte
   (Ø 6,6 mm an der Außenfläche). `wand_deckel.stl` neu exportiert.

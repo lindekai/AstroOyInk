@@ -48,6 +48,7 @@ komplett auf dem Deckel.
 | Druckteile | `wand_rahmen.stl` (Sichtseite aufs Bett), `wand_deckel.stl` (Außenseite aufs Bett) |
 | Anschluss | 1 × USB-C (Laden) an der Unterkante links, Wand vor der Buchse außen auf 1 mm ausgespart |
 | Aufhängung | 2 Schlüssellöcher, Abstand 100 mm, 15 mm unter der Oberkante (Schraube mit Kopf ≤ 9 mm) |
+| Probestücke | `probe_wand_rahmen.stl` + `probe_wand_deckel.stl` – Ecke unten links (75 × 45 mm: BME-Kammer, TC4056-Tasche, Buck, USB-C), gleiche Druckorientierung, ca. 1 h statt 8 h |
 | Bohrschablone | [`bohrschablone_wand.pdf`](bohrschablone_wand.pdf) – A4, mit 100 % drucken, Kontrollstrecke nachmessen |
 | BME280 | eigene Kammer unten links, 5 Schlitze unten, 3 an der linken Seite, Kabeldurchlass Richtung ESP32 |
 | Ladeelektronik | links auf der ESP-Seite: TC4056 in einer Tasche mit Anschlag rechts neben der BME-Kammer, Buck darüber |
