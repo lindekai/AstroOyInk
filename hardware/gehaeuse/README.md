@@ -7,7 +7,10 @@ Niederhalter-Rippen, Presspassung und Schrauben.
 > **Status:** Das Tischgehäuse ist in der aktuellen, kompakten Version gedruckt
 > und im Einsatz getestet – es funktioniert. (Beim ersten Probedruck stieß die
 > BME-Kammer noch auf den Zentrierrand der Bodenplatte, siehe
-> [Kollisionsprüfung](#kollisionsprüfung).) Das Wandgehäuse ist im Druck.
+> [Kollisionsprüfung](#kollisionsprüfung).) Beim Wandgehäuse passte nach dem
+> ersten Druck der Rahmen; der Deckel wurde überarbeitet (Ladeelektronik nach
+> links, BME-Kammer niedriger mit Kabeldurchlass, USB-C-Wand ausgespart) – dafür
+> ist auch der Rahmen neu zu drucken (USB-Loch an neuer Stelle).
 > Passungen ggf. über `tol` in `common.scad` anpassen.
 
 ## Tischgehäuse
@@ -43,10 +46,11 @@ komplett auf dem Deckel.
 |---|---|
 | Außenmaß | 180,8 × 133,8 × 23,5 mm |
 | Druckteile | `wand_rahmen.stl` (Sichtseite aufs Bett), `wand_deckel.stl` (Außenseite aufs Bett) |
-| Anschluss | 1 × USB-C (Laden) an der Unterkante |
+| Anschluss | 1 × USB-C (Laden) an der Unterkante links, Wand vor der Buchse außen auf 1 mm ausgespart |
 | Aufhängung | 2 Schlüssellöcher, Abstand 100 mm, 15 mm unter der Oberkante (Schraube mit Kopf ≤ 9 mm) |
 | Bohrschablone | [`bohrschablone_wand.pdf`](bohrschablone_wand.pdf) – A4, mit 100 % drucken, Kontrollstrecke nachmessen |
-| BME280 | eigene Kammer unten links, 5 Schlitze unten, 3 an der linken Seite |
+| BME280 | eigene Kammer unten links, 5 Schlitze unten, 3 an der linken Seite, Kabeldurchlass Richtung ESP32 |
+| Ladeelektronik | links auf der ESP-Seite: TC4056 in einer Tasche mit Anschlag rechts neben der BME-Kammer, Buck darüber |
 
 ## Teileliste
 
@@ -95,7 +99,12 @@ TC4056 USB-C, TPS62827-Buck, BME280.
 
 **Wand**
 1. Glas mit der Sichtseite nach unten in den Rahmen legen, Flexkabel nach unten.
-2. Elektronik auf dem Deckel einsetzen (wie oben), Panel-Flexkabel am Adapter einstecken.
+2. Elektronik auf dem Deckel einsetzen: Akku rechts in die Mulde, Driver Board
+   oben links auf die Stege, TC4056 mit der Buchse nach unten in die Tasche
+   schieben bis an den Anschlag und einrasten, Buck darüber in den Rastrahmen,
+   FPC-Adapter mit 4 × M2,5, BME280 in den Halter der Kammer unten links
+   (Sensorkabel durch den Durchlass oben rechts in der Kammerwand).
+   Panel-Flexkabel am Adapter einstecken.
 3. Deckel aufsetzen – die Rippen drücken das Glas an die Blende – und mit 4 × M3 verschrauben.
 4. [Bohrschablone](bohrschablone_wand.pdf) in Originalgröße drucken, mit der
    Wasserwaage ausrichten und die zwei Punkte bohren. Rund- oder Linsenkopfschrauben
@@ -108,11 +117,12 @@ Zum Flashen per Kabel die Bodenplatte bzw. den Deckel abnehmen; im Alltag reicht
 ## Kollisionsprüfung
 
 ```bash
-hardware/gehaeuse/pruefe_kollision.sh
+hardware/gehaeuse/pruefe_kollision.sh        # Tisch
+hardware/gehaeuse/pruefe_kollision.sh wand   # Wand
 ```
 
-Schneidet beim Tischgehäuse jedes Paar aus Sockel, Bodenplatte, Display und
-Elektronik miteinander (`teil="kollision"` in `gehaeuse_tisch.scad`). Reine
+Schneidet jedes Paar aus Druckteilen (Sockel/Bodenplatte bzw. Rahmen/Deckel),
+Display und Elektronik miteinander (`teil="kollision"` in der jeweiligen `.scad`). Reine
 Flächenkontakte (Platine liegt auf Steg) sind erlaubt, jedes echte Volumen wird
 mit Lage gemeldet. Nach jeder Änderung an Maßen oder Bauteillage laufen lassen,
 bevor gedruckt wird.

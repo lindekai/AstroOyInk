@@ -38,6 +38,15 @@ Alle relevanten Änderungen am Projekt.
   abends/nachts) und Sequenz-Auswertung über `sequence/state`.
 
 ### Geändert (Gehäuse)
+- 🔋 **Wanddeckel überarbeitet nach Probedruck:** Ladeelektronik (TC4056 +
+  Buck) sitzt jetzt links auf der ESP-Seite, der TC4056 in einer Tasche mit
+  Führungen, Rastnasen und Anschlag hinten. USB-C wandert an der Unterkante
+  nach links (x = 47), die Rahmenwand vor der Buchse ist außen auf 1 mm
+  ausgespart, damit der Stecker ganz einrastet. BME-Kammer: kurze Wand stieß
+  an die Glasauflage des Rahmens – jetzt 1 mm darunter, obere Wand 1 mm vor
+  dem Glas, Kabeldurchlass Richtung ESP32, Sensorhalter weg vom Schraubdom.
+  **Rahmen und Deckel neu drucken.**
+- 🧪 `pruefe_kollision.sh wand` prüft jetzt auch das Wandgehäuse.
 - 🔩 **Wanddeckel: Senkungen auf die Außenseite** – die M3-Senkungen saßen
   innen, verschraubt wird aber von außen. Jetzt wie bei der Tisch-Bodenplatte
   (Ø 6,6 mm an der Außenfläche). `wand_deckel.stl` neu exportiert.

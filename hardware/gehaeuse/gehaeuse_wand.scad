@@ -13,6 +13,7 @@
 //    "deckel"  – Rueckdeckel mit Aufnahmen, Druck mit der Aussenseite auf dem Bett
 //    "ansicht" – Zusammenbau fuer die Vorschau (haengend)
 //    "schnitt" – Deckel mit Elektronik (Vorschau)
+//    "kollision" – Schnittmenge von gruppe und gruppe2 (leer = passt)
 //
 //  Export:  openscad -D 'teil="rahmen"' -o rahmen.stl gehaeuse_wand.scad
 // =====================================================================
@@ -21,7 +22,8 @@ include <common.scad>
 
 teil = "ansicht";
 // Fuer tools/make_gehaeuse_mockups.py
-gruppe   = "rahmen";
+gruppe   = "rahmen";   // Bauteilgruppe fuer teil = "cut" und "kollision"
+gruppe2  = "deckel";   // zweite Gruppe fuer teil = "kollision"
 cut_x    = -1;
 cut_y    = -1;
 cut_z    = -1;
@@ -57,10 +59,13 @@ drv_pos  = [20, 50];
 drv_h    = drv_stift + 3;            // Platinenunterseite ueber dem Deckel
 ada_pos  = [W / 2 - ada_l / 2, 14];
 ada_h_st = 12;                        // Abstandshalter Adapter
-tc_pos   = [120, rand + 0.5];         // USB-C nach unten
-buck_pos = [138, 10];
+// Ladeelektronik links auf der ESP-Seite: TC4056 rechts neben der BME-Kammer,
+// USB-C nach unten, Buck darueber (kurze Wege zum Driver Board)
+tc_pos   = [41, rand + 0.5];          // USB-C nach unten, Buchse buendig mit der Rahmenwand
+buck_pos = [58, 24];
 bme_kam  = [rand, rand, 31, 16];      // x, y, Breite, Hoehe der Kammer
-bme_pos  = [12, 7.5];                 // Sensor steht senkrecht, 13 mm entlang x
+bme_pos  = [13, 7.5];                 // Sensor steht senkrecht, 13 mm entlang x
+auflage_hinten = front_t + pnl_t + 0.8;   // Rueckseite der Glas-Auflagen im Rahmen
 
 // --- Frontrahmen --------------------------------------------------------
 module rahmen_aussen() {
@@ -85,10 +90,16 @@ module bme_lueftung() {
   for (y = [8, 12, 16]) translate([-1, y, 7]) cube([rand + 2, 1.8, 11]);
 }
 
-module usb_loch() {
+// USB-C: Durchbruch plus Aussparung von aussen, die Wand vor der Buchse ist
+// nur noch 1 mm stark, damit auch Stecker mit dickem Griff ganz einrasten
+module usb_langloch(w, h, l) {
   translate([tc_pos[0] + tc_b / 2, -1, D - 1 - tc_t - usbc_h / 2]) rotate([-90, 0, 0])
-    hull() for (dx = [-(usbc_w + 1) / 2 + 2.4, (usbc_w + 1) / 2 - 2.4]) translate([dx, 0, 0])
-      cylinder(r = 2.4, h = rand + 2);
+    hull() for (dx = [-w / 2 + h / 2, w / 2 - h / 2]) translate([dx, 0, 0])
+      cylinder(r = h / 2, h = l);
+}
+module usb_loch() {
+  usb_langloch(usbc_w + 1, 4.8, rand + 2);
+  usb_langloch(13, 7, 1 + rand - 1.0);
 }
 
 module rahmen() {
@@ -129,8 +140,9 @@ module deckel_inhalt() {
   translate([pnl_x + 0.6, bme_kam[1] + bme_kam[3] + 2, 0]) cube([1.5, pnl_h - 20, rh]);              // links
   translate([pnl_x + pnl_w - 2.1, pnl_y + 6, 0]) cube([1.5, pnl_h - 12, rh]);                         // rechts
   translate([pnl_x + 12, pnl_y + pnl_h - 2.4, 0]) cube([pnl_w - 24, 1.5, rh]);                        // oben
-  for (x = [[bme_kam[2] + 8, W / 2 - 20], [W / 2 + 20, tc_pos[0] - 4], [buck_pos[0] + buck_l + 5, pnl_x + pnl_w - 12]])
-    translate([x[0], pnl_y + 2, 0]) cube([x[1] - x[0], 1.5, rh]);                                     // unten
+  // unten: links uebernimmt die BME-Kammerwand, Luecke fuer TC4056 und Flexkabel
+  for (x = [[tc_pos[0] + tc_b + 5, W / 2 - 20], [W / 2 + 20, pnl_x + pnl_w - 12]])
+    translate([x[0], pnl_y + 2, 0]) cube([x[1] - x[0], 1.5, rh]);
   // Zentrierrand (in den Rahmen), an Domen und USB unterbrochen
   difference() {
     translate([rand + tol, rand + tol, 0]) rrect(W - 2 * (rand + tol), H - 2 * (rand + tol), 2, 1.5);
@@ -161,13 +173,19 @@ module deckel_inhalt() {
   for (dx = [-1, 1], dy = [-1, 1])
     translate([ada_pos[0] + ada_l / 2 + dx * ada_loch[0] / 2, ada_pos[1] + ada_b / 2 + dy * ada_loch[1] / 2, 0])
       difference() { cylinder(d = 6, h = ada_h_st); translate([0, 0, 2]) cylinder(d = 2.2, h = ada_h_st); }
-  // TC4056 (laengs in y, USB-C nach unten) und Buck: Rastrahmen
-  translate([tc_pos[0] + tc_b, tc_pos[1], 0]) rotate([0, 0, 90]) rastrahmen(tc_l, tc_b, 1, stirn = false);
+  // TC4056 (laengs in y, USB-C nach unten) in einer Tasche, Buck: Rastrahmen
+  translate([tc_pos[0], tc_pos[1], 0]) tc_tasche();
   translate([buck_pos[0], buck_pos[1], 0]) rastrahmen(buck_l, buck_b, 0.01, buck_h - 0.6);
-  // BME-Kammer: Trennwaende bis kurz vor das Glas, Sensorhalter
-  kh = D - glas_hinten - 0.4;
-  translate([bme_kam[0] + bme_kam[2], bme_kam[1], 0]) cube([1.6, bme_kam[3] + 1.6, kh]);
-  translate([bme_kam[0], bme_kam[1] + bme_kam[3], 0]) cube([bme_kam[2] + 1.6, 1.6, kh]);
+  // BME-Kammer: obere Wand bis 1 mm vor das Glas, kurze Wand steht unter der
+  // Glas-Auflage des Rahmens und endet 1 mm davor. Kabeldurchlass oben rechts
+  // am Boden (Richtung Driver Board).
+  kh = D - glas_hinten - 1.0;
+  kh_kurz = D - auflage_hinten - 1.0;
+  translate([bme_kam[0] + bme_kam[2], bme_kam[1], 0]) cube([1.6, bme_kam[3] + 1.6, kh_kurz]);
+  difference() {
+    translate([bme_kam[0], bme_kam[1] + bme_kam[3], 0]) cube([bme_kam[2] + 1.6, 1.6, kh]);
+    translate([bme_kam[0] + bme_kam[2] - 8, bme_kam[1] + bme_kam[3] - 1, -1]) cube([6, 4, 5]);
+  }
   translate([bme_pos[0] - 1, bme_pos[1] - 1.6, 0]) difference() {
     cube([bme_l + 2, 5, 6]);
     translate([1, 1.6, 1]) cube([bme_l + 0.2, 1.7, 6]);
@@ -177,6 +195,19 @@ module deckel_inhalt() {
     cube([16, 24, 4]);
     translate([8, 6, -0.01]) rotate([0, 0, 90]) langloch(9, 9.5, 3);
   }
+}
+
+// Tasche fuer den TC4056: Auflagepads, seitliche Fuehrungen mit je einer
+// Rastnase, Anschlag hinten (stuetzt die Buchse beim Einstecken ab; niedrig,
+// damit die Kabel an den Loetpads oben frei bleiben). Lokal: Platine von
+// (0, 0) bis (tc_b, tc_l), Buchse bei y = 0.
+module tc_tasche(pad = 1) {
+  h = pad + tc_t;
+  for (x = [0, tc_b - 4], y = [0, tc_l - 4]) translate([x, y, 0]) cube([4, 4, pad]);
+  for (x = [-tol - 1.2, tc_b + tol]) translate([x, tc_l / 2 + 5, 0]) cube([1.2, tc_l / 2 - 5 + tol + 1.6, h + 0.6]);
+  translate([-tol, tc_l / 2, 0]) rotate([0, 0, -90]) rastnase(h, 6);
+  translate([tc_b + tol, tc_l / 2, 0]) rotate([0, 0, 90]) rastnase(h, 6);
+  translate([-tol - 1.2, tc_l + tol, 0]) cube([tc_b + 2 * tol + 2.4, 1.6, h]);
 }
 
 module deckel_lokal() {
@@ -201,6 +232,8 @@ module ada_k()  { translate([0, 0, ada_h_st]) cube([ada_l, ada_b, 1.6]);
                   translate([3, 3, ada_h_st + 1.6]) cube([ada_l - 6, ada_b - 6, ada_h - 1.6]); }
 module tc_k()   { translate([0, 0, 1]) cube([tc_b, tc_l, tc_t]);
                   translate([tc_b / 2 - 4.5, -0.5, 1 + tc_t]) cube([9, 7.5, usbc_h - 0.5]); }
+module buck_k() { translate([0, 0, 0.01]) cube([buck_l, buck_b, buck_h - 0.6]);   // Rastkante bei buck_h - 0,6
+                  translate([1, 1, 0.01]) cube([buck_l - 2, buck_b - 2, buck_h]); }
 module bme_k()  { translate([bme_pos[0], bme_pos[1], 1]) cube([bme_l, 1.6, bme_b]); }
 
 module gruppe_lokal(g) {
@@ -208,7 +241,7 @@ module gruppe_lokal(g) {
   if (g == "lipo") translate([lipo_pos[0], lipo_pos[1], 0]) cube([lipo_l, lipo_b, lipo_t]);
   if (g == "ada") translate([ada_pos[0], ada_pos[1], 0]) ada_k();
   if (g == "tc") translate([tc_pos[0], tc_pos[1], 0]) tc_k();
-  if (g == "buck") translate([buck_pos[0], buck_pos[1], 0]) cube([buck_l, buck_b, buck_h]);
+  if (g == "buck") translate([buck_pos[0], buck_pos[1], 0]) buck_k();
   if (g == "bme") bme_k();
 }
 
@@ -241,6 +274,7 @@ if (teil == "cut") {
   else
     projection(cut = true) translate([0, 0, -cut_z]) gruppe_3d(gruppe);
 }
+else if (teil == "kollision") intersection() { gruppe_3d(gruppe); gruppe_3d(gruppe2); }
 else if (teil == "rahmen") rahmen();
 else if (teil == "deckel") translate([0, 0, deckel_t]) deckel_lokal();
 else if (teil == "schnitt") {

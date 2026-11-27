@@ -145,7 +145,7 @@ AstroOyInk/
 │   ├── gehaeuse_tisch.scad        # Sockel + Bodenplatte, Display im 15°-Schlitz
 │   ├── gehaeuse_wand.scad         # Frontrahmen + Rueckdeckel, Schluesselloecher
 │   ├── export_stl.sh              # → stl/*.stl
-│   ├── pruefe_kollision.sh        # Tisch: alle Teile paarweise schneiden, vor jedem Druck
+│   ├── pruefe_kollision.sh        # [tisch|wand]: alle Teile paarweise schneiden, vor jedem Druck
 │   └── README.md                  # Teileliste, Druck, Montage
 │
 ├── docs/images/                   # README-Grafiken + Vorschau-PNGs,

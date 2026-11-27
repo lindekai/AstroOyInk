@@ -58,33 +58,28 @@ M 2,-11.3 L 3.2,-11.3 L 3.2,-122.5 L 2,-122.5 z
 <circle cx="171.8" cy="467.6" r="11" fill="#C8102E"/>
 <text x="171.8" y="472.1" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">5</text>
 <text x="300.0" y="120.0" font-size="15" text-anchor="start" fill="#1B1B1B" font-weight="800">Schnitt B–B</text>
-<text x="300.0" y="138.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">TC4056 und Akku (x = 126)</text>
+<text x="300.0" y="138.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">TC4056 und USB-C (x = 47)</text>
 <g><g transform="translate(330.0,520.0) scale(2.6)"><path d="
-M 3.5,-120.1 L 21,-120.1 L 21,-88.1 L 16,-88.1 L 16,-86.5 L 21,-86.5
- L 21,-39.5 L 16,-39.5 L 16,-37.9 L 21,-37.9 L 21,-0 L 23.5,-0
- L 23.5,-133.8 L 21,-133.8 L 21,-128.5 L 19,-128.5 L 19,-127.3 L 21,-127.3
- L 21,-121.6 L 3.5,-121.6 z
+M 3.5,-120.1 L 17,-120.1 L 17,-103.8 L 21,-103.8 L 21,-37.4 L 18.4,-37.4
+ L 18.4,-35.8 L 21,-35.8 L 21,-0 L 23.5,-0 L 23.5,-133.8 L 21,-133.8
+ L 21,-128.5 L 19,-128.5 L 19,-127.8 L 17,-127.8 L 17,-121.6 L 3.5,-121.6
+ z
 " fill="url(#hatchB)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
-M 11,-40 L 21,-40 L 21,-86 L 11,-86 z
-" fill="#B8BEC8" stroke="#6E7686" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/><path d="
 M 14.9,-5 L 18.4,-5 L 18.4,-5.5 L 20,-5.5 L 20,-35.5 L 18.4,-35.5
  L 18.4,-12.5 L 14.9,-12.5 z
 " fill="#2252A8" stroke="#173A78" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/><path d="
-M 0,-1.2 L 1.2,-0 L 14,-0 L 14,-5 L 2,-5 L 2,-5.01
- L 4,-5.01 L 4,-11 L 2,-11 L 2,-20.62 L 0.00999928,-18.63 L 0,-18.63
+M 0,-1.2 L 1.2,-0 L 12.9,-0 L 12.9,-4 L 14,-4 L 14,-5
+ L 2,-5 L 2,-5.01 L 4,-5.01 L 4,-11 L 2,-11 L 2,-20.62
+ L 0.00999928,-18.63 L 0,-18.63 z
+M 0,-121.15 L 0.00999928,-121.15 L 2,-119.16 L 2,-122.8 L 4,-122.8 L 4,-128.8
+ L 21,-128.8 L 21,-133.8 L 1.2,-133.8 L 0,-132.6 z
+M 18.8,-4 L 19.9,-4 L 19.9,-0 L 21,-0 L 21,-5 L 18.8,-5
  z
-M 0,-121.15 L 0.00999928,-121.15 L 2,-119.16 L 2,-128.8 L 21,-128.8 L 21,-133.8
- L 1.2,-133.8 L 0,-132.6 z
-M 18.8,-0 L 21,-0 L 21,-5 L 18.8,-5 z
 " fill="url(#hatchA)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
 M 2,-11.3 L 3.2,-11.3 L 3.2,-122.5 L 2,-122.5 z
 " fill="#1E1E22" stroke="#1E1E22" stroke-width="0.2" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
 <path d="M372.6,525.2 L372.6,551.2" fill="none" stroke="#C8102E" stroke-width="1.6" marker-end="url(#pfeilR)" stroke-linecap="round" stroke-linejoin="round"/>
 <text x="372.6" y="559.0" font-size="11" text-anchor="middle" fill="#C8102E" font-weight="700">USB-C</text>
-<circle cx="371.6" cy="358.8" r="2.6" fill="#1B1B1B"/>
-<line x1="371.6" y1="358.8" x2="431.6" y2="328.8" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
-<circle cx="431.6" cy="328.8" r="11" fill="#C8102E"/>
-<text x="431.6" y="333.3" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">7</text>
 <circle cx="380.7" cy="468.0" r="2.6" fill="#1B1B1B"/>
 <line x1="380.7" y1="468.0" x2="440.7" y2="498.0" stroke="#1B1B1B" stroke-width="1" stroke-linecap="round"/>
 <circle cx="440.7" cy="498.0" r="11" fill="#C8102E"/>
@@ -92,11 +87,11 @@ M 2,-11.3 L 3.2,-11.3 L 3.2,-122.5 L 2,-122.5 z
 <text x="540.0" y="120.0" font-size="15" text-anchor="start" fill="#1B1B1B" font-weight="800">Schnitt E–E</text>
 <text x="540.0" y="138.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">Driver Board und Schlüsselloch (x = 40)</text>
 <g><g transform="translate(570.0,520.0) scale(2.6)"><path d="
-M 3.5,-13.3 L 21,-13.3 L 21,-6.5 L 19,-6.5 L 19,-5.3 L 21,-5.3
+M 3.5,-120.1 L 17,-120.1 L 17,-103.8 L 21,-103.8 L 21,-37.4 L 17.8,-37.4
+ L 17.8,-25.5 L 21,-25.5 L 21,-23.5 L 17,-23.5 L 17,-17.5 L 21,-17.5
  L 21,-0 L 23.5,-0 L 23.5,-105.3 L 21.01,-105.3 L 21.01,-105.05 L 18.01,-105.05
  L 18.01,-123.55 L 21.01,-123.55 L 21.01,-121.05 L 23.5,-121.05 L 23.5,-133.8 L 21,-133.8
  L 21,-128.5 L 19,-128.5 L 19,-127.8 L 17,-127.8 L 17,-121.6 L 3.5,-121.6
- L 3.5,-120.1 L 17,-120.1 L 17,-103.8 L 21,-103.8 L 21,-14.8 L 3.5,-14.8
  z
 " fill="url(#hatchB)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/><path d="
 M 7.4,-50 L 9,-50 L 9,-51.3 L 18,-51.3 L 18,-53.8 L 9,-53.8
@@ -125,10 +120,10 @@ M 2,-11.3 L 3.2,-11.3 L 3.2,-122.5 L 2,-122.5 z
 <text x="677.2" y="532.4" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">14</text>
 <text x="840.0" y="120.0" font-size="15" text-anchor="start" fill="#1B1B1B" font-weight="800">Detail C – BME280-Kammer</text>
 <text x="840.0" y="138.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">Seitenschnitt durch die Kammer (x = 19), 6 : 1</text>
-<clipPath id="clip63"><rect x="852.0" y="240.0" width="174.0" height="216.0"/></clipPath>
-<g clip-path="url(#clip63)"><g transform="translate(870.0,420.0) scale(6.0)"><path d="
+<clipPath id="clip59"><rect x="852.0" y="240.0" width="174.0" height="216.0"/></clipPath>
+<g clip-path="url(#clip59)"><g transform="translate(870.0,420.0) scale(6.0)"><path d="
 M 3.5,-120.1 L 21,-120.1 L 21,-68.75 L 6,-68.75 L 6,-60.75 L 21,-60.75
- L 21,-22.6 L 3.6,-22.6 L 3.6,-21 L 21,-21 L 21,-10.9 L 15,-10.9
+ L 21,-22.6 L 4.2,-22.6 L 4.2,-21 L 21,-21 L 21,-10.9 L 15,-10.9
  L 15,-9.2 L 20,-9.2 L 20,-7.5 L 15,-7.5 L 15,-5.9 L 21,-5.9
  L 21,-0 L 23.5,-0 L 23.5,-133.8 L 21,-133.8 L 21,-128.5 L 19,-128.5
  L 19,-127.3 L 21,-127.3 L 21,-121.6 L 3.5,-121.6 z
@@ -165,8 +160,7 @@ M 2,-11.3 L 3.2,-11.3 L 3.2,-122.5 L 2,-122.5 z
 <text x="50.0" y="640.0" font-size="15" text-anchor="start" fill="#1B1B1B" font-weight="800">Durchsicht von vorne</text>
 <text x="50.0" y="658.0" font-size="11.5" text-anchor="start" fill="#5B6472" font-weight="400">Glas ausgeblendet, Bauteile auf dem Deckel · 3 : 1</text>
 <g><g transform="translate(70.0,1091.4) scale(3.0)"><path d="
-M 5,-21 L 36,-21 L 36,-5 L 37.6,-5 L 37.6,-22.6 L 5,-22.6
- z
+M 5,-21 L 28,-21 L 28,-22.6 L 5,-22.6 z
 M 5.3,-24 L 5.9,-24 L 5.9,-23 L 7.4,-23 L 7.4,-114.2 L 6.5,-114.2
  L 6.5,-122.936 L 6.36933,-123.023 L 6.02513,-123.325 L 5.72326,-123.669 L 5.46891,-124.05 L 5.3,-124.393
  z
@@ -199,13 +193,28 @@ M 135.65,-109.8 L 135.65,-118.8 L 135.691,-119.42 L 135.812,-120.029 L 135.836,-
  L 140.4,-105.05 L 139.78,-105.091 L 139.171,-105.212 L 138.582,-105.412 L 138.025,-105.686 L 137.508,-106.032
  L 137.041,-106.441 L 136.632,-106.908 L 136.286,-107.425 L 136.012,-107.982 L 135.812,-108.571 L 135.691,-109.18
  z
-M 11,-5.9 L 26,-5.9 L 26,-10.9 L 11,-10.9 z
-M 12,-7.5 L 12,-9.2 L 25.2,-9.2 L 25.2,-7.5 z
+M 12,-5.9 L 27,-5.9 L 27,-10.9 L 12,-10.9 z
+M 13,-7.5 L 13,-9.2 L 26.2,-9.2 L 26.2,-7.5 z
 M 18.3,-60.75 L 19.7,-60.75 L 19.7,-68.75 L 18.3,-68.75 z
 M 20,-55 L 23,-55 L 23,-74.5 L 20,-74.5 z
-M 39,-5.3 L 118,-5.3 L 118,-6.5 L 39,-6.5 z
-M 39,-13.3 L 70.4,-13.3 L 70.4,-14.8 L 39,-14.8 z
+M 34,-21 L 36,-21 L 36,-5 L 37.6,-5 L 37.6,-22.6 L 34,-22.6
+ z
+M 39.3,-17.5 L 40.7,-17.5 L 40.7,-23.5 L 39.3,-23.5 z
+M 39.5,-25.5 L 40.7,-25.5 L 40.7,-35.8 L 53.3,-35.8 L 53.3,-25.5 L 54.5,-25.5
+ L 54.5,-37.4 L 39.5,-37.4 z
+M 41,-5.5 L 45,-5.5 L 45,-9.5 L 41,-9.5 z
+M 41,-31.5 L 45,-31.5 L 45,-35.5 L 41,-35.5 z
+M 49,-5.5 L 53,-5.5 L 53,-9.5 L 49,-9.5 z
+M 49,-31.5 L 53,-31.5 L 53,-35.5 L 49,-35.5 z
+M 53.3,-17.5 L 54.7,-17.5 L 54.7,-23.5 L 53.3,-23.5 z
+M 55,-5.3 L 170.082,-5.3 L 169.825,-5.52513 L 169.523,-5.86933 L 169.269,-6.25 L 169.146,-6.5
+ L 55,-6.5 z
+M 56.5,-26 L 57.7,-26 L 57.7,-34 L 56.5,-34 z
+M 58,-13.3 L 70.4,-13.3 L 70.4,-14.8 L 58,-14.8 z
+M 60,-22.3 L 66,-22.3 L 66,-23.7 L 60,-23.7 z
+M 60,-36.3 L 66,-36.3 L 66,-37.7 L 60,-37.7 z
 M 65.3,-55 L 68.3,-55 L 68.3,-74.5 L 65.3,-74.5 z
+M 68.3,-26 L 69.5,-26 L 69.5,-34 L 68.3,-34 z
 M 68.6,-60.75 L 70,-60.75 L 70,-68.75 L 68.6,-68.75 z
 M 74.9,-17.5 L 74.9257,-17.1084 L 75.0022,-16.7235 L 75.1284,-16.352 L 75.3019,-16 L 75.5199,-15.6737
  L 75.7787,-15.3787 L 76.0737,-15.1199 L 76.4,-14.9019 L 76.752,-14.7284 L 77.1235,-14.6022 L 77.5084,-14.5257
@@ -246,20 +255,7 @@ M 99.9,-28.5 L 99.9257,-28.1084 L 100.002,-27.7235 L 100.128,-27.352 L 100.302,-
  L 102.9,-31.5 L 102.508,-31.4743 L 102.124,-31.3978 L 101.752,-31.2716 L 101.4,-31.0981 L 101.074,-30.8801
  L 100.779,-30.6213 L 100.52,-30.3263 L 100.302,-30 L 100.128,-29.648 L 100.002,-29.2765 L 99.9257,-28.8916
  z
-M 110.4,-13.3 L 116,-13.3 L 116,-14.8 L 110.4,-14.8 z
-M 118.3,-17.5 L 119.7,-17.5 L 119.7,-23.5 L 118.3,-23.5 z
-M 120,-5.5 L 124,-5.5 L 124,-9.5 L 120,-9.5 z
-M 120,-31.5 L 124,-31.5 L 124,-35.5 L 120,-35.5 z
-M 128,-5.5 L 132,-5.5 L 132,-9.5 L 128,-9.5 z
-M 128,-31.5 L 132,-31.5 L 132,-35.5 L 128,-35.5 z
-M 132.3,-17.5 L 133.7,-17.5 L 133.7,-23.5 L 132.3,-23.5 z
-M 134,-5.3 L 170.082,-5.3 L 169.825,-5.52513 L 169.523,-5.86933 L 169.269,-6.25 L 169.146,-6.5
- L 134,-6.5 z
-M 136.5,-12 L 137.7,-12 L 137.7,-20 L 136.5,-20 z
-M 140,-8.3 L 146,-8.3 L 146,-9.7 L 140,-9.7 z
-M 140,-22.3 L 146,-22.3 L 146,-23.7 L 140,-23.7 z
-M 148.3,-12 L 149.5,-12 L 149.5,-20 L 148.3,-20 z
-M 153,-13.3 L 163.5,-13.3 L 163.5,-14.8 L 153,-14.8 z
+M 110.4,-13.3 L 163.5,-13.3 L 163.5,-14.8 L 110.4,-14.8 z
 M 173.4,-17.3 L 174.3,-17.3 L 174.3,-10.864 L 174.431,-10.7767 L 174.775,-10.4749 L 175.077,-10.1307
  L 175.331,-9.75 L 175.5,-9.40748 L 175.5,-124.393 L 175.331,-124.05 L 175.077,-123.669 L 174.775,-123.325
  L 174.431,-123.023 L 174.3,-122.936 L 174.3,-116.5 L 173.4,-116.5 z
@@ -280,13 +276,13 @@ M 20,-50 L 68.3,-50 L 68.3,-79.5 L 20,-79.5 z
 M 74.4,-14 L 106.4,-14 L 106.4,-32 L 74.4,-32 z
 " fill="#1F4FA0" stroke="#123468" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
 <g><g transform="translate(70.0,1091.4) scale(3.0)"><path d="
-M 120,-5.5 L 132,-5.5 L 132,-35.5 L 120,-35.5 z
+M 41,-5.5 L 53,-5.5 L 53,-35.5 L 41,-35.5 z
 " fill="#2252A8" stroke="#173A78" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
 <g><g transform="translate(70.0,1091.4) scale(3.0)"><path d="
-M 138,-10 L 148,-10 L 148,-22 L 138,-22 z
+M 58,-24 L 68,-24 L 68,-36 L 58,-36 z
 " fill="#1D4E9A" stroke="#123468" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
 <g><g transform="translate(70.0,1091.4) scale(3.0)"><path d="
-M 12,-7.5 L 25,-7.5 L 25,-9.1 L 12,-9.1 z
+M 13,-7.5 L 26,-7.5 L 26,-9.1 L 13,-9.1 z
 " fill="#6B2C8F" stroke="#4A1E63" stroke-width="0.3" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
 <g><g transform="translate(70.0,1091.4) scale(3.0)"><path d="
 M 0,-6 L 0.0513306,-5.21684 L 0.204445,-4.44709 L 0.456722,-3.7039 L 0.803847,-3 L 1.23988,-2.34743
@@ -390,16 +386,16 @@ M 171,-125.8 L 171.011,-125.97 L 171.044,-126.136 L 171.099,-126.297 L 171.174,-
 " fill="url(#hatchA)" stroke="#3D3A33" stroke-width="0.35" fill-rule="evenodd" stroke-linejoin="round"/></g></g>
 <path d="M341.2,1057.5 L341.2,1043.4" fill="none" stroke="#D9822B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M389.2,1022.4 L406.0,1001.4 L406.0,959.4 L274.9,899.4" fill="none" stroke="#B9BEC8" stroke-width="3.4" stroke-dasharray="2 2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M448.0,1094.4 L448.0,1118.4" fill="none" stroke="#C8102E" stroke-width="1.6" marker-end="url(#pfeilR)" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="456.0" y="1119.4" font-size="11" text-anchor="start" fill="#C8102E" font-weight="700">USB-C Laden</text>
+<path d="M211.0,1094.4 L211.0,1118.4" fill="none" stroke="#C8102E" stroke-width="1.6" marker-end="url(#pfeilR)" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="219.0" y="1119.4" font-size="11" text-anchor="start" fill="#C8102E" font-weight="700">USB-C Laden</text>
 <circle cx="202.0" cy="896.4" r="11" fill="#C8102E"/>
 <text x="202.0" y="900.9" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">6</text>
 <circle cx="472.0" cy="902.4" r="11" fill="#C8102E"/>
 <text x="472.0" y="906.9" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">7</text>
-<circle cx="448.0" cy="1025.4" r="11" fill="#C8102E"/>
-<text x="448.0" y="1029.9" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">8</text>
-<circle cx="499.0" cy="1043.4" r="11" fill="#C8102E"/>
-<text x="499.0" y="1047.9" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">9</text>
+<circle cx="211.0" cy="1025.4" r="11" fill="#C8102E"/>
+<text x="211.0" y="1029.9" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">8</text>
+<circle cx="259.0" cy="1001.4" r="11" fill="#C8102E"/>
+<text x="259.0" y="1005.9" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">9</text>
 <circle cx="341.2" cy="1022.4" r="11" fill="#C8102E"/>
 <text x="341.2" y="1026.9" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">5</text>
 <circle cx="127.0" cy="1064.4" r="11" fill="#C8102E"/>
@@ -435,10 +431,10 @@ M 171,-125.8 L 171.011,-125.97 L 171.044,-126.136 L 171.099,-126.297 L 171.174,-
 <text x="756.0" y="866.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">LiPo 68 × 46 × 10 in Mulde, zwei Rastnasenpaare halten die Zelle ohne Druck.</text>
 <circle cx="734.0" cy="893.0" r="11" fill="#C8102E"/>
 <text x="734.0" y="897.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">8</text>
-<text x="756.0" y="897.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">TC4056 im Rastrahmen, USB-C an der Unterkante – der einzige Anschluss.</text>
+<text x="756.0" y="897.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">TC4056 links in einer Tasche mit Anschlag, USB-C unten – Wand außen auf 1 mm ausgespart.</text>
 <circle cx="734.0" cy="924.0" r="11" fill="#C8102E"/>
 <text x="734.0" y="928.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">9</text>
-<text x="756.0" y="928.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">TPS62827-Buck im Rastrahmen.</text>
+<text x="756.0" y="928.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">TPS62827-Buck im Rastrahmen über dem TC4056 – kurze Wege zum ESP32.</text>
 <circle cx="734.0" cy="955.0" r="11" fill="#C8102E"/>
 <text x="734.0" y="959.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">10</text>
 <text x="756.0" y="959.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">BME280 steht senkrecht im Halter direkt über den Schlitzen der Unterkante.</text>
@@ -447,7 +443,7 @@ M 171,-125.8 L 171.011,-125.97 L 171.044,-126.136 L 171.099,-126.297 L 171.174,-
 <text x="756.0" y="990.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Lüftungsschlitze: 5 × Unterkante, 3 × linke Seite – warme Luft zieht seitlich ab.</text>
 <circle cx="734.0" cy="1017.0" r="11" fill="#C8102E"/>
 <text x="734.0" y="1021.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">12</text>
-<text x="756.0" y="1021.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Trennwände der Kammer reichen bis kurz vor das Glas.</text>
+<text x="756.0" y="1021.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Trennwände enden 1 mm vor Glas bzw. Glasauflage, Kabeldurchlass Richtung ESP32.</text>
 <circle cx="734.0" cy="1048.0" r="11" fill="#C8102E"/>
 <text x="734.0" y="1052.5" font-size="12" text-anchor="middle" fill="#FFFFFF" font-weight="800">13</text>
 <text x="756.0" y="1052.0" font-size="12.5" text-anchor="start" fill="#1B1B1B" font-weight="400">Zwei Schlüssellöcher (Abstand 100 mm) mit Polster für den Schraubenkopf.</text>

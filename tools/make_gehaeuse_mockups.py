@@ -441,11 +441,11 @@ WAND_LEGENDE = [
     "FPC-Adapter auf 4 Abstandshaltern (M2,5), 200-mm-Kabel gefaltet zum Board.",
     "Driver Board auf zwei Stegen, Rastnasen an den Stirnseiten, Stiftleisten frei.",
     "LiPo 68 × 46 × 10 in Mulde, zwei Rastnasenpaare halten die Zelle ohne Druck.",
-    "TC4056 im Rastrahmen, USB-C an der Unterkante – der einzige Anschluss.",
-    "TPS62827-Buck im Rastrahmen.",
+    "TC4056 links in einer Tasche mit Anschlag, USB-C unten – Wand außen auf 1 mm ausgespart.",
+    "TPS62827-Buck im Rastrahmen über dem TC4056 – kurze Wege zum ESP32.",
     "BME280 steht senkrecht im Halter direkt über den Schlitzen der Unterkante.",
     "Lüftungsschlitze: 5 × Unterkante, 3 × linke Seite – warme Luft zieht seitlich ab.",
-    "Trennwände der Kammer reichen bis kurz vor das Glas.",
+    "Trennwände enden 1 mm vor Glas bzw. Glasauflage, Kabeldurchlass Richtung ESP32.",
     "Zwei Schlüssellöcher (Abstand 100 mm) mit Polster für den Schraubenkopf.",
     "4 × M3-Senkkopf durch den Deckel in die Dome – von vorne keine Schraube sichtbar.",
 ]
@@ -479,12 +479,11 @@ def wand_schnitt(out):
 
     # --- B-B TC4056 + Akku ------------------------------------------------
     B = View(s, 330, base_y, k)
-    title_block(s, 300, 120, "Schnitt B–B", "TC4056 und Akku (x = 126)")
-    B.draw(f, ["deckel", "lipo", "tc", "rahmen", "panel"], cut_x=126)
+    title_block(s, 300, 120, "Schnitt B–B", "TC4056 und USB-C (x = 47)")
+    B.draw(f, ["deckel", "tc", "rahmen", "panel"], cut_x=47)
     B.path([(D - 4.6, -2), (D - 4.6, -12)], RED, 1.6, marker="pfeilR")
     tx, ty = B.P(D - 4.6, -15)
     s.text(tx, ty, "USB-C", 11, "middle", RED, 700)
-    B.callout(7, 16, 62, 60, -30)
     B.callout(8, 19.5, 20, 60, 30)
 
     # --- E-E Board + Schluesselloch --------------------------------------
@@ -520,10 +519,10 @@ def wand_schnitt(out):
     V.draw(f, ["rahmen"], cut_z=12)
     V.path([(90.4, 11.3), (90.4, 16)], "#D9822B", 2.2)
     V.path([(106.4, 23), (112, 30), (112, 44), (68.3, 64)], "#B9BEC8", 3.4, dash="2 2")
-    V.path([(126, -1), (126, -9)], RED, 1.6, marker="pfeilR")
-    tx, ty = V.P(126, -6)
+    V.path([(47, -1), (47, -9)], RED, 1.6, marker="pfeilR")
+    tx, ty = V.P(47, -6)
     s.text(tx + 8, ty + 10, "USB-C Laden", 11, "start", RED, 700)
-    for (u, v, n) in ((44, 65, 6), (134, 63, 7), (126, 22, 8), (143, 16, 9), (90.4, 23, 5), (19, 9, 10),
+    for (u, v, n) in ((44, 65, 6), (134, 63, 7), (47, 22, 8), (63, 30, 9), (90.4, 23, 5), (19, 9, 10),
                       (40.4, 114, 13), (140.4, 114, 13)):
         marker(s, *V.P(u, v), n)
     V.dim(0, 0, Wd, 0, f"{Wd:.1f}", off=(0, 30))

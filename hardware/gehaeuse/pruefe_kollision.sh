@@ -1,25 +1,34 @@
 #!/usr/bin/env bash
-# Prueft das Tischgehaeuse auf Ueberschneidungen: jedes Paar aus Druckteilen,
+# Prueft ein Gehaeuse auf Ueberschneidungen: jedes Paar aus Druckteilen,
 # Display und Elektronik wird geschnitten (teil="kollision"). Flaechenkontakt
 # (0 mm³, z. B. Platine liegt auf Steg) ist gewollt, alles darueber nicht.
-# Aufruf: hardware/gehaeuse/pruefe_kollision.sh   (OpenSCAD-Pfad per $OPENSCAD)
+# Aufruf: hardware/gehaeuse/pruefe_kollision.sh [tisch|wand]   (Default tisch,
+#         OpenSCAD-Pfad per $OPENSCAD)
 set -euo pipefail
 cd "$(dirname "$0")"
 OPENSCAD="${OPENSCAD:-/Applications/OpenSCAD-2021.01.app/Contents/MacOS/OpenSCAD}"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-GRUPPEN=(sockel boden panel drv lipo ada tc buck bme)
+case "${1:-tisch}" in
+  tisch) SCAD=gehaeuse_tisch.scad; GRUPPEN=(sockel boden panel drv lipo ada tc buck bme) ;;
+  wand)  SCAD=gehaeuse_wand.scad;  GRUPPEN=(rahmen deckel panel drv lipo ada tc buck bme) ;;
+  *) echo "Aufruf: $0 [tisch|wand]"; exit 2 ;;
+esac
+echo "[PRUEFE] $SCAD"
 fehler=0
 for ((i = 0; i < ${#GRUPPEN[@]}; i++)); do
   for ((j = i + 1; j < ${#GRUPPEN[@]}; j++)); do
     a=${GRUPPEN[i]}; b=${GRUPPEN[j]}
+    rm -f "$TMP/k.stl"
     out=$("$OPENSCAD" -D "teil=\"kollision\"" -D "gruppe=\"$a\"" -D "gruppe2=\"$b\"" \
-          -o "$TMP/k.stl" gehaeuse_tisch.scad 2>&1 || true)
-    if echo "$out" | grep -qi "empty"; then continue; fi
+          -o "$TMP/k.stl" "$SCAD" 2>&1 || true)
+    if echo "$out" | grep -qi "empty" || [ ! -s "$TMP/k.stl" ]; then continue; fi
     erg=$(python3 - "$TMP/k.stl" <<'PY'
 import re, sys
 v = [tuple(map(float, m)) for m in re.findall(r"vertex\s+(\S+)\s+(\S+)\s+(\S+)", open(sys.argv[1]).read())]
+if not v:
+    print("0.0 leer"); sys.exit()
 vol = 0.0
 for i in range(0, len(v), 3):
     a, b, c = v[i:i + 3]

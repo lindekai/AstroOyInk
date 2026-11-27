@@ -22,7 +22,7 @@ KEY_DX = 50            # schluessel = [W/2 -+ 50, H - 24]
 KEY_Y = H - 24         # Mitte der Einhaengebohrung (Kopf rein)
 KEY_SLOT = 9           # Langloch nach oben, Schraube sitzt am oberen Ende
 KEY_HEAD_D, KEY_SLOT_W = 9, 4.5
-USB_X = 120 + 12 / 2   # tc_pos[0] + tc_b / 2, Frontansicht
+USB_X = 41 + 12 / 2    # tc_pos[0] + tc_b / 2, Frontansicht
 SCREW_Y = KEY_Y + KEY_SLOT   # Lage der Schraube, wenn das Geraet haengt
 
 # --- Blatt ----------------------------------------------------------------
